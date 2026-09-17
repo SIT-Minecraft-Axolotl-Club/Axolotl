@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { PlusIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	defineMessages,
@@ -11,7 +10,6 @@ import { onUnmounted, shallowRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { NewInstanceImage } from '@/assets/icons'
-import { useNetworkStatus } from '@/composables/useNetworkStatus'
 import { DIRECT_LINKS_SYNCED_EVENT } from '@/helpers/direct-link-sync'
 import { instance_listener } from '@/helpers/events.js'
 import { list } from '@/helpers/instance'
@@ -32,6 +30,7 @@ const messages = defineMessages({
 	shared: { id: 'app.library.tabs.shared', defaultMessage: 'Shared with me' },
 	saved: { id: 'app.library.tabs.saved', defaultMessage: 'Saved' },
 	noInstances: { id: 'app.library.no-instances', defaultMessage: 'No instances found' },
+	home: { id: 'app.navigation.home', defaultMessage: 'Home' },
 	createInstance: {
 		id: 'app.library.create-instance',
 		defaultMessage: 'Create new instance',
@@ -48,8 +47,6 @@ const refreshInstances = async () => {
 
 window.addEventListener(DIRECT_LINKS_SYNCED_EVENT, refreshInstances)
 
-const { offline } = useNetworkStatus()
-
 const unlistenInstance = await instance_listener(async () => {
 	await refreshInstances()
 })
@@ -63,14 +60,7 @@ onUnmounted(() => {
 	<div data-onboarding-id="library-content" class="p-6 flex flex-col gap-3">
 		<h1 class="m-0 text-2xl hidden">{{ formatMessage(messages.library) }}</h1>
 		<NavTabs
-			:links="[
-				{ label: formatMessage(messages.allInstances), href: `/library` },
-				{ label: formatMessage(messages.modpacks), href: `/library/modpacks` },
-				{ label: formatMessage(messages.servers), href: `/library/servers` },
-				{ label: formatMessage(messages.custom), href: `/library/custom` },
-				{ label: formatMessage(messages.shared), href: `/library/shared`, shown: false },
-				{ label: formatMessage(messages.saved), href: `/library/saved`, shown: false },
-			]"
+			:links="[{ label: formatMessage(messages.allInstances), href: `/library` }]"
 		/>
 		<template v-if="instances && instances.length > 0">
 			<RouterView v-if="route.path.startsWith('/library')" :instances="instances" />
@@ -81,13 +71,8 @@ onUnmounted(() => {
 			</div>
 			<h3>{{ formatMessage(messages.noInstances) }}</h3>
 			<ButtonStyled color="brand">
-				<button
-					data-onboarding-id="create-instance"
-					:disabled="offline"
-					@click="router.push('/create')"
-				>
-					<PlusIcon />
-					{{ formatMessage(messages.createInstance) }}
+				<button @click="router.push('/')">
+					{{ formatMessage(messages.home) }}
 				</button>
 			</ButtonStyled>
 		</div>

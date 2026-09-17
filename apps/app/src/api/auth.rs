@@ -20,13 +20,14 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             browser_login,
             begin_device_login,
             poll_device_login,
+            begin_sitmc_device_login,
+            poll_sitmc_device_login,
             begin_yggdrasil_login,
             finish_yggdrasil_login,
             list_yggdrasil_saved_logins,
             get_yggdrasil_password,
             set_yggdrasil_password,
             delete_yggdrasil_password,
-            add_offline_user,
             remove_user,
             get_default_user,
             set_default_user,
@@ -296,15 +297,24 @@ pub async fn poll_device_login(
 }
 
 #[tauri::command]
+pub async fn begin_sitmc_device_login()
+-> Result<minecraft_auth::SitmcDeviceLoginFlow> {
+    Ok(minecraft_auth::begin_sitmc_device_login().await?)
+}
+
+#[tauri::command]
+pub async fn poll_sitmc_device_login(
+    flow_id: uuid::Uuid,
+) -> Result<minecraft_auth::SitmcDeviceLoginPoll> {
+    Ok(minecraft_auth::poll_sitmc_device_login(flow_id).await?)
+}
+
+#[tauri::command]
 pub async fn begin_yggdrasil_login(
-    api_root: String,
     login: String,
     password: String,
 ) -> Result<minecraft_auth::YggdrasilLoginResult> {
-    Ok(
-        minecraft_auth::begin_yggdrasil_login(&api_root, &login, &password)
-            .await?,
-    )
+    Ok(minecraft_auth::begin_yggdrasil_login(&login, &password).await?)
 }
 
 #[tauri::command]
@@ -329,11 +339,9 @@ pub fn list_yggdrasil_saved_logins() -> Result<Vec<SavedYggdrasilLogin>> {
 }
 
 #[tauri::command]
-pub fn get_yggdrasil_password(
-    api_root: String,
-    login: String,
-) -> Result<Option<String>> {
-    let entry = yggdrasil_password_entry(&api_root, &login)?;
+pub fn get_yggdrasil_password(login: String) -> Result<Option<String>> {
+    let entry =
+        yggdrasil_password_entry(theseus::sitmc::YGGDRASIL_API_ROOT, &login)?;
     match entry.get_password() {
         Ok(password) => Ok(Some(password)),
         Err(keyring::Error::NoEntry) => Ok(None),
@@ -342,15 +350,14 @@ pub fn get_yggdrasil_password(
 }
 
 #[tauri::command]
-pub fn set_yggdrasil_password(
-    api_root: String,
-    login: String,
-    password: String,
-) -> Result<()> {
+pub fn set_yggdrasil_password(login: String, password: String) -> Result<()> {
     if password.is_empty() {
-        return delete_yggdrasil_password(api_root, login);
+        return delete_yggdrasil_password(login);
     }
-    let saved_login = normalize_saved_yggdrasil_login(&api_root, &login)?;
+    let saved_login = normalize_saved_yggdrasil_login(
+        theseus::sitmc::YGGDRASIL_API_ROOT,
+        &login,
+    )?;
     yggdrasil_password_entry(&saved_login.api_root, &saved_login.login)?
         .set_password(&password)
         .map_err(keyring_error)?;
@@ -361,11 +368,11 @@ pub fn set_yggdrasil_password(
 }
 
 #[tauri::command]
-pub fn delete_yggdrasil_password(
-    api_root: String,
-    login: String,
-) -> Result<()> {
-    let saved_login = normalize_saved_yggdrasil_login(&api_root, &login)?;
+pub fn delete_yggdrasil_password(login: String) -> Result<()> {
+    let saved_login = normalize_saved_yggdrasil_login(
+        theseus::sitmc::YGGDRASIL_API_ROOT,
+        &login,
+    )?;
     match yggdrasil_password_entry(&saved_login.api_root, &saved_login.login)?
         .delete_credential()
     {
@@ -491,39 +498,6 @@ fn keyring_error(
     .into()
 }
 
-fn parse_custom_uuid(uuid: Option<String>) -> Result<Option<uuid::Uuid>> {
-    let Some(uuid) = uuid else {
-        return Ok(None);
-    };
-    let uuid = uuid.trim().replace('-', "");
-    if uuid.len() != 32
-        || !uuid.chars().all(|character| character.is_ascii_hexdigit())
-    {
-        return Err(theseus::ErrorKind::InputError(
-            "Custom UUID must be 32 hexadecimal characters; hyphens are optional"
-                .to_string(),
-        )
-        .as_error()
-        .into());
-    }
-
-    Ok(Some(uuid::Uuid::parse_str(&uuid).map_err(|_| {
-        theseus::ErrorKind::InputError("Invalid custom UUID".to_string())
-            .as_error()
-    })?))
-}
-
-#[tauri::command]
-pub async fn add_offline_user(
-    username: String,
-    uuid: Option<String>,
-) -> Result<Credentials> {
-    Ok(
-        minecraft_auth::add_offline_user(&username, parse_custom_uuid(uuid)?)
-            .await?,
-    )
-}
-
 #[tauri::command]
 pub async fn remove_user(user: String) -> Result<()> {
     Ok(minecraft_auth::remove_user(&user).await?)
@@ -587,35 +561,5 @@ mod tests {
         remove_saved_yggdrasil_login(&mut saved_logins, &removed);
 
         assert_eq!(saved_logins, vec![retained]);
-    }
-
-    #[test]
-    fn parses_custom_offline_uuid() {
-        let expected =
-            uuid::Uuid::parse_str("b50ad385-829d-3141-a216-7e7d7539ca7f")
-                .unwrap();
-
-        assert_eq!(
-            parse_custom_uuid(Some(
-                "b50ad385829d3141a2167e7d7539ca7f".to_string()
-            ))
-            .unwrap(),
-            Some(expected)
-        );
-        assert_eq!(
-            parse_custom_uuid(Some(
-                "B50AD385-829D-3141-A216-7E7D7539CA7F".to_string()
-            ))
-            .unwrap(),
-            Some(expected)
-        );
-        assert_eq!(parse_custom_uuid(None).unwrap(), None);
-        assert!(parse_custom_uuid(Some("not-a-uuid".to_string())).is_err());
-        assert!(
-            parse_custom_uuid(Some(
-                "b50ad385829d3141a2167e7d7539ca7".to_string()
-            ))
-            .is_err()
-        );
     }
 }

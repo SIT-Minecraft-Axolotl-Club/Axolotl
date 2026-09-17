@@ -11,6 +11,7 @@ import {
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ref } from 'vue'
 
+import { SitmcConfig } from '@/config'
 import { type PrivacySettings, savePrivacySettings } from '@/helpers/settings'
 
 const emit = defineEmits<{
@@ -128,7 +129,7 @@ defineExpose({ show })
 		<template #actions>
 			<div class="flex items-center justify-between gap-4">
 				<ButtonStyled type="transparent">
-					<button type="button" :disabled="saving" @click="openUrl('https://axlmc.org/privacy')">
+					<button type="button" :disabled="saving" @click="openUrl(SitmcConfig.privacyUrl)">
 						<ExternalIcon />
 						{{ formatMessage(messages.privacyPolicy) }}
 					</button>

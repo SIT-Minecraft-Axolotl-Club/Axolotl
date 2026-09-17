@@ -9,12 +9,6 @@
 					@tab-click="selectTab"
 				/>
 			</div>
-			<ButtonStyled color="brand">
-				<button @click="router.push('/create')">
-					<PlusIcon />
-					{{ formatMessage(messages.newDownload) }}
-				</button>
-			</ButtonStyled>
 		</div>
 
 		<div class="flex flex-wrap items-center gap-2">
@@ -422,7 +416,6 @@ import {
 	ExternalIcon,
 	GlobeIcon,
 	ModrinthIcon,
-	PlusIcon,
 	RefreshCwIcon,
 	SearchIcon,
 	SpinnerIcon,

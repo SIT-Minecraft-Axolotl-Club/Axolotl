@@ -15,12 +15,10 @@ import {
 	NewModal,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, ref } from 'vue'
+import { computed, inject, type Ref,ref } from 'vue'
 
 import { AxolotlBrandConfig } from '@/config'
-import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import i18n from '@/i18n.config'
-import { handleSevereError } from '@/store/error.js'
 
 import { findMinecraftAuthError, type MinecraftAuthError } from './minecraft-auth-errors'
 import { translateMinecraftAuthErrorText } from './minecraft-auth-errors-zh'
@@ -32,6 +30,7 @@ const debugCollapsed = ref(true)
 const copied = ref(false)
 const loadingSignIn = ref(false)
 const { formatMessage } = useVIntl()
+const accountsCard = inject<Ref<{ login?: () => void } | null> | null>('accountsCard', null)
 
 const messages = defineMessages({
 	title: { id: 'app.minecraft-auth.title', defaultMessage: 'Sign in failed' },
@@ -122,21 +121,14 @@ defineExpose({
 })
 
 async function signInAgain() {
+	// The account card owns the SIT-Minecraft sign-in gate, so this modal only
+	// opens it and steps out of the way.
+	loadingSignIn.value = true
 	try {
-		loadingSignIn.value = true
-		const loggedIn = await login_flow({
-			trouble: formatMessage(messages.loginTrouble),
-			browserLogin: formatMessage(messages.loginBrowser),
-			deviceCode: formatMessage(messages.loginDeviceCode),
-		})
-		if (loggedIn) {
-			await set_default_user(loggedIn.account_id)
-		}
-		loadingSignIn.value = false
+		accountsCard?.value?.login?.()
 		modal.value?.hide()
-	} catch (err) {
+	} finally {
 		loadingSignIn.value = false
-		handleSevereError(err)
 	}
 }
 

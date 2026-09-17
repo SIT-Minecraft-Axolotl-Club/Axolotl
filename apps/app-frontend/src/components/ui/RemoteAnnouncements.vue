@@ -14,6 +14,7 @@ import { getVersion } from '@tauri-apps/api/app'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
+import { SitmcConfig } from '@/config'
 import {
 	announcementKey,
 	isAnnouncementActive,
@@ -46,7 +47,7 @@ const messages = defineMessages({
 	previewContent: {
 		id: 'app.remote-announcements.preview-content',
 		defaultMessage:
-			'## Announcement preview\n\nThis is **sample content**, not a published announcement.\n\n- Supports headings, lists, and links\n- Close buttons are always available\n\n> Previewing does not change real announcement read status.\n\n| Type | Display |\n| --- | --- |\n| Modal | Full Markdown content |\n| Popup | Summary, then full content |\n\n[Visit the website](https://axlmc.org)',
+			'## Announcement preview\n\nThis is **sample content**, not a published announcement.\n\n- Supports headings, lists, and links\n- Close buttons are always available\n\n> Previewing does not change real announcement read status.\n\n| Type | Display |\n| --- | --- |\n| Modal | Full Markdown content |\n| Popup | Summary, then full content |\n\n[Visit the website](https://www.sitmc.club/)',
 	},
 	previewAction: { id: 'app.remote-announcements.preview-action', defaultMessage: 'Visit website' },
 })
@@ -203,6 +204,7 @@ function loadCache() {
 }
 async function refresh() {
 	if (inFlight || disposed) return
+	if (!SitmcConfig.announcementsUrl) return
 	inFlight = true
 	lastAttempt = Date.now()
 	const abort = new AbortController()
@@ -211,10 +213,7 @@ async function refresh() {
 	try {
 		if (!endpoint) {
 			const [version, channel] = await Promise.all([getVersion(), getUpdateChannel()])
-			endpoint = new URL(
-				import.meta.env.VITE_AXO_ANNOUNCEMENTS_URL ||
-					'https://admin.axlmc.org/api/public/announcements',
-			)
+			endpoint = new URL(SitmcConfig.announcementsUrl)
 			endpoint.searchParams.set('version', version)
 			endpoint.searchParams.set('channel', channel === 'release' ? 'stable' : 'beta')
 			cacheKey = stateKey + ':cache:' + endpoint.href
@@ -275,7 +274,7 @@ function preview(type: RemoteAnnouncement['type'], withAction = false) {
 		ends_at: null,
 		published_at: now,
 		action_label: withAction ? formatMessage(messages.previewAction) : null,
-		action_url: withAction ? 'https://axlmc.org' : null,
+		action_url: withAction ? 'https://www.sitmc.club/' : null,
 	}
 	read.clear()
 	reminded.clear()

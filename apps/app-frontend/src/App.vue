@@ -1,32 +1,23 @@
 <script setup lang="ts">
 import { AuthFeature, TauriModrinthClient, VerboseLoggingFeature } from '@modrinth/api-client'
 import {
-	ChangeSkinIcon,
-	CompassIcon,
 	DownloadIcon,
-	ExternalIcon,
-	FlaskConicalIcon,
 	FolderOpenIcon,
 	HomeIcon,
 	ImagesIcon,
 	LeftArrowIcon,
 	LibraryIcon,
 	LogInIcon,
-	LogOutIcon,
-	PlusIcon,
 	RefreshCwIcon,
 	RightArrowIcon,
 	RotateCounterClockwiseIcon,
 	SettingsIcon,
 	SpinnerIcon,
-	UserIcon,
-	UsersIcon,
 	WorldIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	Admonition,
-	Avatar,
 	BigOptionButton,
 	bindingMatchesKeyboardEvent,
 	bindingMatchesMouseEvent,
@@ -44,7 +35,6 @@ import {
 	LoadingBar,
 	NewModal,
 	NotificationPanel,
-	OverflowMenu,
 	PopupNotificationPanel,
 	provideModalBehavior,
 	provideModrinthClient,
@@ -85,6 +75,7 @@ import ContentInstallPreviewModal from '@/components/ui/ContentInstallPreviewMod
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
+import SitmcLoginGate from '@/components/ui/login/SitmcLoginGate.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import MinecraftCrashModal from '@/components/ui/MinecraftCrashModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
@@ -105,10 +96,12 @@ import SplashScreen from '@/components/ui/SplashScreen.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { useDropImport } from '@/composables/useDropImport'
+import { useManagedInstances } from '@/composables/useManagedInstances'
 import { minecraftLaunchErrorKey } from '@/composables/useMinecraftLaunchError'
 import { useNetworkStatus } from '@/composables/useNetworkStatus'
 import { AxolotlBrandConfig, config, getOfficialLabrinthBaseUrl } from '@/config'
 import { trackEvent } from '@/helpers/analytics'
+import { users as getUsers } from '@/helpers/auth'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { configureCurseForgeManualDownloadWatcher } from '@/helpers/curseforge'
@@ -127,11 +120,9 @@ import { reconcileMojangAuthSourceAtStartup } from '@/helpers/mojang-auth'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { getNavShortcutEnabled } from '@/helpers/nav-shortcut-state'
 import { runWhenIdle } from '@/helpers/page-transition'
-import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { getQuickScrollEnabled, getShowScrollTop } from '@/helpers/scroll-top-state'
 import {
 	get as getSettings,
-	getLastBrowseContentProjectType,
 	getPrivacySettings,
 	getUpdateChannel,
 	getUpdatePreferences,
@@ -139,11 +130,7 @@ import {
 	savePrivacySettings,
 	set as setSettings,
 } from '@/helpers/settings.ts'
-import {
-	discoverContentTarget,
-	SHORTCUT_ACTIONS,
-	type ShortcutAction,
-} from '@/helpers/shortcut-actions'
+import { SHORTCUT_ACTIONS, type ShortcutAction } from '@/helpers/shortcut-actions'
 import { resolveAllBindings } from '@/helpers/shortcut-bindings'
 import { getSidebarExpanded, setSidebarExpanded } from '@/helpers/sidebar-state.ts'
 import { get_opening_command, initialize_state, set_discord_activity } from '@/helpers/state'
@@ -195,13 +182,10 @@ const themeStore = useTheming()
 const { hasModal } = useModalStack()
 const router = useRouter()
 const route = useRoute()
-const onSkinsPage = computed(() => route.path === '/skins')
 const onSchematicWorkshopPage = computed(() => route.path === '/lab/schematic-preview')
 const onSettingsPage = computed(() => route.path.startsWith('/settings'))
 const isSchematicFile = (path: string) => /\.(litematic|schematic|schem)$/i.test(path)
 const APP_LEFT_NAV_WIDTH = '4rem'
-
-const discoverContentPath = computed(() => discoverContentTarget(route))
 
 function getPageTransitionKey(route: RouteLocationNormalizedLoaded) {
 	const transitionGroup = route.meta.pageTransitionGroup
@@ -210,14 +194,6 @@ function getPageTransitionKey(route: RouteLocationNormalizedLoaded) {
 	const routeId = route.params.id
 	if (routeId !== undefined) {
 		return `${transitionGroup}:${Array.isArray(routeId) ? routeId.join('/') : routeId}`
-	}
-
-	// Browse-style routes use :projectType instead of :id. Keep tab switches on
-	// the same SPA instance (Browse already watches the param) so only the
-	// results area refreshes — no full page transition. Favorites is a different
-	// component under the same group; give it its own key so it still remounts.
-	if (route.name === 'Favorites') {
-		return `${transitionGroup}:favorites`
 	}
 
 	return `${transitionGroup}:`
@@ -231,13 +207,8 @@ function toggleSidebar() {
 	setSidebarExpanded(sidebarToggled.value)
 }
 
-const forceSidebar = computed(
-	() => route.path.startsWith('/browse') || route.path.startsWith('/project'),
-)
 const forceSidebarHidden = computed(() => route.path === '/settings')
-const sidebarVisible = computed(
-	() => !forceSidebarHidden.value && (sidebarToggled.value || forceSidebar.value),
-)
+const sidebarVisible = computed(() => !forceSidebarHidden.value && sidebarToggled.value)
 const customBackgroundStyle = computed(() => {
 	// A custom image would sit between the desktop and the UI, defeating the
 	// transparent window entirely, so the two are mutually exclusive.
@@ -466,10 +437,8 @@ async function checkUpdates() {
 
 	updatesEnabled.value = true
 	updatesPaused.value = (await getUpdatePreferences()).updatesPaused
-	if (updatesPaused.value) {
-		setTimeout(checkUpdates, 5 * 60 * 1000)
-		return
-	}
+	// The check keeps running while updates are paused so a mandatory update can
+	// still be discovered; `performUpdateCheck` decides what pausing means.
 	if (!offline.value) {
 		await performUpdateCheck().catch((error) => {
 			console.warn('Failed to check for launcher updates', error)
@@ -897,6 +866,27 @@ async function onImportFileReceived({
 }
 
 const messages = defineMessages({
+	launcherUpdateRequiredTitle: {
+		id: 'app.launcher-update-required.title',
+		defaultMessage: 'Launcher update required',
+	},
+	launcherUpdateRequiredBody: {
+		id: 'app.launcher-update-required.body',
+		defaultMessage:
+			'The club server requires launcher version {version} or newer. Update the launcher first; afterwards you can install and launch the game again.',
+	},
+	launcherUpdateAction: {
+		id: 'app.launcher-update-required.action',
+		defaultMessage: 'Update and restart now',
+	},
+	launcherUpdateBusy: {
+		id: 'app.launcher-update-required.busy',
+		defaultMessage: 'Downloading the update...',
+	},
+	launcherUpdateUnavailable: {
+		id: 'app.launcher-update-required.unavailable',
+		defaultMessage: 'No update is available right now. Try again later or contact a club administrator.',
+	},
 	updateInstalledToastTitle: {
 		id: 'app.update.complete-toast.title',
 		defaultMessage: 'Version {version} was successfully installed!',
@@ -963,17 +953,9 @@ const messages = defineMessages({
 		id: 'app.navigation.discover-content',
 		defaultMessage: 'Discover content',
 	},
-	skinSelector: {
-		id: 'app.navigation.skin-selector',
-		defaultMessage: 'Skin selector',
-	},
 	library: {
 		id: 'app.navigation.library',
 		defaultMessage: 'Library',
-	},
-	multiplayer: {
-		id: 'app.navigation.multiplayer',
-		defaultMessage: 'Multiplayer',
 	},
 	downloads: {
 		id: 'app.navigation.downloads',
@@ -1322,7 +1304,8 @@ async function setupApp() {
 
 	const defaultPageRoutes = {
 		Home: '/',
-		DiscoverContent: `/browse/${getLastBrowseContentProjectType()}`,
+		// Content browsing is unrouted, so this saved preference opens Home.
+		DiscoverContent: '/',
 		Library: '/library',
 	}
 	const defaultPageRoute = offline.value ? '/library' : defaultPageRoutes[default_page]
@@ -1371,6 +1354,15 @@ async function setupApp() {
 	}
 	themeStore.shortcutBindings = resolveAllBindings()
 	stateInitialized.value = true
+	void refreshMinecraftAccounts()
+	// The server decides both the instances and the minimum launcher version, so
+	// reconcile at startup rather than only when the home page happens to mount:
+	// the blocking update notice must not depend on the page the player lands on.
+	// Waiting for privacy consent keeps large downloads from starting before the
+	// player has agreed to the launcher using the network at all.
+	if (!privacyConsentPending.value) {
+		void ensureInstancesSynced()
+	}
 	if (privacyConsentPending.value) {
 		await nextTick()
 		privacyConsentModal.value?.show({
@@ -1841,12 +1833,6 @@ watch(
 	{ flush: 'post' },
 )
 
-watch(offline, (isOffline) => {
-	if (isOffline && (route.path.startsWith('/browse') || route.path.startsWith('/project'))) {
-		void router.push('/library')
-	}
-})
-
 watch(
 	() => route.path,
 	(path) => {
@@ -1933,7 +1919,6 @@ const dropImport = useDropImport({
 	installModpackFromPath,
 	contentInstall,
 	fileDrop,
-	onSkinsPage,
 	onSchematicWorkshopPage,
 	onSettingsPage,
 	isSchematicFile,
@@ -2070,11 +2055,6 @@ async function signIn() {
 	}
 }
 
-async function logOut() {
-	await logout().catch(handleError)
-	await fetchCredentials()
-}
-
 onMounted(() => {
 	invoke('show_window')
 
@@ -2114,20 +2094,115 @@ onMounted(() => {
 	})()
 })
 
-const accounts = ref(null)
+type AccountsCardHandle = {
+	refreshValues?: () => unknown
+	accountChangeRevision?: number | string
+}
+
+const accounts = ref<AccountsCardHandle | null>(null)
 provide('accountsCard', accounts)
+
+/**
+ * Accounts the launcher can start the game with.
+ *
+ * An empty list means the player has not signed in to the club's account site
+ * yet, which blocks the whole launcher behind `SitmcLoginGate`.
+ */
+const minecraftAccounts = ref<unknown[]>([])
+
+/**
+ * The login gate comes before everything else: the launcher is useless without a
+ * club account, and the onboarding tour walks through pages that need one.
+ */
+const loginGateVisible = computed(
+	() =>
+		stateInitialized.value &&
+		!privacyConsentPending.value &&
+		minecraftAccounts.value.length === 0,
+)
+
+/** The tour waits for a signed-in account so it never tours an unusable launcher. */
+const onboardingVisible = computed(
+	() => showOnboarding.value && minecraftAccounts.value.length > 0,
+)
+
+async function refreshMinecraftAccounts() {
+	try {
+		// Always read the full list: offline mode only decides which account may
+		// start the game, and the club's accounts are all online ones.
+		const loaded = await getUsers(false)
+		minecraftAccounts.value = Array.isArray(loaded) ? loaded : []
+	} catch (error) {
+		console.warn('Failed to read the signed-in accounts', error)
+		minecraftAccounts.value = []
+	}
+}
+
+async function handleSitmcLoginComplete() {
+	await refreshMinecraftAccounts()
+	await accounts.value?.refreshValues?.()
+}
+
+// Signing out or switching accounts inside the account card has to be able to
+// bring the login gate back, so follow the revision the card publishes.
+watch(
+	() => accounts.value?.accountChangeRevision,
+	() => void refreshMinecraftAccounts(),
+)
+
+const { launcherUpdateRequired: managedLauncherUpdateRequired, ensureSynced: ensureInstancesSynced } =
+	useManagedInstances()
+
+const updateGateBusy = ref(false)
+const updateGateMessage = ref<string | null>(null)
+
+/**
+ * Updates the launcher from the blocking notice the club manifest can raise.
+ *
+ * This path deliberately ignores the paused-updates preference: the server has
+ * declared this build unusable, so installing the newer one is the only way
+ * forward.
+ */
+async function runLauncherUpdateFromGate() {
+	if (updateGateBusy.value) return
+	updateGateBusy.value = true
+	updateGateMessage.value = null
+	try {
+		const channel = await getUpdateChannel()
+		const update = await checkAppUpdate(channel)
+		if (!update) {
+			updateGateMessage.value = formatMessage(messages.launcherUpdateUnavailable)
+			return
+		}
+
+		availableUpdate.value = update
+		await downloadUpdate(update)
+		if (!finishedDownloading.value) {
+			updateGateMessage.value = formatMessage(messages.launcherUpdateUnavailable)
+			return
+		}
+
+		await installUpdate()
+	} catch (updateError) {
+		updateGateMessage.value =
+			updateError instanceof Error ? updateError.message : String(updateError)
+	} finally {
+		updateGateBusy.value = false
+	}
+}
 
 command_listener(handleCommand)
 
 async function handleCommand(e) {
 	if (!e) return
+	// The discovery and seed map commands are refused by the backend; these
+	// branches only keep an unexpected event from navigating anywhere.
 	if (e.event === 'OpenSeedMap') {
-		const query = Object.fromEntries(new URLSearchParams(e.query ?? ''))
-		await router.push({ path: '/lab/seed-map', query })
+		await router.push('/')
 		return
 	}
 	if (e.event === 'OpenDiscovery') {
-		await router.push('/browse/mod')
+		await router.push('/')
 		return
 	}
 	if (offline.value && e.event !== 'LaunchInstance') {
@@ -2327,7 +2402,6 @@ async function performUpdateCheck() {
 	const channel = await getUpdateChannel()
 	const preferences = await getUpdatePreferences()
 	updatesPaused.value = preferences.updatesPaused
-	if (updatesPaused.value) return 'paused'
 	if (channel !== lastUpdateChannel) {
 		availableUpdate.value = null
 		updateSize.value = null
@@ -2341,6 +2415,12 @@ async function performUpdateCheck() {
 	if (!update) {
 		console.log('No update available')
 		return 'up-to-date'
+	}
+
+	// A mandatory update cannot be deferred, paused or skipped: only the release
+	// delay and the paused preference below are negotiable, and neither applies.
+	if (!update.forceUpdate && updatesPaused.value) {
+		return 'paused'
 	}
 
 	const publishedAt = Date.parse(update.publishedAt ?? '')
@@ -2376,7 +2456,7 @@ async function performUpdateCheck() {
 
 	metered.value = await isNetworkMetered()
 
-	if (!metered.value) {
+	if (!metered.value || update.forceUpdate) {
 		console.log('Starting download of update')
 		downloadUpdate(update)
 	} else {
@@ -2398,8 +2478,9 @@ async function manualUpdateCheck() {
 	}
 
 	updatesEnabled.value = true
+	// A mandatory update has to be found even when the player paused updates, so
+	// the decision is left to `performUpdateCheck`.
 	updatesPaused.value = (await getUpdatePreferences()).updatesPaused
-	if (updatesPaused.value) return 'paused'
 	if (offline.value) {
 		return 'offline'
 	}
@@ -2485,28 +2566,6 @@ setAppUpdateActions({
 	},
 })
 
-async function openModrinthProjectLinkInApp(parsed) {
-	const { slug, pathSuffix, url } = parsed
-	const loadToken = loading.begin()
-	try {
-		const { id } = await tauriApiClient.labrinth.projects_v2.check(slug)
-		const query = mergeUrlQuery(route.query, url)
-		await router.push({
-			path: `/project/${id}${pathSuffix}`,
-			query,
-			hash: url.hash || undefined,
-		})
-	} catch (err) {
-		if (err instanceof ModrinthApiError && err.statusCode === 404) {
-			openUrl(url.href)
-		} else {
-			handleError(err)
-		}
-	} finally {
-		loading.end(loadToken)
-	}
-}
-
 function handleClick(e) {
 	let target = e.target
 	while (target != null) {
@@ -2519,12 +2578,7 @@ function handleClick(e) {
 				!target.href.startsWith('https://tauri.localhost') &&
 				!target.href.startsWith('http://tauri.localhost')
 			) {
-				const parsed = parseModrinthLink(target.href)
-				if (target.target !== '_blank' && parsed) {
-					void openModrinthProjectLinkInApp(parsed)
-				} else {
-					openUrl(target.href)
-				}
+				openUrl(target.href)
 			}
 			e.preventDefault()
 			break
@@ -2650,50 +2704,13 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					<WorldIcon />
 				</NavButton>
 				<NavButton
-					v-tooltip.right="formatMessage(messages.discoverContent)"
-					data-onboarding-id="nav-discover"
-					:to="discoverContentPath"
-					:disabled="offline"
-					:is-primary="() => route.path.startsWith('/browse') && !route.query.i"
-					:is-subpage="(route) => route.path.startsWith('/project') && !route.query.i"
-				>
-					<CompassIcon />
-				</NavButton>
-				<NavButton
-					v-tooltip.right="formatMessage(messages.skinSelector)"
-					data-onboarding-id="nav-skins"
-					to="/skins"
-				>
-					<ChangeSkinIcon />
-				</NavButton>
-				<NavButton
-					v-tooltip.right="formatMessage(messages.multiplayer)"
-					to="/multiplayer"
-					:is-primary="(r) => r.path.startsWith('/multiplayer')"
-				>
-					<UsersIcon />
-				</NavButton>
-				<NavButton
 					v-tooltip.right="formatMessage(messages.library)"
 					data-onboarding-id="nav-library"
 					to="/library"
-					:is-primary="(r) => r.path === '/library' || r.path === '/library'"
-					:is-subpage="
-						() =>
-							route.path.startsWith('/instance') ||
-							((route.path.startsWith('/browse') || route.path.startsWith('/project')) &&
-								route.query.i)
-					"
+					:is-primary="(r) => r.path === '/library'"
+					:is-subpage="() => route.path.startsWith('/instance')"
 				>
 					<LibraryIcon />
-				</NavButton>
-				<NavButton
-					v-tooltip.right="formatMessage(messages.lab)"
-					data-onboarding-id="nav-lab"
-					to="/lab"
-					:is-primary="(r) => r.path.startsWith('/lab')"
-				>
-					<FlaskConicalIcon />
 				</NavButton>
 				<NavButton
 					v-if="!themeStore.autoHideDownloadsButton || downloadManager.activeCount.value > 0"
@@ -2718,12 +2735,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</suspense>
 			</div>
 			<NavButton
-				v-tooltip.right="formatMessage(messages.createInstance)"
-				data-onboarding-id="create-instance"
-				to="/create"
-				:disabled="offline"
+				v-if="AxolotlBrandConfig.capabilities.privateModrinthServices"
+				v-tooltip.right="'Sign in to a Modrinth account'"
+				data-onboarding-id="account-entry"
+				:to="() => signIn()"
 			>
-				<PlusIcon />
+				<LogInIcon class="text-brand" />
 			</NavButton>
 			<NavButton
 				v-tooltip.right="formatMessage(commonMessages.settingsLabel)"
@@ -2731,46 +2748,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				to="/settings"
 			>
 				<SettingsIcon />
-			</NavButton>
-			<OverflowMenu
-				v-if="AxolotlBrandConfig.capabilities.privateModrinthServices && credentials?.user"
-				v-tooltip.right="`Modrinth account`"
-				data-onboarding-id="account-entry"
-				class="w-12 h-12 text-primary rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast border-0 cursor-pointer"
-				:options="[
-					{
-						id: 'view-profile',
-						action: () => openUrl('https://modrinth.com/user/' + credentials.user.username),
-					},
-					{
-						id: 'sign-out',
-						action: () => logOut(),
-						color: 'danger',
-					},
-				]"
-				placement="right-end"
-			>
-				<Avatar :src="credentials?.user?.avatar_url" alt="" size="32px" circle />
-				<template #view-profile>
-					<UserIcon />
-					<span class="inline-flex items-center gap-1">
-						{{ formatMessage(messages.signedInAs) }}
-						<span class="inline-flex items-center gap-1 text-contrast font-semibold">
-							<Avatar :src="credentials?.user?.avatar_url" alt="" size="20px" circle />
-							{{ credentials?.user?.username }}
-						</span>
-					</span>
-					<ExternalIcon />
-				</template>
-				<template #sign-out> <LogOutIcon /> Sign out </template>
-			</OverflowMenu>
-			<NavButton
-				v-else-if="AxolotlBrandConfig.capabilities.privateModrinthServices"
-				v-tooltip.right="'Sign in to a Modrinth account'"
-				data-onboarding-id="account-entry"
-				:to="() => signIn()"
-			>
-				<LogInIcon class="text-brand" />
 			</NavButton>
 		</div>
 		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
@@ -2875,7 +2852,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid"
 		>
 			<button
-				v-if="!forceSidebar && !forceSidebarHidden"
+				v-if="!forceSidebarHidden"
 				v-tooltip.left="
 					sidebarToggled
 						? formatMessage(messages.collapseSidebar)
@@ -2926,6 +2903,38 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		:on-error-action="exportNotificationErrorLogs"
 		:error-action-label="formatMessage(messages.exportErrorLogs)"
 	/>
+	<div
+		v-if="managedLauncherUpdateRequired"
+		class="fixed inset-0 z-[120] flex items-center justify-center overflow-y-auto bg-surface-1 p-6"
+	>
+		<div class="w-full max-w-md rounded-xl border border-divider bg-surface-2 p-8 text-center">
+			<h2 class="m-0 text-xl font-semibold text-contrast">
+				{{ formatMessage(messages.launcherUpdateRequiredTitle) }}
+			</h2>
+			<p class="mb-0 mt-3 text-sm text-secondary">
+				{{
+					formatMessage(messages.launcherUpdateRequiredBody, {
+						version: managedLauncherUpdateRequired,
+					})
+				}}
+			</p>
+			<div class="mt-6 flex justify-center">
+				<ButtonStyled color="brand">
+					<button :disabled="updateGateBusy" @click="runLauncherUpdateFromGate">
+						{{
+							updateGateBusy
+								? formatMessage(messages.launcherUpdateBusy)
+								: formatMessage(messages.launcherUpdateAction)
+						}}
+					</button>
+				</ButtonStyled>
+			</div>
+			<p v-if="updateGateMessage" class="mb-0 mt-3 text-sm text-red">
+				{{ updateGateMessage }}
+			</p>
+		</div>
+	</div>
+	<SitmcLoginGate v-if="loginGateVisible" @complete="handleSitmcLoginComplete" />
 	<MinecraftCrashModal ref="minecraftCrashModal" @error="handleError" />
 	<JavaDownloadConfirmationModal ref="javaDownloadConfirmationModal" />
 	<PrivacyConsentModal ref="privacyConsentModal" @saved="handlePrivacyConsentSaved" />
@@ -3041,7 +3050,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 
 	<!-- Global drop overlay -->
 	<div
-		v-if="isDragging && !onSkinsPage && !onSettingsPage"
+		v-if="isDragging && !onSettingsPage"
 		class="fixed inset-0 z-[9999] bg-black/40 flex items-center justify-center pointer-events-none"
 	>
 		<div class="rounded-2xl border-2 border-dashed border-brand bg-surface-2/90 p-8 text-center">
@@ -3055,7 +3064,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		v-if="
 			(isProcessing || scanningInstances) &&
 			!isDragging &&
-			!onSkinsPage &&
 			!onSettingsPage &&
 			!batchActive
 		"
@@ -3156,7 +3164,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	/>
 
 	<OnboardingOverlay
-		:visible="showOnboarding"
+		:visible="onboardingVisible"
 		:mode="onboardingMode"
 		@complete="finishOnboarding"
 		@skip="skipOnboarding"

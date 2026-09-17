@@ -96,15 +96,18 @@ async fn run_with_extra_launch_args_inner(
             MAX_LAUNCH_PREPARATION_TIMEOUT,
         );
     let default_account = if offline_mode {
-        Credentials::get_offline_credential(&state.pool)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::LauncherError(
-                    "Offline mode requires an offline Minecraft account"
-                        .to_string(),
-                )
-                .as_error()
-            })?
+        // New accounts can only be SIT-Minecraft ones, so offline mode still honours a
+        // historical offline account but otherwise launches with the account
+        // the player is signed in with: an unreachable Mojang service must not
+        // lock a signed-in player out of an already installed instance.
+        match Credentials::get_offline_credential(&state.pool).await? {
+            Some(credentials) => credentials,
+            None => Credentials::get_default_credential(&state.pool)
+                .await?
+                .ok_or_else(|| {
+                    crate::ErrorKind::NoCredentialsError.as_error()
+                })?,
+        }
     } else {
         Credentials::get_default_credential(&state.pool)
             .await?
@@ -174,6 +177,10 @@ async fn run_credentials(
         )
         .as_error());
     }
+
+    // Server-issued instances refuse to launch once they are retired or when
+    // the applied revision is not the revision the manifest requires.
+    crate::api::managed::ensure_instance_runnable(&context.instance.id).await?;
 
     let pre_launch_hooks = context
         .launch_overrides
@@ -278,15 +285,15 @@ async fn run_credentials(
             state.mojang_auth_use_mirror(),
         );
         let join_result = fetch::INSECURE_REQWEST_CLIENT
-			.post(join_url.as_ref())
-			.json(&json!({
-				"accessToken": &credentials.access_token,
-				"selectedProfile": credentials.offline_profile.id.simple().to_string(),
-				"serverId": &server_id,
-			}))
-			.timeout(Duration::from_secs(5))
-			.send()
-			.await;
+            .post(join_url.as_ref())
+            .json(&json!({
+                "accessToken": &credentials.access_token,
+                "selectedProfile": credentials.offline_profile.id.simple().to_string(),
+                "serverId": &server_id,
+            }))
+            .timeout(Duration::from_secs(5))
+            .send()
+            .await;
 
         match join_result {
             Ok(resp) if resp.status().is_success() => {

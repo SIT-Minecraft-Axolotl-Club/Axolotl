@@ -105,12 +105,9 @@
 									:tint-by="instance.id"
 									size="24px"
 								/>
-								<router-link
-									:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
-									class="hover:underline text-primary truncate"
-								>
+								<span class="text-primary truncate">
 									{{ linkedProjectV3.name }}
-								</router-link>
+								</span>
 							</div>
 						</template>
 
@@ -249,9 +246,6 @@
 										id: 'create-shortcut',
 										action: () => createShortcut(),
 									},
-									...(canUpgradeInstance
-										? [{ id: 'upgrade-instance', action: () => openUpgrade() }]
-										: []),
 								]"
 							>
 								<MoreVerticalIcon />
@@ -269,9 +263,6 @@
 								</template>
 								<template #create-shortcut>
 									<ExternalIcon /> {{ formatMessage(messages.createShortcut) }}
-								</template>
-								<template #upgrade-instance>
-									<UpdatedIcon /> {{ formatMessage(messages.upgradeInstance) }}
 								</template>
 							</OverflowMenu>
 						</ButtonStyled>
@@ -318,7 +309,6 @@
 		<ContextMenu ref="options" @option-clicked="handleOptionsClick">
 			<template #play> <PlayIcon /> {{ formatMessage(commonMessages.playButton) }} </template>
 			<template #stop> <StopCircleIcon /> {{ formatMessage(commonMessages.stopButton) }} </template>
-			<template #add_content> <PlusIcon /> {{ formatMessage(messages.addContent) }} </template>
 			<template #edit> <EditIcon /> {{ formatMessage(commonMessages.editButton) }} </template>
 			<template #copy_path> <ClipboardCopyIcon /> {{ formatMessage(messages.copyPath) }} </template>
 			<template #open_folder>
@@ -366,11 +356,9 @@ import {
 	getLoaderIcon,
 	GlobeIcon,
 	HashIcon,
-	ImageIcon,
 	MoreVerticalIcon,
 	PackageIcon,
 	PlayIcon,
-	PlusIcon,
 	ServerIcon,
 	SettingsIcon,
 	SpinnerIcon,
@@ -423,7 +411,6 @@ import { get_project_v3 } from '@/helpers/cache.js'
 import { instance_listener, process_listener } from '@/helpers/events'
 import {
 	install_existing_instance,
-	install_job_list,
 	install_pack_to_existing_instance,
 } from '@/helpers/install'
 import {
@@ -442,8 +429,6 @@ import { refreshWorlds, type ServerStatus } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs, useTheming } from '@/store/state'
-
-import { isActiveUpgradeJobForInstance, isUnmanagedUpgradeEligible } from './upgrade/entry'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -490,6 +475,7 @@ const messages = defineMessages({
 	updateAll: { id: 'app.instance.update-all', defaultMessage: 'Update all' },
 	selectUpdatable: { id: 'app.instance.select-updatable', defaultMessage: 'Select updatable' },
 	contentTab: { id: 'app.instance.tabs.content', defaultMessage: 'Content' },
+	overviewTab: { id: 'app.home.widgets.group.overview', defaultMessage: 'Overview' },
 	filesTab: { id: 'app.instance.tabs.files', defaultMessage: 'Files' },
 	worldsTab: { id: 'app.instance.tabs.worlds', defaultMessage: 'Worlds' },
 	screenshotsTab: { id: 'app.instance.tabs.screenshots', defaultMessage: 'Screenshots' },
@@ -530,9 +516,6 @@ useLoadingBarToken(subpagePending)
 const isServerInstance = ref(false)
 const linkedProjectV3 = ref<Labrinth.Projects.v3.Project>()
 const selected = ref<unknown[]>([])
-const canUpgradeInstance = computed(() =>
-	instance.value ? isUnmanagedUpgradeEligible(instance.value) : false,
-)
 
 const minecraftServer = computed(() => linkedProjectV3.value?.minecraft_server)
 const javaServerPingData = computed(() => linkedProjectV3.value?.minecraft_java_server?.ping?.data)
@@ -687,24 +670,9 @@ const hideInstanceTabs = computed(() =>
 const isStudioMode = computed(() => displayedInstanceRoute.value.name === 'FileStudio')
 const tabs = computed(() => [
 	{
-		label: formatMessage(messages.contentTab),
+		label: formatMessage(messages.overviewTab),
 		href: `${basePath.value}`,
 		icon: BoxesIcon,
-	},
-	{
-		label: formatMessage(messages.filesTab),
-		href: `${basePath.value}/files`,
-		icon: FolderOpenIcon,
-	},
-	{
-		label: formatMessage(messages.screenshotsTab),
-		href: `${basePath.value}/screenshots`,
-		icon: ImageIcon,
-	},
-	{
-		label: formatMessage(messages.worldsTab),
-		href: `${basePath.value}/worlds`,
-		icon: GlobeIcon,
 	},
 	{
 		label: formatMessage(messages.logsTab),
@@ -838,21 +806,8 @@ const createShortcut = async () => {
 	}
 }
 
-const openUpgrade = async () => {
-	if (!instance.value) return
-	const active = (await install_job_list(true).catch(() => [])).find((job) =>
-		isActiveUpgradeJobForInstance(job, instance.value!.id),
-	)
-	if (active) {
-		await router.push({ path: '/downloads', query: { job: active.job_id } })
-		return
-	}
-	await router.push(`/instance/${encodeURIComponent(instance.value.id)}/upgrade`)
-}
-
 const handleRightClick = (event: MouseEvent) => {
 	const baseOptions = [
-		{ name: 'add_content' },
 		{ type: 'divider' },
 		{ name: 'edit' },
 		{ name: 'open_folder' },
@@ -887,12 +842,6 @@ const handleOptionsClick = async (args: { option: string; item: unknown }) => {
 			break
 		case 'stop':
 			await stopInstance('InstancePageContextMenu')
-			break
-		case 'add_content':
-			await router.push({
-				path: `/browse/${instance.value?.loader === 'vanilla' ? 'datapack' : 'mod'}`,
-				query: { i: props.id },
-			})
 			break
 		case 'edit':
 			settingsModal.value?.show()

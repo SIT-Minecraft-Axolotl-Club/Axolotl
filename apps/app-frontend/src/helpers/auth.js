@@ -30,31 +30,32 @@ export async function check_mojang_services() {
 }
 
 /**
- * Authenticate a user with Hydra - part 1.
- * This begins the authentication flow quasi-synchronously.
+ * Starts a sign-in with the SIT-Minecraft account site.
  *
- * @returns {Promise<DeviceLoginSuccess>} A DeviceLoginSuccess object with two relevant fields:
- * @property {string} verification_uri - The URL to go to complete the flow.
- * @property {string} user_code - The code to enter on the verification_uri page.
+ * The player approves `user_code` on `verification_uri_complete` in a browser.
+ *
+ * @returns {Promise<SitmcDeviceLoginFlow>} The code to show the player, plus the
+ * `flow_id` used to poll and finish the sign-in.
  */
-export async function login(troubleLinks) {
-	return await invoke('plugin:auth|login', { troubleLinks })
+export async function begin_sitmc_device_login() {
+	return await invoke('plugin:auth|begin_sitmc_device_login')
 }
 
-export async function browser_login() {
-	return await invoke('plugin:auth|browser_login')
+/**
+ * Reports whether the player has approved the pending SIT-Minecraft sign-in.
+ *
+ * The account site asks for the character on its authorization page, so a
+ * completed poll already carries the credentials.
+ *
+ * @param {string} flowId
+ * @returns {Promise<{ status: 'pending', slow_down: boolean } | { status: 'complete', credentials: unknown }>}
+ */
+export async function poll_sitmc_device_login(flowId) {
+	return await invoke('plugin:auth|poll_sitmc_device_login', { flowId })
 }
 
-export async function begin_device_login() {
-	return await invoke('plugin:auth|begin_device_login')
-}
-
-export async function poll_device_login(deviceCode) {
-	return await invoke('plugin:auth|poll_device_login', { deviceCode })
-}
-
-export async function begin_yggdrasil_login(apiRoot, login, password) {
-	return await invoke('plugin:auth|begin_yggdrasil_login', { apiRoot, login, password })
+export async function begin_yggdrasil_login(login, password) {
+	return await invoke('plugin:auth|begin_yggdrasil_login', { login, password })
 }
 
 export async function finish_yggdrasil_login(flowId, profileId) {
@@ -65,29 +66,16 @@ export async function list_yggdrasil_saved_logins() {
 	return await invoke('plugin:auth|list_yggdrasil_saved_logins')
 }
 
-export async function get_yggdrasil_password(apiRoot, login) {
-	return await invoke('plugin:auth|get_yggdrasil_password', { apiRoot, login })
+export async function get_yggdrasil_password(login) {
+	return await invoke('plugin:auth|get_yggdrasil_password', { login })
 }
 
-export async function set_yggdrasil_password(apiRoot, login, password) {
-	return await invoke('plugin:auth|set_yggdrasil_password', { apiRoot, login, password })
+export async function set_yggdrasil_password(login, password) {
+	return await invoke('plugin:auth|set_yggdrasil_password', { login, password })
 }
 
-export async function delete_yggdrasil_password(apiRoot, login) {
-	return await invoke('plugin:auth|delete_yggdrasil_password', { apiRoot, login })
-}
-
-/**
- * Creates and selects a local Minecraft account.
- * @param {string} username
- * @param {string} [uuid] Custom UUID as 32 hexadecimal characters, with or without hyphens
- * @returns {Promise<Credential>}
- */
-export async function add_offline_user(username, uuid) {
-	return await invoke('plugin:auth|add_offline_user', {
-		username,
-		...(uuid ? { uuid } : {}),
-	})
+export async function delete_yggdrasil_password(login) {
+	return await invoke('plugin:auth|delete_yggdrasil_password', { login })
 }
 
 /**

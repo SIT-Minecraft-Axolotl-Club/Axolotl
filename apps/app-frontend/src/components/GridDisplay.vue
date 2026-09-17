@@ -33,7 +33,6 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import Instance from '@/components/ui/Instance.vue'
@@ -50,7 +49,6 @@ import {
 const { handleError } = injectNotificationManager()
 
 const { formatMessage } = useVIntl()
-const router = useRouter()
 
 const messages = defineMessages({
 	search: { id: 'app.instances.search', defaultMessage: 'Search' },
@@ -421,12 +419,6 @@ function onBatchEditApplied() {
 			clearable
 			wrapper-class="flex-1"
 		/>
-		<ButtonStyled color="brand">
-			<button @click="router.push('/create')">
-				<PlusIcon />
-				{{ formatMessage(messages.createInstance) }}
-			</button>
-		</ButtonStyled>
 	</div>
 	<div class="flex flex-wrap items-center gap-2">
 		<DropdownSelect

@@ -6,7 +6,6 @@ use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use tauri::{AppHandle, Runtime};
 use tauri_plugin_opener::OpenerExt;
 use theseus::DownloadReason;
 use theseus::data::{
@@ -150,6 +149,13 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_upload_synced_pack,
             instance_set_synced_pack_enabled,
             instance_remove_synced_pack,
+            managed_fetch_manifest,
+            managed_sync,
+            managed_list,
+            managed_prepare_pack,
+            managed_mark_installed,
+            managed_register_instance,
+            managed_ensure_runnable,
         ])
         .build()
 }
@@ -1183,7 +1189,7 @@ pub struct InstanceScreenshot {
 }
 
 fn serialize_screenshot<R: tauri::Runtime>(
-    app: &tauri::AppHandle<R>,
+    _app: &tauri::AppHandle<R>,
     s: theseus::instance::InstanceScreenshot,
 ) -> Result<InstanceScreenshot> {
     let mut url = super::utils::tauri_convert_file_src(&s.path)?;
@@ -1933,5 +1939,69 @@ pub async fn instance_edit_icon(
     icon_path: Option<&Path>,
 ) -> Result<()> {
     theseus::instance::edit_icon(instance_id, icon_path).await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn managed_fetch_manifest(
+    manifest_url: String,
+) -> Result<theseus::managed::ManagedManifest> {
+    Ok(theseus::managed::fetch_manifest(&manifest_url).await?)
+}
+
+#[tauri::command]
+pub async fn managed_sync(
+    manifest_url: String,
+) -> Result<theseus::managed::ManagedSyncReport> {
+    Ok(theseus::managed::sync_manifest(&manifest_url).await?)
+}
+
+#[tauri::command]
+pub async fn managed_list()
+-> Result<Vec<theseus::managed::ManagedInstanceRecord>> {
+    Ok(theseus::managed::list_managed_instances().await?)
+}
+
+#[tauri::command]
+pub async fn managed_prepare_pack(
+    server_instance_id: String,
+    revision: i64,
+) -> Result<String> {
+    Ok(theseus::managed::prepare_pack(&server_instance_id, revision).await?)
+}
+
+#[tauri::command]
+pub async fn managed_mark_installed(
+    server_instance_id: String,
+    instance_id: String,
+    revision: i64,
+) -> Result<()> {
+    theseus::managed::mark_instance_installed(
+        &server_instance_id,
+        &instance_id,
+        revision,
+    )
+    .await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn managed_register_instance(
+    server_instance_id: String,
+    instance_id: String,
+    revision: i64,
+) -> Result<()> {
+    theseus::managed::register_instance(
+        &server_instance_id,
+        &instance_id,
+        revision,
+    )
+    .await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn managed_ensure_runnable(instance_id: String) -> Result<()> {
+    theseus::managed::ensure_instance_runnable(&instance_id).await?;
     Ok(())
 }

@@ -62,7 +62,10 @@ generated
 *.d1
 *.dump.sql
 access-jwt*.txt
-/docs/
+# The launcher protocol and conversion notes are deliverables and stay in the repo
+/docs/*
+!/docs/launcher-protocol.md
+!/docs/sitmc-conversion.md
 .vercel/
 
 .astro
@@ -106,3 +109,12 @@ apps/app/resources/blockbench-skin/
 .netlify
 .cf-reconcile-test
 .cf-reconcile-state-a
+
+# Club user-center source: a sibling project, never part of the launcher repo
+/SITUserCenter/
+
+# Local run/build logs and third-party spec material kept out of the repo
+.dev*.log
+.tauri-build.log
+.yggdrasil-connect.txt
+Yggdrasil-Connect.pdf

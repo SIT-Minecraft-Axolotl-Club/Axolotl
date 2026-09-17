@@ -6,8 +6,6 @@ import LabGradientText from './LabGradientText.vue'
 import LabRecipeGenerator from './LabRecipeGenerator.vue'
 import LabSchematicPreview from './LabSchematicPreview.vue'
 import LabSeedMap from './LabSeedMap.vue'
-import Multiplayer from './Multiplayer.vue'
-import Skins from './Skins.vue'
 import Worlds from './Worlds.vue'
 
 export {
@@ -19,7 +17,5 @@ export {
 	LabRecipeGenerator,
 	LabSchematicPreview,
 	LabSeedMap,
-	Multiplayer,
-	Skins,
 	Worlds,
 }

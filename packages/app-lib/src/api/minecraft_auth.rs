@@ -1,35 +1,34 @@
 //! Authentication flow interface
 
 use chrono::{DateTime, Utc};
-use reqwest::StatusCode;
 use serde::Serialize;
 use std::time::Duration;
 use uuid::Uuid;
 
 use crate::State;
+use crate::sitmc;
 pub use crate::state::YggdrasilLoginResult;
 use crate::state::{
     Credentials, MinecraftAccountType, MinecraftLoginFlow, MinecraftProfile,
     YggdrasilAccount,
 };
 pub use crate::state::{MinecraftDeviceLoginFlow, MinecraftDeviceLoginPoll};
+pub use crate::state::{SitmcDeviceLoginFlow, SitmcDeviceLoginPoll};
 use crate::util::fetch::INSECURE_REQWEST_CLIENT;
-use crate::util::mojang::{mojang_service_url, should_use_mojang_mirror};
 
+/// Checks whether the launcher's own services are reachable.
+///
+/// This decides whether the launcher considers itself online, so it probes the
+/// club's account site instead of Mojang: the account site is the service this
+/// launcher actually depends on, and it stays reachable in networks where
+/// Mojang does not.
 #[tracing::instrument]
 pub async fn check_reachable() -> crate::Result<()> {
-    let url = mojang_service_url(
-        "https://sessionserver.mojang.com/session/minecraft/hasJoined",
-        should_use_mojang_mirror(),
-    );
     let resp = INSECURE_REQWEST_CLIENT
-        .get(url.as_ref())
+        .get(sitmc::YGGDRASIL_API_ROOT)
         .timeout(Duration::from_secs(5))
         .send()
         .await?;
-    if resp.status() == StatusCode::NO_CONTENT {
-        return Ok(());
-    }
     resp.error_for_status()?;
     Ok(())
 }
@@ -126,43 +125,41 @@ pub async fn finish_login(
     crate::state::login_finish(code, state, flow, &app_state.pool).await
 }
 
+/// Starts a sign-in with the club's account site.
+///
+/// The player approves a short code in a browser and picks a character there, so
+/// the launcher never sees the account password.
 #[tracing::instrument]
-pub async fn add_offline_user(
-    username: &str,
-    uuid: Option<Uuid>,
-) -> crate::Result<Credentials> {
-    let state = State::get().await?;
-    let credentials = match uuid {
-        Some(uuid) => Credentials::offline_with_uuid(username, uuid)?,
-        None => Credentials::offline(username)?,
-    };
-
-    if uuid.is_some() {
-        let users = Credentials::get_all_without_refresh(&state.pool).await?;
-        if users
-            .iter()
-            .any(|user| user.account_id() == credentials.account_id())
-        {
-            return Err(crate::ErrorKind::InputError(
-                "An account with this UUID already exists".to_string(),
-            )
-            .as_error());
-        }
-    }
-
-    credentials.upsert(&state.pool).await?;
-    Ok(credentials)
+pub async fn begin_sitmc_device_login() -> crate::Result<SitmcDeviceLoginFlow> {
+    crate::state::begin_device_login().await
 }
 
+#[tracing::instrument]
+pub async fn poll_sitmc_device_login(
+    flow_id: Uuid,
+) -> crate::Result<SitmcDeviceLoginPoll> {
+    let state = State::get().await?;
+    crate::state::poll_device_login(flow_id, &state.pool).await
+}
+
+/// Signs in with the account name and password of the club's account site.
+///
+/// This is the fallback for when the OpenID Connect exchange is unavailable.
+/// Only the club's own site is accepted, because an account anywhere else cannot
+/// play on the club's servers.
 #[tracing::instrument(skip(password))]
 pub async fn begin_yggdrasil_login(
-    api_root: &str,
     login: &str,
     password: &str,
 ) -> crate::Result<YggdrasilLoginResult> {
     let state = State::get().await?;
-    crate::state::begin_yggdrasil_login(api_root, login, password, &state.pool)
-        .await
+    crate::state::begin_yggdrasil_login(
+        sitmc::YGGDRASIL_API_ROOT,
+        login,
+        password,
+        &state.pool,
+    )
+    .await
 }
 
 #[tracing::instrument]
@@ -188,7 +185,9 @@ pub async fn get_default_user(
     } else {
         Credentials::get_active(&state.pool).await?
     };
-    Ok(user.map(|user| user.account_id()))
+    Ok(user
+        .filter(Credentials::is_supported_provider)
+        .map(|user| user.account_id()))
 }
 
 #[tracing::instrument]
@@ -276,6 +275,7 @@ pub async fn users(offline_mode: bool) -> crate::Result<Vec<MinecraftUser>> {
     };
     let credentials = users
         .into_iter()
+        .filter(Credentials::is_supported_provider)
         .filter(|credentials| !offline_mode || credentials.is_offline());
     let mut hydrated_users = Vec::new();
     for credentials in credentials {

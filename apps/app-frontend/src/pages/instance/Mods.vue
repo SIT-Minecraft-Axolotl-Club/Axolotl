@@ -2958,7 +2958,7 @@ provideContentManager({
 
 type UnlistenFn = () => void
 
-const initialContentReady = loadInitialContent()
+void loadInitialContent()
 
 function getInstallRevision() {
 	return installRevisionByInstance.value.get(props.instance.id) ?? 0

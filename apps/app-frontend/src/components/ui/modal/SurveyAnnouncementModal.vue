@@ -52,6 +52,7 @@ function fillOutSurvey() {
 
 function showIfNeeded() {
 	if (!launchedBefore) return
+	if (!AxolotlBrandConfig.surveyUrl) return
 	if (localStorage.getItem(DISMISSAL_KEY) === 'true') return
 	modal.value?.show()
 }

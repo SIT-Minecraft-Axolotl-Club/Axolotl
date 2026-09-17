@@ -12,8 +12,6 @@ export type ShortcutEnabledField =
 	| 'shortcutNavHome'
 	| 'shortcutNavWorlds'
 	| 'shortcutNavDiscover'
-	| 'shortcutNavSkins'
-	| 'shortcutNavMultiplayer'
 	| 'shortcutNavLibrary'
 	| 'shortcutNavLab'
 	| 'shortcutNavDownloads'
@@ -95,16 +93,6 @@ const messages = defineMessages({
 	navDiscoverDescription: {
 		id: 'app.shortcut-settings.nav-discover-description',
 		defaultMessage: 'Jump to browsing content.',
-	},
-	navSkins: { id: 'app.shortcut-settings.nav-skins', defaultMessage: 'Skin selector' },
-	navSkinsDescription: {
-		id: 'app.shortcut-settings.nav-skins-description',
-		defaultMessage: 'Jump to the skin selector.',
-	},
-	navMultiplayer: { id: 'app.shortcut-settings.nav-multiplayer', defaultMessage: 'Multiplayer' },
-	navMultiplayerDescription: {
-		id: 'app.shortcut-settings.nav-multiplayer-description',
-		defaultMessage: 'Jump to multiplayer.',
 	},
 	navLibrary: { id: 'app.shortcut-settings.nav-library', defaultMessage: 'Library' },
 	navLibraryDescription: {
@@ -226,34 +214,6 @@ export const SHORTCUT_ACTIONS: ShortcutAction[] = [
 		unavailable: (context) => !context.worldsTabEnabled,
 	},
 	{
-		id: 'shortcutNavDiscover',
-		group: 'nav',
-		enabledField: 'shortcutNavDiscover',
-		defaultBinding: keyboard('Digit3', true),
-		label: messages.navDiscover,
-		description: messages.navDiscoverDescription,
-		target: (route) => discoverContentTarget(route),
-		unavailable: (context) => context.offline,
-	},
-	{
-		id: 'shortcutNavSkins',
-		group: 'nav',
-		enabledField: 'shortcutNavSkins',
-		defaultBinding: keyboard('Digit4', true),
-		label: messages.navSkins,
-		description: messages.navSkinsDescription,
-		target: () => '/skins',
-	},
-	{
-		id: 'shortcutNavMultiplayer',
-		group: 'nav',
-		enabledField: 'shortcutNavMultiplayer',
-		defaultBinding: keyboard('Digit5', true),
-		label: messages.navMultiplayer,
-		description: messages.navMultiplayerDescription,
-		target: () => '/multiplayer',
-	},
-	{
 		id: 'shortcutNavLibrary',
 		group: 'nav',
 		enabledField: 'shortcutNavLibrary',
@@ -263,15 +223,6 @@ export const SHORTCUT_ACTIONS: ShortcutAction[] = [
 		target: () => '/library',
 	},
 	{
-		id: 'shortcutNavLab',
-		group: 'nav',
-		enabledField: 'shortcutNavLab',
-		defaultBinding: keyboard('Digit7', true),
-		label: messages.navLab,
-		description: messages.navLabDescription,
-		target: () => '/lab',
-	},
-	{
 		id: 'shortcutNavDownloads',
 		group: 'nav',
 		enabledField: 'shortcutNavDownloads',
@@ -279,16 +230,6 @@ export const SHORTCUT_ACTIONS: ShortcutAction[] = [
 		label: messages.navDownloads,
 		description: messages.navDownloadsDescription,
 		target: () => '/downloads',
-	},
-	{
-		id: 'shortcutNavCreate',
-		group: 'nav',
-		enabledField: 'shortcutNavCreate',
-		defaultBinding: keyboard('Digit9', true),
-		label: messages.navCreate,
-		description: messages.navCreateDescription,
-		target: () => '/create',
-		unavailable: (context) => context.offline,
 	},
 	{
 		id: 'shortcutNavSettings',

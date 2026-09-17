@@ -296,6 +296,15 @@ export function useDropImport(options: DropImportOptions) {
 			id: 'app.drop.error.unknown-title',
 			defaultMessage: 'Unknown file type',
 		},
+		unmanagedDropTitle: {
+			id: 'app.drop.error.unmanaged-title',
+			defaultMessage: 'Only club instances can be installed',
+		},
+		unmanagedDropText: {
+			id: 'app.drop.error.unmanaged-text',
+			defaultMessage:
+				'This launcher installs the game instances published by the club server. Drop a world save instead, or start the game from the home page.',
+		},
 		dropUnknownText: {
 			id: 'app.drop.error.unknown-text',
 			defaultMessage: 'Could not determine what kind of file this is.',
@@ -694,6 +703,15 @@ export function useDropImport(options: DropImportOptions) {
 	}
 
 	async function handleDropConfirm(type: string, innerBase?: string) {
+		// The confirmation dialog lets the player correct the detected type, so the
+		// refusal is repeated here: choosing a modpack or an instance import must
+		// not create an instance the club server did not publish.
+		if (isUnmanagedDrop(type)) {
+			dropClassification.value = null
+			confirmDropModal.value?.hide()
+			refuseUnmanagedDrop()
+			return
+		}
 		const classification = dropClassification.value
 		dropClassification.value = null
 		confirmDropModal.value?.hide()
@@ -1186,6 +1204,27 @@ export function useDropImport(options: DropImportOptions) {
 		})
 	}
 
+	/**
+	 * Whether a classification describes something the club server did not
+	 * publish: a modpack archive or another launcher's instance folder. Both
+	 * would add a local instance, which this launcher must not offer.
+	 */
+	function isUnmanagedDrop(itemType: string | undefined) {
+		return (
+			itemType === 'modpack' ||
+			itemType === 'launcher' ||
+			itemType === 'hmcl_launcher'
+		)
+	}
+
+	function refuseUnmanagedDrop() {
+		addNotification({
+			title: formatMessage(messages.unmanagedDropTitle),
+			text: formatMessage(messages.unmanagedDropText),
+			type: 'error',
+		})
+	}
+
 	async function continueWithClassification(
 		result: ClassificationResult,
 		fallbackFileName: string,
@@ -1196,6 +1235,10 @@ export function useDropImport(options: DropImportOptions) {
 				text: unknownReasonMessage(result.reason),
 				type: 'error',
 			})
+			return
+		}
+		if (isUnmanagedDrop(result.item_type)) {
+			refuseUnmanagedDrop()
 			return
 		}
 		dropClassification.value = result
@@ -1310,7 +1353,9 @@ export function useDropImport(options: DropImportOptions) {
 			genericInstallModal.value?.hide()
 			void cancelBatch('target-instance-navigate-create')
 		}
-		router.push('/create')
+		// Instances are published by the club server, so there is no creation form
+		// to send the player to: the home page owns the instance catalog.
+		router.push('/')
 	}
 
 	async function handleDatapackWorldSelect(target: { instanceId: string; worldPath: string }) {
@@ -1975,6 +2020,10 @@ export function useDropImport(options: DropImportOptions) {
 	}
 
 	async function showBatchGroupConfirmModal(group: BatchDropGroup) {
+		if (isUnmanagedDrop(group.type)) {
+			refuseUnmanagedDrop()
+			return
+		}
 		batchGroupKey.value++
 		await nextTick()
 
@@ -1989,6 +2038,7 @@ export function useDropImport(options: DropImportOptions) {
 				.filter(
 					(choice, index, all) => all.findIndex((c) => c.itemType === choice.itemType) === index,
 				)
+				.filter((choice) => !isUnmanagedDrop(choice.itemType))
 			classification = {
 				item_type: 'multiple',
 				file_path: group.items[0]?.sourcePath,
@@ -2009,6 +2059,10 @@ export function useDropImport(options: DropImportOptions) {
 	function onBatchGroupConfirm(type: string) {
 		const group = batchCurrentGroup.value
 		if (!group) return
+		if (isUnmanagedDrop(type)) {
+			refuseUnmanagedDrop()
+			return
+		}
 		console.log('[BatchDrop] onBatchGroupConfirm group=', group.type, 'type=', type)
 		for (const item of group.items) {
 			item.selected = true

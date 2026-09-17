@@ -16,7 +16,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, onUnmounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 import {
 	createDefaultHomeDashboard,
@@ -25,12 +25,13 @@ import {
 	normalizeHomeDashboard,
 } from '@/components/home/home-dashboard'
 import { getActivePlayerName } from '@/components/home/home-utils'
-import HomeDailyChallenge from '@/components/home/HomeDailyChallenge.vue'
 import HomeDashboard from '@/components/home/HomeDashboard.vue'
 import HomeInstancePickerModal from '@/components/home/HomeInstancePickerModal.vue'
 import HomeMinecraftNews from '@/components/home/HomeMinecraftNews.vue'
 import HomeMinimal from '@/components/home/HomeMinimal.vue'
 import HomePlayInsights from '@/components/home/HomePlayInsights.vue'
+import ManagedInstancesPanel from '@/components/home/ManagedInstancesPanel.vue'
+import { useManagedInstances } from '@/composables/useManagedInstances'
 import { useNetworkStatus } from '@/composables/useNetworkStatus'
 import { get_default_user, users } from '@/helpers/auth'
 import { DIRECT_LINKS_SYNCED_EVENT } from '@/helpers/direct-link-sync'
@@ -44,10 +45,10 @@ import type { FeatureFlag, HomeLayout } from '@/store/theme'
 
 const { handleError } = injectNotificationManager()
 const route = useRoute()
-const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 const { formatMessage } = useVIntl()
 const { offline } = useNetworkStatus()
+const { ensureSynced: ensureInstancesSynced } = useManagedInstances()
 const themeStore = useTheming()
 const pageContext = injectPageContext()
 
@@ -205,7 +206,9 @@ async function selectMinimalInstance(instance: GameInstance) {
 }
 
 function createInstance() {
-	void router.push('/create')
+	// Instances are published by the club server, so there is nothing to create by
+	// hand: asking for one means asking the server for its current catalog.
+	void ensureInstancesSynced()
 }
 
 async function toggleHomeLayout() {
@@ -266,6 +269,7 @@ onUnmounted(() => {
 		:selected-instance-id="themeStore.minimalHomeInstanceId"
 		@select="selectMinimalInstance"
 	/>
+	<ManagedInstancesPanel />
 	<div class="min-h-full">
 		<HomeDashboard
 			v-if="!isMinimal && dashboardConfig"
@@ -379,7 +383,6 @@ onUnmounted(() => {
 			:class="{ 'slide-enter-from': !animateSidebarShow }"
 		>
 			<HomePlayInsights />
-			<HomeDailyChallenge />
 			<HomeMinecraftNews />
 		</div>
 	</Teleport>

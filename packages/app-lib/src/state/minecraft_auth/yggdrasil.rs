@@ -90,12 +90,12 @@ struct Metadata {
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct AuthenticateResponse {
-    access_token: String,
-    client_token: String,
+pub(super) struct AuthenticateResponse {
+    pub(super) access_token: String,
+    pub(super) client_token: String,
     #[serde(default)]
-    available_profiles: Vec<YggdrasilProfile>,
-    selected_profile: Option<YggdrasilProfile>,
+    pub(super) available_profiles: Vec<YggdrasilProfile>,
+    pub(super) selected_profile: Option<YggdrasilProfile>,
 }
 
 #[derive(Deserialize)]
@@ -336,6 +336,13 @@ pub async fn refresh_yggdrasil_credentials(
         return Ok(());
     }
 
+    // A session opened through the account site belongs to its OpenID provider:
+    // the classic auth server does not know those tokens, so renew it there.
+    if !credentials.refresh_token.is_empty() {
+        return super::oidc::refresh_credentials_with_oidc(credentials, exec)
+            .await;
+    }
+
     let account = credentials.yggdrasil.clone().ok_or_else(|| {
         ErrorKind::OtherError(
             "Yggdrasil credentials are missing provider information"
@@ -381,6 +388,7 @@ pub async fn refresh_yggdrasil_credentials(
         },
     )
     .await?;
+
     let profile = refreshed.selected_profile.ok_or_else(|| {
         ErrorKind::OtherError(
             "The Yggdrasil service rejected the selected profile".to_string(),
@@ -518,6 +526,32 @@ pub async fn fetch_yggdrasil_metadata(
     })
 }
 
+/// The OpenID provider the account site announces, if it supports Yggdrasil
+/// Connect.
+///
+/// The specification puts the discovery URL in the Yggdrasil API metadata under
+/// `meta.feature.openid_configuration_url`; a site without it does not implement
+/// Yggdrasil Connect, which is what the launcher prefers for signing in.
+pub(super) fn openid_configuration_url(metadata: &str) -> Option<String> {
+    #[derive(Deserialize, Default)]
+    struct OpenIdFeature {
+        #[serde(default, rename = "feature.openid_configuration_url")]
+        configuration_url: Option<String>,
+    }
+
+    #[derive(Deserialize, Default)]
+    struct Metadata {
+        #[serde(default)]
+        meta: OpenIdFeature,
+    }
+
+    serde_json::from_str::<Metadata>(metadata)
+        .ok()
+        .and_then(|document| document.meta.configuration_url)
+        .map(|url| url.trim().to_string())
+        .filter(|url| !url.is_empty())
+}
+
 pub fn normalize_api_root(api_root: &str) -> crate::Result<String> {
     let mut url = Url::parse(api_root.trim()).map_err(|error| {
         ErrorKind::InputError(format!("Invalid Yggdrasil API URL: {error}"))
@@ -607,7 +641,7 @@ async fn response_error(response: reqwest::Response) -> crate::Error {
     ErrorKind::OtherError(message).as_error()
 }
 
-fn create_credentials(
+pub(super) fn create_credentials(
     profile: YggdrasilProfile,
     access_token: String,
     client_token: String,

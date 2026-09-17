@@ -101,21 +101,6 @@ export const onboardingMessages = defineMessages({
 		id: 'app.onboarding.action.continue-area',
 		defaultMessage: 'Click anywhere for the next bit',
 	},
-	skinsTitle: { id: 'app.onboarding.skins.title', defaultMessage: 'A new look, maybe' },
-	skinsDescription: {
-		id: 'app.onboarding.skins.description',
-		defaultMessage:
-			'Keep your Minecraft skins together. Signing in can wait until you feel like it.',
-	},
-	clickSkins: {
-		id: 'app.onboarding.action.click-skins',
-		defaultMessage: 'Click Skin selector to continue',
-	},
-	skinsPageTitle: { id: 'app.onboarding.skins-page.title', defaultMessage: 'Your skin drawer' },
-	skinsPageDescription: {
-		id: 'app.onboarding.skins-page.description',
-		defaultMessage: 'Add, preview, sort, and apply skins here. No pressure to sign in just yet.',
-	},
 	accountTitle: {
 		id: 'app.onboarding.account.title',
 		defaultMessage: 'Accounts, on your schedule',
@@ -487,55 +472,6 @@ export const onboardingTours: Record<OnboardingMode, OnboardingStep[]> = {
 			onboardingMessages.homeLayoutDescription,
 		),
 		step(
-			'discover-navigation',
-			'navigate',
-			copy(
-				onboardingMessages.discoverTitle,
-				onboardingMessages.discoverDescription,
-				onboardingMessages.clickDiscover,
-			),
-			// Discover keeps the last project type, so the path is not fixed.
-			control('nav-discover'),
-		),
-		inspect(
-			'discover-content',
-			'browse-content',
-			onboardingMessages.browseTitle,
-			onboardingMessages.browseDescription,
-		),
-		step(
-			'discover-favorites-navigation',
-			'navigate',
-			copy(
-				onboardingMessages.favoritesTitle,
-				onboardingMessages.favoritesDescription,
-				onboardingMessages.clickFavorites,
-			),
-			control('browse-favorites-tab', '/browse/favorites'),
-		),
-		inspect(
-			'discover-favorites-content',
-			'browse-favorites-content',
-			onboardingMessages.favoritesTitle,
-			onboardingMessages.favoritesDescription,
-		),
-		step(
-			'skins-navigation',
-			'navigate',
-			copy(
-				onboardingMessages.skinsTitle,
-				onboardingMessages.skinsDescription,
-				onboardingMessages.clickSkins,
-			),
-			control('nav-skins', '/skins'),
-		),
-		inspect(
-			'skins-page',
-			'skins-page',
-			onboardingMessages.skinsPageTitle,
-			onboardingMessages.skinsPageDescription,
-		),
-		step(
 			'account',
 			'inspect',
 			copy(
@@ -544,106 +480,6 @@ export const onboardingTours: Record<OnboardingMode, OnboardingStep[]> = {
 				onboardingMessages.continueArea,
 			),
 			control('account-entry'),
-		),
-		step(
-			'lab-navigation',
-			'navigate',
-			copy(
-				onboardingMessages.labTitle,
-				onboardingMessages.labDescription,
-				onboardingMessages.clickLab,
-			),
-			control('nav-lab', '/lab'),
-		),
-		inspect(
-			'lab-tools',
-			'lab-tools',
-			onboardingMessages.labToolsTitle,
-			onboardingMessages.labToolsDescription,
-		),
-		step(
-			'lab-gradient-text-navigation',
-			'navigate',
-			copy(
-				onboardingMessages.labEditorTitle,
-				onboardingMessages.labEditorDescription,
-				onboardingMessages.openGradientText,
-			),
-			control('lab-gradient-text-card', '/lab/gradient-text'),
-		),
-		inspect(
-			'lab-gradient-text-editor',
-			'lab-gradient-text-editor',
-			onboardingMessages.labEditorTitle,
-			onboardingMessages.labEditorDescription,
-		),
-		step(
-			'lab-return-navigation',
-			'navigate',
-			copy(
-				onboardingMessages.labSeedMapTitle,
-				onboardingMessages.labSeedMapDescription,
-				onboardingMessages.returnToLab,
-			),
-			control('nav-lab', '/lab'),
-		),
-		step(
-			'lab-seed-map-navigation',
-			'navigate',
-			copy(
-				onboardingMessages.labSeedMapTitle,
-				onboardingMessages.labSeedMapDescription,
-				onboardingMessages.openSeedMap,
-			),
-			control('lab-seed-map-card', '/lab/seed-map'),
-		),
-		inspect(
-			'lab-seed-map-workspace',
-			'seed-map-workspace',
-			onboardingMessages.labSeedMapTitle,
-			onboardingMessages.labSeedMapDescription,
-		),
-		step(
-			'lab-return-schematic-navigation',
-			'navigate',
-			copy(
-				onboardingMessages.labSchematicTitle,
-				onboardingMessages.labSchematicDescription,
-				onboardingMessages.returnToLab,
-			),
-			control('nav-lab', '/lab'),
-		),
-		step(
-			'lab-schematic-navigation',
-			'navigate',
-			copy(
-				onboardingMessages.labSchematicTitle,
-				onboardingMessages.labSchematicDescription,
-				onboardingMessages.openSchematicWorkshop,
-			),
-			control('lab-schematic-preview-card', '/lab/schematic-preview'),
-		),
-		inspect(
-			'lab-schematic-workspace',
-			'schematic-preview-workspace',
-			onboardingMessages.labSchematicTitle,
-			onboardingMessages.labSchematicDescription,
-		),
-		step(
-			'lab-recipe-generator-navigation',
-			'navigate',
-			copy(
-				onboardingMessages.labRecipeGeneratorTitle,
-				onboardingMessages.labRecipeGeneratorDescription,
-				onboardingMessages.openRecipeGenerator,
-			),
-			control('lab-recipe-generator-card', '/lab/recipe-generator'),
-		),
-		inspect(
-			'lab-recipe-generator-workspace',
-			'recipe-generator-workspace',
-			onboardingMessages.labRecipeGeneratorTitle,
-			onboardingMessages.labRecipeGeneratorDescription,
 		),
 		step(
 			'downloads-navigation',
@@ -697,67 +533,6 @@ export const onboardingTours: Record<OnboardingMode, OnboardingStep[]> = {
 			'library-content',
 			onboardingMessages.libraryPageTitle,
 			onboardingMessages.libraryPageDescription,
-		),
-		step(
-			'create-instance',
-			'navigate',
-			copy(
-				onboardingMessages.createTitle,
-				onboardingMessages.createDescription,
-				onboardingMessages.clickCreate,
-			),
-			control('create-instance', '/create'),
-		),
-		step(
-			'creation-flow',
-			'activate',
-			copy(
-				onboardingMessages.creationTitle,
-				onboardingMessages.creationDescription,
-				onboardingMessages.clickCreationMethod,
-			),
-			{
-				targetId: 'creation-methods',
-				branchByTarget: {
-					'creation-method-custom': { creationPath: 'custom', next: 'creation-name' },
-					'creation-method-import': { next: 'complete' },
-				},
-			},
-		),
-		inspect(
-			'creation-name',
-			'creation-name',
-			onboardingMessages.creationNameTitle,
-			onboardingMessages.creationNameDescription,
-		),
-		inspect(
-			'creation-loader',
-			'creation-loader',
-			onboardingMessages.creationLoaderTitle,
-			onboardingMessages.creationLoaderDescription,
-		),
-		step(
-			'creation-version',
-			'inspect',
-			copy(
-				onboardingMessages.creationVersionTitle,
-				onboardingMessages.creationVersionDescription,
-				onboardingMessages.continueArea,
-			),
-			{
-				targetId: 'creation-game-version',
-				nextByCreationPath: { custom: 'creation-confirm' },
-			},
-		),
-		step(
-			'creation-confirm',
-			'inspect',
-			copy(
-				onboardingMessages.creationConfirmTitle,
-				onboardingMessages.creationConfirmDescription,
-				onboardingMessages.finishArea,
-			),
-			{ targetId: 'creation-confirm' },
 		),
 	],
 	instance: [

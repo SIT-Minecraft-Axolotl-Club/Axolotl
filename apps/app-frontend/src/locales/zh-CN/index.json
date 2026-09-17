@@ -12472,5 +12472,158 @@
   },
   "instance.settings.tabs.sync": {
     "message": "同步"
+  },
+  "sitmc-login.title": {
+    "message": "登录 SIT-Minecraft 账户"
+  },
+  "sitmc-login.subtitle": {
+    "message": "启动器只接受 SIT-Minecraft 皮肤站账户，登录后即可安装并启动社团游戏实例。"
+  },
+  "sitmc-login.sign-in-with-site": {
+    "message": "使用 SIT-Minecraft 账户登录"
+  },
+  "sitmc-login.sign-in-hint": {
+    "message": "将打开浏览器完成授权，启动器不会接触你的密码。"
+  },
+  "sitmc-login.starting": {
+    "message": "正在向皮肤站申请授权码…"
+  },
+  "sitmc-login.device-description": {
+    "message": "浏览器未自动打开时，请访问下面的地址并输入授权码："
+  },
+  "sitmc-login.open-verification": {
+    "message": "重新打开授权页面"
+  },
+  "sitmc-login.waiting-approval": {
+    "message": "等待在浏览器中完成授权…"
+  },
+  "sitmc-login.select-profile": {
+    "message": "选择要使用的角色"
+  },
+  "sitmc-login.select-profile-hint": {
+    "message": "该账户下有多个角色，请选择进入游戏时使用的角色。"
+  },
+  "sitmc-login.device-expired": {
+    "message": "授权码已过期，请重新开始登录。"
+  },
+  "sitmc-login.register-title": {
+    "message": "还没有账户？"
+  },
+  "sitmc-login.register": {
+    "message": "前往皮肤站注册"
+  },
+  "sitmc-login.visit-site": {
+    "message": "打开皮肤站"
+  },
+  "sitmc-login.password-fallback": {
+    "message": "改用账号密码登录"
+  },
+  "sitmc-login.device-fallback": {
+    "message": "返回浏览器授权登录"
+  },
+  "sitmc-login.password-hint": {
+    "message": "浏览器授权不可用时，可以直接使用皮肤站的账号与密码登录。"
+  },
+  "sitmc-login.account-label": {
+    "message": "账户（邮箱或用户名）"
+  },
+  "sitmc-login.password-label": {
+    "message": "密码"
+  },
+  "sitmc-login.remember-password": {
+    "message": "记住密码（保存在系统凭据管理器）"
+  },
+  "sitmc-login.sign-in": {
+    "message": "登录"
+  },
+  "sitmc-login.saved-accounts": {
+    "message": "已记住的账户"
+  },
+  "sitmc-login.forget-account": {
+    "message": "移除"
+  },
+  "sitmc-login.close": {
+    "message": "稍后再说"
+  },
+  "sitmc-account.sign-in": {
+    "message": "登录 SIT-Minecraft 账户"
+  },
+  "sitmc-account.register": {
+    "message": "注册 SIT-Minecraft 账户"
+  },
+  "sitmc-account.open-site": {
+    "message": "打开皮肤站"
+  },
+  "sitmc-account.add": {
+    "message": "添加 SIT-Minecraft 账户"
+  },
+  "managed-instances.title": {
+    "message": "社团游戏实例"
+  },
+  "managed-instances.subtitle": {
+    "message": "实例由社团服务端统一下发，启动前会强制更新到最新版本。"
+  },
+  "managed-instances.checking": {
+    "message": "正在检查服务端版本…"
+  },
+  "managed-instances.updating": {
+    "message": "正在更新 {name}"
+  },
+  "managed-instances.progress": {
+    "message": "已完成 {done}/{total}"
+  },
+  "managed-instances.ready": {
+    "message": "已是最新版本"
+  },
+  "managed-instances.retry": {
+    "message": "重试"
+  },
+  "managed-instances.refresh": {
+    "message": "检查更新"
+  },
+  "managed-instances.play": {
+    "message": "开始游戏"
+  },
+  "managed-instances.starting": {
+    "message": "启动中…"
+  },
+  "managed-instances.empty": {
+    "message": "服务端当前没有下发可用的游戏实例。"
+  },
+  "managed-instances.retired-title": {
+    "message": "已下线的实例"
+  },
+  "managed-instances.retired-hint": {
+    "message": "这些实例已从服务端清单移除，不再能启动，数据仍保留在本地。"
+  },
+  "managed-instances.unconfigured": {
+    "message": "未配置社团实例清单地址，无法获取游戏实例。"
+  },
+  "app.launcher-update-required.title": {
+    "message": "需要更新启动器"
+  },
+  "app.launcher-update-required.body": {
+    "message": "社团服务端要求启动器版本不低于 {version}。请先更新启动器，更新完成后即可继续安装并启动游戏。"
+  },
+  "app.launcher-update-required.action": {
+    "message": "立即更新并重启"
+  },
+  "app.launcher-update-required.busy": {
+    "message": "正在下载更新…"
+  },
+  "app.launcher-update-required.unavailable": {
+    "message": "暂时获取不到可用更新，请稍后重试或联系社团管理员。"
+  },
+  "app.action-bar.update-required": {
+    "message": "必须更新"
+  },
+  "app.drop.error.unmanaged-title": {
+    "message": "只能安装社团下发的实例"
+  },
+  "app.drop.error.unmanaged-text": {
+    "message": "本启动器只安装社团服务端下发的游戏实例。你可以改为拖入存档，或从首页启动游戏。"
+  },
+  "sitmc-login.select-profile-on-site": {
+    "message": "授权页面会让你选择要使用的角色，启动器会以该角色进入游戏。"
   }
 }

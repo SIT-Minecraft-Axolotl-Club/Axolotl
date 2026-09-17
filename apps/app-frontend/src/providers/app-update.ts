@@ -46,6 +46,15 @@ function getCurrentAppUpdatePromptStage(): AppUpdatePromptStage {
 	return finishedDownloading.value ? 'downloaded' : 'available'
 }
 
+/**
+ * Whether the available update is mandatory.
+ *
+ * A mandatory update cannot be hidden by pausing updates, and the update checks
+ * keep running while paused so it is still discovered. The release delay and the
+ * metered-connection guard are skipped for it as well.
+ */
+const isUpdateForced = computed(() => availableUpdate.value?.forceUpdate === true)
+
 export const appUpdateState = {
 	progress,
 	metered,
@@ -56,11 +65,15 @@ export const appUpdateState = {
 	updateSize,
 	updatesEnabled,
 	updatesPaused,
+	isUpdateForced,
 	downloadProgress: computed(() => progress.value),
 	downloadPercent: computed(() => Math.trunc(progress.value * 100)),
 	isVisible: computed(
 		() =>
-			!!availableUpdate.value && !restarting.value && updatesEnabled.value && !updatesPaused.value,
+			!!availableUpdate.value &&
+			!restarting.value &&
+			updatesEnabled.value &&
+			(isUpdateForced.value || !updatesPaused.value),
 	),
 }
 

@@ -276,7 +276,7 @@ const projectLinks = [
 		label: messages.qqChannel,
 		icon: QqChannelIcon,
 	},
-]
+].filter((link) => link.href)
 </script>
 
 <template>
@@ -376,6 +376,7 @@ const projectLinks = [
 				</a>
 
 				<button
+					v-if="AxolotlBrandConfig.qqGroupNumber"
 					type="button"
 					:disabled="copied"
 					:aria-label="
@@ -409,6 +410,7 @@ const projectLinks = [
 				</button>
 
 				<a
+					v-if="AxolotlBrandConfig.sponsorUrl"
 					:href="AxolotlBrandConfig.sponsorUrl"
 					target="_blank"
 					rel="noopener noreferrer"
@@ -429,6 +431,7 @@ const projectLinks = [
 				</a>
 
 				<a
+					v-if="AxolotlBrandConfig.surveyUrl"
 					:href="AxolotlBrandConfig.surveyUrl"
 					target="_blank"
 					rel="noopener noreferrer"

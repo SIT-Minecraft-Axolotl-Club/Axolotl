@@ -49,6 +49,10 @@ const messages = defineMessages({
 		id: 'app.action-bar.reload-to-update',
 		defaultMessage: 'Reload to update',
 	},
+	updateRequired: {
+		id: 'app.action-bar.update-required',
+		defaultMessage: 'Update required',
+	},
 })
 
 const {
@@ -56,6 +60,7 @@ const {
 	downloadPercent,
 	downloadProgress,
 	finishedDownloading,
+	isUpdateForced,
 	isVisible: isUpdateVisible,
 	metered,
 	restarting,
@@ -67,7 +72,9 @@ const isUpdateDownloading = computed(
 		(downloadProgress.value > 0 && downloadProgress.value < 1 && !finishedDownloading.value),
 )
 const showUpdatePill = computed(
-	() => isUpdateVisible.value && (finishedDownloading.value || metered.value),
+	() =>
+		isUpdateVisible.value &&
+		(finishedDownloading.value || metered.value || isUpdateForced.value),
 )
 const animateReadyPill = ref(false)
 const updateLabel = computed(() => {
@@ -77,6 +84,10 @@ const updateLabel = computed(() => {
 
 	if (finishedDownloading.value) {
 		return formatMessage(messages.reloadToUpdate)
+	}
+
+	if (isUpdateForced.value) {
+		return formatMessage(messages.updateRequired)
 	}
 
 	return formatMessage(messages.update)

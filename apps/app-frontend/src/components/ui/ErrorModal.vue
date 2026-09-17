@@ -18,13 +18,12 @@ import {
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 
 import { ChatIcon } from '@/assets/icons'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { AxolotlBrandConfig } from '@/config'
 import { trackEvent } from '@/helpers/analytics'
-import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { install_existing_instance } from '@/helpers/install'
 import { cancel_directory_change } from '@/helpers/settings.ts'
 import { exportErrorLogs } from '@/helpers/utils'
@@ -32,6 +31,7 @@ import { handleSevereError } from '@/store/error.js'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const accountsCard = inject('accountsCard', null)
 
 const messages = defineMessages({
 	genericTitle: { id: 'app.error.generic-title', defaultMessage: 'An error occurred' },
@@ -270,24 +270,15 @@ defineExpose({
 
 const loadingMinecraft = ref(false)
 async function loginMinecraft() {
+	// Accounts live on the club account site now, and the account card owns the
+	// sign-in gate, so hand the player over to it instead of signing in here.
+	loadingMinecraft.value = true
 	try {
-		loadingMinecraft.value = true
-		const loggedIn = await login_flow({
-			trouble: formatMessage(messages.loginTrouble),
-			browserLogin: formatMessage(messages.loginBrowser),
-			deviceCode: formatMessage(messages.loginDeviceCode),
-		})
-
-		if (loggedIn) {
-			await set_default_user(loggedIn.account_id).catch(handleError)
-		}
-
+		accountsCard?.value?.login?.()
 		await trackEvent('AccountLogIn', { source: 'ErrorModal' })
-		loadingMinecraft.value = false
 		errorModal.value.hide()
-	} catch (err) {
+	} finally {
 		loadingMinecraft.value = false
-		handleSevereError(err)
 	}
 }
 

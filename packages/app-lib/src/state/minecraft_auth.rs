@@ -1,4 +1,5 @@
 use crate::ErrorKind;
+use crate::sitmc;
 use crate::util::fetch::INSECURE_REQWEST_CLIENT;
 use crate::util::mojang::{mojang_service_url, should_use_mojang_mirror};
 use base64::Engine;
@@ -30,7 +31,9 @@ use tokio::task;
 use url::Url;
 use uuid::Uuid;
 
+mod oidc;
 mod yggdrasil;
+pub use oidc::*;
 pub use yggdrasil::*;
 
 #[derive(Debug, Clone, Copy)]
@@ -505,6 +508,20 @@ impl Credentials {
         self.account_type == MinecraftAccountType::Yggdrasil
     }
 
+    /// Whether this account belongs to the club's own account site.
+    ///
+    /// The launcher is built for exactly one account provider: an account from
+    /// anywhere else cannot sign in to the club's servers, so it must never be
+    /// offered as a choice or used to launch the game. Accounts stored by
+    /// earlier builds therefore stop being usable the moment this build runs,
+    /// without deleting their rows.
+    pub fn is_supported_provider(&self) -> bool {
+        self.is_yggdrasil()
+            && self.yggdrasil.as_ref().is_some_and(|account| {
+                sitmc::is_yggdrasil_api_root(&account.api_root)
+            })
+    }
+
     fn from_stored(stored: StoredCredentials) -> Self {
         let account_type =
             MinecraftAccountType::from_database(&stored.account_type);
@@ -785,7 +802,8 @@ impl Credentials {
     ) -> crate::Result<Option<Credentials>> {
         let credentials = Self::get_active_without_refresh(exec).await?;
 
-        if let Some(mut creds) = credentials {
+        if let Some(mut creds) = credentials.filter(Self::is_supported_provider)
+        {
             let res = creds.refresh(exec).await;
 
             match res {

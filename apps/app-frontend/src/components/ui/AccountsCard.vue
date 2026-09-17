@@ -22,19 +22,19 @@
 			<button color="primary" :disabled="loginDisabled" @click="login()">
 				<LogInIcon v-if="!loginDisabled" />
 				<SpinnerIcon v-else class="animate-spin" />
-				{{ formatMessage(messages.signInToMinecraft) }}
+				{{ formatMessage(messages.signInToSitmc) }}
 			</button>
 		</ButtonStyled>
 		<ButtonStyled v-if="!offline">
-			<button :disabled="loginDisabled" @click="showYggdrasilAccountModal()">
-				<PlusIcon />
-				{{ formatMessage(messages.addThirdPartyAccount) }}
+			<button :disabled="loginDisabled" @click="openSitmcRegister()">
+				<ExternalIcon />
+				{{ formatMessage(messages.registerSitmcAccount) }}
 			</button>
 		</ButtonStyled>
 		<ButtonStyled>
-			<button :disabled="loginDisabled" @click="showOfflineAccountModal()">
-				<PlusIcon />
-				{{ formatMessage(messages.addOfflineAccount) }}
+			<button :disabled="loginDisabled" @click="openSitmcSite()">
+				<ExternalIcon />
+				{{ formatMessage(messages.openSitmcSite) }}
 			</button>
 		</ButtonStyled>
 	</div>
@@ -56,288 +56,96 @@
 					<span class="truncate w-full text-left">{{
 						selectedAccount ? selectedAccount.profile.name : formatMessage(messages.selectAccount)
 					}}</span>
-					<span class="text-secondary text-xs">
-						{{
-							selectedAccount?.account_type === 'offline'
-								? formatMessage(messages.offlineAccount)
-								: selectedAccount?.account_type === 'yggdrasil'
-									? selectedAccount.yggdrasil?.server_name ||
-										formatMessage(messages.thirdPartyAccount)
-									: formatMessage(messages.minecraftAccount)
-						}}
-					</span>
+					<span class="text-secondary text-xs">{{ SitmcConfig.serverLabel }}</span>
 				</div>
 			</div>
 		</template>
 		<div class="bg-button-bg pt-1 pb-2 border-0 border-t border-solid border-surface-5">
-			<template v-if="accounts.length > 0">
-				<div v-for="account in accounts" :key="account.account_id" class="flex gap-1 items-center">
-					<button
-						class="flex items-center flex-shrink flex-grow overflow-clip gap-2 p-2 border-0 bg-transparent cursor-pointer button-base min-w-0"
-						@click="setAccount(account)"
-					>
-						<RadioButtonCheckedIcon
-							v-if="selectedAccount && selectedAccount.account_id === account.account_id"
-							class="w-5 h-5 text-brand shrink-0"
-						/>
-						<RadioButtonIcon v-else class="w-5 h-5 text-secondary shrink-0" />
-						<Avatar
-							:src="getAccountAvatarUrl(account)"
-							size="24px"
-							pixelated
-							:unframed-natural-width="72"
-						/>
-						<div class="flex flex-1 min-w-0 flex-col text-left">
-							<p
-								class="m-0 truncate text-left"
-								:class="
-									selectedAccount && selectedAccount.account_id === account.account_id
-										? 'text-contrast font-semibold'
-										: 'text-primary'
-								"
-							>
-								{{ account.profile.name }}
-							</p>
-							<p
-								v-if="duplicateAccountNames.has(account.profile.name)"
-								class="m-0 truncate text-left text-xs text-secondary"
-							>
-								{{ account.profile.id }}
-							</p>
-						</div>
-						<span v-if="account.account_type === 'offline'" class="text-secondary text-xs shrink-0">
-							{{ formatMessage(messages.offlineBadge) }}
-						</span>
-						<span
-							v-else-if="account.account_type === 'microsoft'"
-							class="text-secondary text-xs shrink-0"
+			<div v-for="account in accounts" :key="account.account_id" class="flex gap-1 items-center">
+				<button
+					class="flex items-center flex-shrink flex-grow overflow-clip gap-2 p-2 border-0 bg-transparent cursor-pointer button-base min-w-0"
+					@click="setAccount(account)"
+				>
+					<RadioButtonCheckedIcon
+						v-if="selectedAccount && selectedAccount.account_id === account.account_id"
+						class="w-5 h-5 text-brand shrink-0"
+					/>
+					<RadioButtonIcon v-else class="w-5 h-5 text-secondary shrink-0" />
+					<Avatar
+						:src="getAccountAvatarUrl(account)"
+						size="24px"
+						pixelated
+						:unframed-natural-width="72"
+					/>
+					<div class="flex flex-1 min-w-0 flex-col text-left">
+						<p
+							class="m-0 truncate text-left"
+							:class="
+								selectedAccount && selectedAccount.account_id === account.account_id
+									? 'text-contrast font-semibold'
+									: 'text-primary'
+							"
 						>
-							{{ formatMessage(messages.officialBadge) }}
-						</span>
-						<span
-							v-else-if="account.account_type === 'yggdrasil'"
-							class="text-secondary text-xs shrink-0"
+							{{ account.profile.name }}
+						</p>
+						<p
+							v-if="duplicateAccountNames.has(account.profile.name)"
+							class="m-0 truncate text-left text-xs text-secondary"
 						>
-							{{ account.yggdrasil?.server_name || formatMessage(messages.thirdPartyBadge) }}
-						</span>
-					</button>
-					<div class="flex shrink-0 items-center">
-						<button
-							v-tooltip="formatMessage(messages.copyUuid)"
-							type="button"
-							class="button-base border-0 bg-transparent p-1.5 cursor-pointer text-secondary hover:text-brand"
-							@click="copyAccountUuid(account)"
-						>
-							<CopyIcon />
-						</button>
-						<button
-							v-tooltip="formatMessage(messages.removeAccount)"
-							type="button"
-							class="button-base border-0 bg-transparent p-1.5 cursor-pointer text-secondary hover:text-red"
-							@click="logout(account)"
-						>
-							<TrashIcon />
-						</button>
+							{{ account.profile.id }}
+						</p>
 					</div>
+					<span class="text-secondary text-xs shrink-0">{{ SitmcConfig.serverLabel }}</span>
+				</button>
+				<div class="flex shrink-0 items-center">
+					<button
+						v-tooltip="formatMessage(messages.copyUuid)"
+						type="button"
+						class="button-base border-0 bg-transparent p-1.5 cursor-pointer text-secondary hover:text-brand"
+						@click="copyAccountUuid(account)"
+					>
+						<CopyIcon />
+					</button>
+					<button
+						v-tooltip="formatMessage(messages.removeAccount)"
+						type="button"
+						class="button-base border-0 bg-transparent p-1.5 cursor-pointer text-secondary hover:text-red"
+						@click="logout(account)"
+					>
+						<TrashIcon />
+					</button>
 				</div>
-			</template>
+			</div>
 			<div class="flex flex-col gap-2 px-2 pt-2">
-				<ButtonStyled v-if="accounts.length > 0 && !offline" class="w-full">
+				<ButtonStyled v-if="!offline" class="w-full">
 					<button :disabled="loginDisabled" @click="login()">
 						<PlusIcon />
-						{{ formatMessage(messages.addMicrosoftAccount) }}
+						{{ formatMessage(messages.addSitmcAccount) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled v-if="accounts.length > 0 && !offline" class="w-full">
-					<button :disabled="loginDisabled" @click="showYggdrasilAccountModal()">
-						<PlusIcon />
-						{{ formatMessage(messages.addThirdPartyAccount) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-if="accounts.length > 0" class="w-full">
-					<button :disabled="loginDisabled" @click="showOfflineAccountModal()">
-						<PlusIcon />
-						{{ formatMessage(messages.addOfflineAccount) }}
+				<ButtonStyled class="w-full">
+					<button :disabled="loginDisabled" @click="openSitmcSite()">
+						<ExternalIcon />
+						{{ formatMessage(messages.openSitmcSite) }}
 					</button>
 				</ButtonStyled>
 			</div>
 		</div>
 	</Accordion>
-	<MinecraftLoginModal ref="minecraftLoginModal" @complete="onMicrosoftLogin" />
-	<ModalWrapper ref="offlineAccountModal" :header="formatMessage(messages.offlineModalTitle)">
-		<div class="flex min-w-[22rem] flex-col gap-4">
-			<p class="m-0 text-secondary">{{ formatMessage(messages.offlineModalDescription) }}</p>
-			<label class="flex flex-col gap-2 font-semibold">
-				{{ formatMessage(messages.usernameLabel) }}
-				<StyledInput
-					v-model="offlineUsername"
-					:disabled="loginDisabled"
-					:placeholder="formatMessage(messages.usernamePlaceholder)"
-					autocomplete="off"
-					maxlength="16"
-					@keyup.enter="addOfflineAccount()"
-				/>
-			</label>
-			<p v-if="offlineUsername.length > 0 && !offlineUsernameValid" class="m-0 text-sm text-red">
-				{{ formatMessage(messages.usernameValidation) }}
-			</p>
-			<p
-				v-if="offlineUsernameContainsChinese"
-				class="m-0 rounded-lg border border-solid border-orange bg-highlight-orange p-3 text-sm text-contrast"
-			>
-				{{ formatMessage(messages.chineseUsernameWarning) }}
-			</p>
-			<Checkbox
-				v-model="offlineCustomUuid"
-				:disabled="loginDisabled"
-				:label="formatMessage(messages.customUuidLabel)"
-			/>
-			<Admonition
-				v-if="offlineCustomUuid"
-				type="warning"
-				:body="formatMessage(messages.customUuidWarning)"
-			/>
-			<label v-if="offlineCustomUuid" class="flex flex-col gap-2 font-semibold">
-				{{ formatMessage(messages.customUuidInputLabel) }}
-				<StyledInput
-					v-model="offlineUuid"
-					:disabled="loginDisabled"
-					:placeholder="formatMessage(messages.customUuidPlaceholder)"
-					autocomplete="off"
-					spellcheck="false"
-					maxlength="36"
-					@keyup.enter="addOfflineAccount()"
-				/>
-			</label>
-			<p
-				v-if="offlineCustomUuid && offlineUuid.length > 0 && !offlineUuidValid"
-				class="m-0 text-sm text-red"
-			>
-				{{ formatMessage(messages.customUuidValidation) }}
-			</p>
-			<Admonition
-				v-if="offlineUuidDuplicate"
-				type="critical"
-				:body="formatMessage(messages.customUuidDuplicate)"
-			/>
-			<div class="input-group push-right">
-				<ButtonStyled>
-					<button :disabled="loginDisabled" @click="offlineAccountModal?.hide()">
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="loginDisabled || !offlineFormValid" @click="addOfflineAccount()">
-						<SpinnerIcon v-if="loginDisabled" class="animate-spin" />
-						<PlusIcon v-else />
-						{{ formatMessage(messages.createOfflineAccount) }}
-					</button>
-				</ButtonStyled>
-			</div>
-		</div>
-	</ModalWrapper>
-	<ModalWrapper ref="yggdrasilAccountModal" :header="formatMessage(messages.thirdPartyModalTitle)">
-		<div class="flex min-w-[24rem] flex-col gap-4">
-			<p class="m-0 text-secondary">{{ formatMessage(messages.thirdPartyModalDescription) }}</p>
-			<div v-if="savedYggdrasilLogins.length > 0" class="flex flex-col gap-2">
-				<span class="font-semibold">{{ formatMessage(messages.savedLogins) }}</span>
-				<div
-					v-for="savedLogin in savedYggdrasilLogins"
-					:key="`${savedLogin.api_root}:${savedLogin.login}`"
-					class="flex items-center gap-1 rounded-xl bg-surface-3 p-1"
-				>
-					<button
-						class="flex min-w-0 flex-grow flex-col items-start border-0 bg-transparent px-3 py-2 text-left cursor-pointer"
-						:disabled="loginDisabled"
-						@click="selectSavedYggdrasilLogin(savedLogin)"
-					>
-						<span class="w-full truncate font-semibold text-primary">{{ savedLogin.login }}</span>
-						<span class="w-full truncate text-xs text-secondary">{{ savedLogin.api_root }}</span>
-					</button>
-					<ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
-						<button
-							v-tooltip="formatMessage(messages.removeSavedLogin)"
-							:disabled="loginDisabled"
-							@click="removeSavedYggdrasilLogin(savedLogin)"
-						>
-							<TrashIcon />
-						</button>
-					</ButtonStyled>
-				</div>
-			</div>
-			<ButtonStyled class="w-full">
-				<button :disabled="loginDisabled" @click="useLittleSkinPreset()">
-					{{ formatMessage(messages.useLittleSkin) }}
-				</button>
-			</ButtonStyled>
-			<label class="flex flex-col gap-2 font-semibold">
-				{{ formatMessage(messages.apiRootLabel) }}
-				<StyledInput
-					v-model="yggdrasilApiRoot"
-					:disabled="loginDisabled"
-					:placeholder="formatMessage(messages.apiRootPlaceholder)"
-					inputmode="url"
-					@blur="loadRememberedYggdrasilPassword()"
-				/>
-			</label>
-			<label class="flex flex-col gap-2 font-semibold">
-				{{ formatMessage(messages.accountLabel) }}
-				<StyledInput
-					v-model="yggdrasilLogin"
-					:disabled="loginDisabled"
-					:placeholder="formatMessage(messages.accountPlaceholder)"
-					autocomplete="username"
-					@blur="loadRememberedYggdrasilPassword()"
-				/>
-			</label>
-			<label class="flex flex-col gap-2 font-semibold">
-				{{ formatMessage(messages.passwordLabel) }}
-				<StyledInput
-					v-model="yggdrasilPassword"
-					type="password"
-					:disabled="loginDisabled"
-					autocomplete="current-password"
-					@keyup.enter="addYggdrasilAccount()"
-				/>
-			</label>
-			<Checkbox
-				v-model="rememberYggdrasilPassword"
-				:disabled="loginDisabled"
-				:label="formatMessage(messages.rememberPassword)"
-			/>
-			<div class="input-group push-right">
-				<ButtonStyled>
-					<button :disabled="loginDisabled" @click="yggdrasilAccountModal?.hide()">
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="loginDisabled || !yggdrasilFormValid" @click="addYggdrasilAccount()">
-						<SpinnerIcon v-if="loginDisabled" class="animate-spin" />
-						<LogInIcon v-else />
-						{{ formatMessage(messages.signInButton) }}
-					</button>
-				</ButtonStyled>
-			</div>
-		</div>
-	</ModalWrapper>
-	<ModalWrapper ref="yggdrasilProfileModal" :header="formatMessage(messages.selectProfileTitle)">
-		<div class="flex min-w-[22rem] flex-col gap-2">
-			<p class="m-0 mb-2 text-secondary">{{ formatMessage(messages.selectProfileDescription) }}</p>
-			<ButtonStyled v-for="profile in pendingYggdrasilProfiles" :key="profile.id" class="w-full">
-				<button :disabled="loginDisabled" @click="selectYggdrasilProfile(profile.id)">
-					<SpinnerIcon v-if="loginDisabled" class="animate-spin" />
-					<RadioButtonIcon v-else />
-					{{ profile.name }}
-				</button>
-			</ButtonStyled>
-		</div>
-	</ModalWrapper>
+	<Teleport to="body">
+		<SitmcLoginGate
+			v-if="showSitmcLogin"
+			overlay
+			@complete="onSitmcLoginComplete"
+			@close="closeSitmcLogin"
+		/>
+	</Teleport>
 </template>
 
 <script setup lang="ts">
 import {
 	CopyIcon,
+	ExternalIcon,
 	LogInIcon,
 	PlusIcon,
 	RadioButtonCheckedIcon,
@@ -348,48 +156,30 @@ import {
 } from '@modrinth/assets'
 import {
 	Accordion,
-	Admonition,
 	Avatar,
 	ButtonStyled,
-	Checkbox,
-	commonMessages,
 	defineMessages,
 	injectNotificationManager,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import { listen } from '@tauri-apps/api/event'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import type { Ref } from 'vue'
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import axolotlLogo from '@/assets/axolotl.png'
 import steveSkinTexture from '@/assets/skins/steve.png?inline'
-import MinecraftLoginModal from '@/components/ui/MinecraftLoginModal.vue'
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import SitmcLoginGate from '@/components/ui/login/SitmcLoginGate.vue'
 import { useNetworkStatus } from '@/composables/useNetworkStatus'
+import { SitmcConfig } from '@/config'
 import { compareMinecraftAccounts } from '@/helpers/accounts'
 import { trackEvent } from '@/helpers/analytics'
-import {
-	add_offline_user,
-	begin_yggdrasil_login,
-	delete_yggdrasil_password,
-	finish_yggdrasil_login,
-	get_default_user,
-	get_yggdrasil_password,
-	list_yggdrasil_saved_logins,
-	login as loginToMinecraft,
-	remove_user,
-	set_default_user,
-	set_yggdrasil_password,
-	users,
-} from '@/helpers/auth'
+import { get_default_user, remove_user, set_default_user, users } from '@/helpers/auth'
 import { process_listener } from '@/helpers/events'
 import { getPlayerHeadUrl } from '@/helpers/rendering/batch-skin-renderer.ts'
 import type { Skin } from '@/helpers/skins'
 import { get_available_skins } from '@/helpers/skins'
-import { handleSevereError } from '@/store/error.js'
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
@@ -433,76 +223,20 @@ type MinecraftCredential = {
 			textureKey?: string
 		}>
 	}
-	yggdrasil?: {
-		api_root: string
-		server_name: string
-		login: string
-	}
 }
-
-type YggdrasilProfile = {
-	id: string
-	name: string
-}
-
-type SavedYggdrasilLogin = {
-	api_root: string
-	login: string
-}
-
-type YggdrasilLoginResult =
-	| { status: 'complete'; credentials: MinecraftCredential }
-	| { status: 'select_profile'; flow_id: string; profiles: YggdrasilProfile[] }
-
-const LITTLE_SKIN_API_ROOT = 'https://littleskin.cn/api/yggdrasil'
 
 const accounts: Ref<MinecraftCredential[]> = ref([])
 const loginDisabled = ref(false)
 const defaultUser = ref<string | undefined>()
 const equippedSkin = ref<Skin | null>(null)
 const accountChangeRevision = ref(0)
+const showSitmcLogin = ref(false)
 const headUrlCache = ref(new Map<string, string>())
 const accountHeadUrlCache = ref(new Map<string, string>())
 const accountHeadTextureKeyCache = ref(new Map<string, string>())
 let refreshGeneration = 0
 let headRefreshTimer: ReturnType<typeof setTimeout> | undefined
 let defaultUserUpdateQueue = Promise.resolve()
-const minecraftLoginModal = ref<InstanceType<typeof MinecraftLoginModal> | null>(null)
-const offlineAccountModal = ref<InstanceType<typeof ModalWrapper> | null>(null)
-const offlineUsername = ref('')
-const offlineCustomUuid = ref(false)
-const offlineUuid = ref('')
-const offlineUuidDuplicate = ref(false)
-const offlineUsernameValid = computed(() =>
-	/^[\p{L}\p{N}_]{1,16}$/u.test(offlineUsername.value.trim()),
-)
-const offlineUuidValid = computed(() =>
-	/^[a-fA-F0-9]{32}$/u.test(offlineUuid.value.replaceAll('-', '')),
-)
-const offlineFormValid = computed(
-	() => offlineUsernameValid.value && (!offlineCustomUuid.value || offlineUuidValid.value),
-)
-watch([offlineUuid, offlineCustomUuid], () => {
-	offlineUuidDuplicate.value = false
-})
-const offlineUsernameContainsChinese = computed(() =>
-	/\p{Script=Han}/u.test(offlineUsername.value.trim()),
-)
-const yggdrasilAccountModal = ref<InstanceType<typeof ModalWrapper> | null>(null)
-const yggdrasilProfileModal = ref<InstanceType<typeof ModalWrapper> | null>(null)
-const yggdrasilApiRoot = ref(LITTLE_SKIN_API_ROOT)
-const yggdrasilLogin = ref('')
-const yggdrasilPassword = ref('')
-const rememberYggdrasilPassword = ref(true)
-const savedYggdrasilLogins = ref<SavedYggdrasilLogin[]>([])
-const pendingYggdrasilFlowId = ref<string | undefined>()
-const pendingYggdrasilProfiles = ref<YggdrasilProfile[]>([])
-const yggdrasilFormValid = computed(
-	() =>
-		yggdrasilApiRoot.value.trim().length > 0 &&
-		yggdrasilLogin.value.trim().length > 0 &&
-		yggdrasilPassword.value.length > 0,
-)
 
 function createSkinHeadDataUrl(textureUrl: string) {
 	const escapedTextureUrl = textureUrl
@@ -632,6 +366,7 @@ function setLoginDisabled(value: boolean) {
 
 defineExpose({
 	accountChangeRevision,
+	accounts,
 	login,
 	refreshValues,
 	setEquippedSkin,
@@ -764,248 +499,35 @@ async function setAccount(account: MinecraftCredential) {
 	if (defaultUser.value === userId) notifyAccountChange()
 }
 
-async function login() {
+function login() {
 	if (offline.value) return
-	loginDisabled.value = true
-	try {
-		const account = await loginToMinecraft({
-			trouble: formatMessage(messages.loginTrouble),
-			browserLogin: formatMessage(messages.loginBrowser),
-			deviceCode: formatMessage(messages.loginDeviceCode),
-		})
-		if (account) await onMicrosoftLogin(account)
-	} catch (error) {
-		handleSevereError(error)
-	} finally {
-		loginDisabled.value = false
-	}
+	showSitmcLogin.value = true
 }
 
-async function onMicrosoftLogin(account: MinecraftCredential) {
+function closeSitmcLogin() {
+	showSitmcLogin.value = false
+}
+
+async function onSitmcLoginComplete() {
+	closeSitmcLogin()
 	loginDisabled.value = true
 	try {
-		await setAccount(account)
+		await refreshValues()
+		notifyAccountChange()
 		trackEvent('AccountLogIn')
 	} catch (error) {
-		handleSevereError(error)
-	} finally {
-		loginDisabled.value = false
-	}
-}
-
-function showOfflineAccountModal() {
-	offlineUsername.value = ''
-	offlineCustomUuid.value = false
-	offlineUuid.value = ''
-	offlineUuidDuplicate.value = false
-	offlineAccountModal.value?.show()
-}
-
-async function showYggdrasilAccountModal() {
-	yggdrasilApiRoot.value = LITTLE_SKIN_API_ROOT
-	yggdrasilLogin.value = ''
-	yggdrasilPassword.value = ''
-	rememberYggdrasilPassword.value = true
-	pendingYggdrasilFlowId.value = undefined
-	pendingYggdrasilProfiles.value = []
-	await loadSavedYggdrasilLogins()
-	yggdrasilAccountModal.value?.show()
-}
-
-async function loadSavedYggdrasilLogins() {
-	const storedLogins = await list_yggdrasil_saved_logins().catch(handleError)
-	const savedLogins: SavedYggdrasilLogin[] = Array.isArray(storedLogins) ? [...storedLogins] : []
-	const savedLoginKeys = new Set(
-		savedLogins.map((savedLogin) => `${savedLogin.api_root}\n${savedLogin.login}`),
-	)
-
-	for (const account of accounts.value) {
-		if (!account.yggdrasil) continue
-		const savedLogin = {
-			api_root: account.yggdrasil.api_root,
-			login: account.yggdrasil.login,
-		}
-		const key = `${savedLogin.api_root}\n${savedLogin.login}`
-		if (savedLoginKeys.has(key)) continue
-
-		try {
-			const password = await get_yggdrasil_password(savedLogin.api_root, savedLogin.login)
-			if (!password) continue
-			await set_yggdrasil_password(savedLogin.api_root, savedLogin.login, password)
-			savedLogins.push(savedLogin)
-			savedLoginKeys.add(key)
-		} catch {
-			continue
-		}
-	}
-
-	savedYggdrasilLogins.value = savedLogins.sort((left, right) =>
-		left.login.localeCompare(right.login),
-	)
-}
-
-async function selectSavedYggdrasilLogin(savedLogin: SavedYggdrasilLogin) {
-	if (loginDisabled.value) return
-
-	loginDisabled.value = true
-	try {
-		const password = await get_yggdrasil_password(savedLogin.api_root, savedLogin.login)
-		if (!password) {
-			await delete_yggdrasil_password(savedLogin.api_root, savedLogin.login)
-			await loadSavedYggdrasilLogins()
-			return
-		}
-		yggdrasilApiRoot.value = savedLogin.api_root
-		yggdrasilLogin.value = savedLogin.login
-		yggdrasilPassword.value = password
-		rememberYggdrasilPassword.value = true
-	} catch (error) {
 		handleError(error as Error)
 	} finally {
 		loginDisabled.value = false
 	}
 }
 
-async function removeSavedYggdrasilLogin(savedLogin: SavedYggdrasilLogin) {
-	if (loginDisabled.value) return
-
-	loginDisabled.value = true
-	try {
-		await delete_yggdrasil_password(savedLogin.api_root, savedLogin.login)
-		savedYggdrasilLogins.value = savedYggdrasilLogins.value.filter(
-			(entry) => entry.api_root !== savedLogin.api_root || entry.login !== savedLogin.login,
-		)
-		if (
-			yggdrasilApiRoot.value === savedLogin.api_root &&
-			yggdrasilLogin.value === savedLogin.login
-		) {
-			yggdrasilPassword.value = ''
-			rememberYggdrasilPassword.value = false
-		}
-	} catch (error) {
-		handleError(error as Error)
-	} finally {
-		loginDisabled.value = false
-	}
+async function openSitmcRegister() {
+	await openUrl(SitmcConfig.registerUrl).catch(() => {})
 }
 
-function useLittleSkinPreset() {
-	yggdrasilApiRoot.value = LITTLE_SKIN_API_ROOT
-}
-
-async function loadRememberedYggdrasilPassword() {
-	if (
-		!rememberYggdrasilPassword.value ||
-		!yggdrasilApiRoot.value.trim() ||
-		!yggdrasilLogin.value.trim() ||
-		yggdrasilPassword.value
-	)
-		return
-
-	try {
-		const password = await get_yggdrasil_password(
-			yggdrasilApiRoot.value.trim(),
-			yggdrasilLogin.value.trim(),
-		)
-		if (password) yggdrasilPassword.value = password
-	} catch {
-		return
-	}
-}
-
-async function persistYggdrasilPasswordPreference() {
-	try {
-		if (rememberYggdrasilPassword.value) {
-			await set_yggdrasil_password(
-				yggdrasilApiRoot.value.trim(),
-				yggdrasilLogin.value.trim(),
-				yggdrasilPassword.value,
-			)
-		} else {
-			await delete_yggdrasil_password(yggdrasilApiRoot.value.trim(), yggdrasilLogin.value.trim())
-		}
-	} catch (error) {
-		handleError(error as Error)
-	}
-}
-
-async function addYggdrasilAccount() {
-	if (!yggdrasilFormValid.value || loginDisabled.value) return
-
-	loginDisabled.value = true
-	try {
-		const result = (await begin_yggdrasil_login(
-			yggdrasilApiRoot.value.trim(),
-			yggdrasilLogin.value.trim(),
-			yggdrasilPassword.value,
-		)) as YggdrasilLoginResult
-		if (result.status === 'complete') {
-			await persistYggdrasilPasswordPreference()
-			yggdrasilAccountModal.value?.hide()
-			await setAccount(result.credentials)
-			trackEvent('YggdrasilAccountAdd')
-		} else {
-			pendingYggdrasilFlowId.value = result.flow_id
-			pendingYggdrasilProfiles.value = result.profiles
-			yggdrasilAccountModal.value?.hide()
-			yggdrasilProfileModal.value?.show()
-		}
-	} catch (error) {
-		handleError(error as Error)
-	} finally {
-		loginDisabled.value = false
-	}
-}
-
-async function selectYggdrasilProfile(profileId: string) {
-	if (!pendingYggdrasilFlowId.value || loginDisabled.value) return
-
-	loginDisabled.value = true
-	try {
-		const account = (await finish_yggdrasil_login(
-			pendingYggdrasilFlowId.value,
-			profileId,
-		)) as MinecraftCredential
-		await persistYggdrasilPasswordPreference()
-		yggdrasilProfileModal.value?.hide()
-		await setAccount(account)
-		trackEvent('YggdrasilAccountAdd')
-	} catch (error) {
-		handleError(error as Error)
-	} finally {
-		loginDisabled.value = false
-	}
-}
-
-async function addOfflineAccount() {
-	if (!offlineFormValid.value || loginDisabled.value) return
-
-	loginDisabled.value = true
-	offlineUuidDuplicate.value = false
-	try {
-		const account = await add_offline_user(
-			offlineUsername.value.trim(),
-			offlineCustomUuid.value ? offlineUuid.value.replaceAll('-', '') : undefined,
-		)
-		offlineAccountModal.value?.hide()
-		await setAccount(account)
-		trackEvent('OfflineAccountAdd')
-	} catch (error) {
-		offlineUuidDuplicate.value = isDuplicateUuidError(error)
-		if (!offlineUuidDuplicate.value) handleError(error as Error)
-	} finally {
-		loginDisabled.value = false
-	}
-}
-
-function isDuplicateUuidError(error: unknown) {
-	const rawMessage =
-		error instanceof Error
-			? error.message
-			: typeof error === 'string'
-				? error
-				: JSON.stringify(error)
-	return rawMessage?.includes('An account with this UUID already exists') ?? false
+async function openSitmcSite() {
+	await openUrl(SitmcConfig.site).catch(() => {})
 }
 
 async function logout(account: MinecraftCredential) {
@@ -1032,14 +554,10 @@ const unlisten = await process_listener(async (e) => {
 		await refreshValues()
 	}
 })
-const unlistenDeviceLogin = await listen('minecraft-device-login-requested', () => {
-	minecraftLoginModal.value?.showDeviceLogin()
-})
 
 onUnmounted(() => {
 	clearHeadRefreshRetry()
 	unlisten()
-	unlistenDeviceLogin()
 })
 
 const messages = defineMessages({
@@ -1060,147 +578,21 @@ const messages = defineMessages({
 		id: 'minecraft-account.not-signed-in',
 		defaultMessage: 'Not signed in',
 	},
-	addMicrosoftAccount: {
-		id: 'minecraft-account.add-microsoft-account',
-		defaultMessage: 'Add Microsoft account',
+	signInToSitmc: {
+		id: 'sitmc-account.sign-in',
+		defaultMessage: 'Sign in to SIT-Minecraft',
 	},
-	addThirdPartyAccount: {
-		id: 'minecraft-account.add-third-party-account',
-		defaultMessage: 'Add third-party account',
+	registerSitmcAccount: {
+		id: 'sitmc-account.register',
+		defaultMessage: 'Register a SIT-Minecraft account',
 	},
-	thirdPartyAccount: {
-		id: 'minecraft-account.third-party-account',
-		defaultMessage: 'Third-party Minecraft account',
+	openSitmcSite: {
+		id: 'sitmc-account.open-site',
+		defaultMessage: 'Open the skin site',
 	},
-	thirdPartyBadge: {
-		id: 'minecraft-account.third-party-badge',
-		defaultMessage: 'Third-party',
-	},
-	thirdPartyModalTitle: {
-		id: 'minecraft-account.third-party-modal.title',
-		defaultMessage: 'Sign in with a third-party service',
-	},
-	thirdPartyModalDescription: {
-		id: 'minecraft-account.third-party-modal.description',
-		defaultMessage: 'Use LittleSkin or another compatible Yggdrasil authentication service.',
-	},
-	useLittleSkin: {
-		id: 'minecraft-account.third-party-modal.littleskin',
-		defaultMessage: 'Use LittleSkin',
-	},
-	apiRootLabel: {
-		id: 'minecraft-account.third-party-modal.api-root',
-		defaultMessage: 'Yggdrasil API address',
-	},
-	apiRootPlaceholder: {
-		id: 'minecraft-account.third-party-modal.api-root-placeholder',
-		defaultMessage: 'https://example.com/api/yggdrasil',
-	},
-	accountLabel: {
-		id: 'minecraft-account.third-party-modal.account',
-		defaultMessage: 'Account or email',
-	},
-	accountPlaceholder: {
-		id: 'minecraft-account.third-party-modal.account-placeholder',
-		defaultMessage: 'Enter your account or email',
-	},
-	passwordLabel: {
-		id: 'minecraft-account.third-party-modal.password',
-		defaultMessage: 'Password',
-	},
-	rememberPassword: {
-		id: 'minecraft-account.third-party-modal.remember-password',
-		defaultMessage: 'Save this login on this device',
-	},
-	savedLogins: {
-		id: 'minecraft-account.third-party-modal.saved-logins',
-		defaultMessage: 'Saved logins',
-	},
-	removeSavedLogin: {
-		id: 'minecraft-account.third-party-modal.remove-saved-login',
-		defaultMessage: 'Remove saved login',
-	},
-	signInButton: {
-		id: 'minecraft-account.third-party-modal.sign-in',
-		defaultMessage: 'Sign in',
-	},
-	selectProfileTitle: {
-		id: 'minecraft-account.third-party-profile.title',
-		defaultMessage: 'Select a profile',
-	},
-	selectProfileDescription: {
-		id: 'minecraft-account.third-party-profile.description',
-		defaultMessage: 'Choose the Minecraft profile to use with this account.',
-	},
-	addOfflineAccount: {
-		id: 'minecraft-account.add-offline-account',
-		defaultMessage: 'Add offline account',
-	},
-	offlineAccount: {
-		id: 'minecraft-account.offline-account',
-		defaultMessage: 'Offline Minecraft account',
-	},
-	offlineBadge: {
-		id: 'minecraft-account.offline-badge',
-		defaultMessage: 'Offline',
-	},
-	officialBadge: {
-		id: 'minecraft-account.official-badge',
-		defaultMessage: 'Official',
-	},
-	offlineModalTitle: {
-		id: 'minecraft-account.offline-modal.title',
-		defaultMessage: 'Add offline account',
-	},
-	offlineModalDescription: {
-		id: 'minecraft-account.offline-modal.description',
-		defaultMessage:
-			'Choose the username used in offline games. This account can only join servers that allow offline players.',
-	},
-	usernameLabel: {
-		id: 'minecraft-account.offline-modal.username-label',
-		defaultMessage: 'Minecraft username',
-	},
-	usernamePlaceholder: {
-		id: 'minecraft-account.offline-modal.username-placeholder',
-		defaultMessage: 'Enter a username',
-	},
-	usernameValidation: {
-		id: 'minecraft-account.offline-modal.username-validation',
-		defaultMessage: 'Use 1–16 letters, numbers, or underscores, including Chinese characters.',
-	},
-	chineseUsernameWarning: {
-		id: 'minecraft-account.offline-modal.chinese-username-warning',
-		defaultMessage:
-			'Minecraft 1.18 and newer may reject Chinese usernames when entering singleplayer worlds or servers. Use this account with an older version, or choose an English username for newer versions.',
-	},
-	customUuidLabel: {
-		id: 'minecraft-account.offline-modal.custom-uuid',
-		defaultMessage: 'Custom UUID',
-	},
-	customUuidDuplicate: {
-		id: 'minecraft-account.offline-modal.custom-uuid-duplicate',
-		defaultMessage: 'An account with this UUID already exists. Please use a different UUID.',
-	},
-	customUuidWarning: {
-		id: 'minecraft-account.offline-modal.custom-uuid-warning',
-		defaultMessage: "If you don't understand what this is, do not enable this feature.",
-	},
-	customUuidInputLabel: {
-		id: 'minecraft-account.offline-modal.custom-uuid-input-label',
-		defaultMessage: 'UUID',
-	},
-	customUuidPlaceholder: {
-		id: 'minecraft-account.offline-modal.custom-uuid-placeholder',
-		defaultMessage: '00000000-0000-0000-0000-000000000000',
-	},
-	customUuidValidation: {
-		id: 'minecraft-account.offline-modal.custom-uuid-validation',
-		defaultMessage: 'Use 32 hexadecimal characters. Hyphens are optional.',
-	},
-	createOfflineAccount: {
-		id: 'minecraft-account.offline-modal.create',
-		defaultMessage: 'Create account',
+	addSitmcAccount: {
+		id: 'sitmc-account.add',
+		defaultMessage: 'Add a SIT-Minecraft account',
 	},
 	copyUuid: {
 		id: 'minecraft-account.copy-uuid',
@@ -1213,26 +605,6 @@ const messages = defineMessages({
 	selectAccount: {
 		id: 'minecraft-account.select-account',
 		defaultMessage: 'Select account',
-	},
-	minecraftAccount: {
-		id: 'minecraft-account.label',
-		defaultMessage: 'Minecraft account',
-	},
-	signInToMinecraft: {
-		id: 'minecraft-account.sign-in',
-		defaultMessage: 'Sign in to Minecraft',
-	},
-	loginTrouble: {
-		id: 'minecraft-login.trouble',
-		defaultMessage: 'Having trouble?',
-	},
-	loginBrowser: {
-		id: 'minecraft-login.browser',
-		defaultMessage: 'Use browser login',
-	},
-	loginDeviceCode: {
-		id: 'minecraft-login.device-code',
-		defaultMessage: 'Use device code',
 	},
 })
 </script>

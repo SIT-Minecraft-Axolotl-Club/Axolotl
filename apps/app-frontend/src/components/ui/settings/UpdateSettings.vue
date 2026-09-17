@@ -14,6 +14,7 @@ import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { inject, nextTick, ref, watch } from 'vue'
 
 import UpdateAnnouncementHistory from '@/components/ui/announcement/UpdateAnnouncementHistory.vue'
+import { SitmcConfig } from '@/config'
 import {
 	betaDatabaseExists,
 	copyDatabaseBetweenChannels,
@@ -282,10 +283,15 @@ const messages = defineMessages({
 })
 
 async function loadLatestChannelVersions() {
+	if (!SitmcConfig.updateUrl) {
+		latestChannelVersionsLoaded.value = true
+		return
+	}
+
 	const versions = await Promise.all(
 		(['release', 'beta'] as const).map(async (channel) => {
 			try {
-				const response = await tauriFetch(`https://update.axlmc.org/latest?channel=${channel}`)
+				const response = await tauriFetch(`${SitmcConfig.updateUrl}/latest?channel=${channel}`)
 				if (!response.ok) return [channel, undefined] as const
 				const payload = (await response.json()) as { version?: string }
 				return [channel, payload.version] as const

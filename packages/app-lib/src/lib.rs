@@ -19,6 +19,7 @@ pub mod install;
 mod launcher;
 mod logger;
 pub mod mod_metadata;
+pub mod sitmc;
 mod state;
 pub mod storage;
 pub mod telemetry;

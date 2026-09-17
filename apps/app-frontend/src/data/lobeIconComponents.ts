@@ -1,4 +1,4 @@
-import { defineAsyncComponent, type Component } from 'vue'
+import { type Component,defineAsyncComponent } from 'vue'
 
 // Generated subset of @lobehub/icons-static-svg actually referenced by
 // lobeProviderIcons / lobeModelIcons / AIIcon templates. Regenerate when

@@ -13,6 +13,7 @@ pub mod instance;
 pub mod jre;
 pub(crate) mod loader_metadata;
 pub mod logs;
+pub mod managed;
 pub mod mcarchive;
 pub mod memory;
 pub mod metadata;

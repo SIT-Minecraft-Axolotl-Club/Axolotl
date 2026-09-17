@@ -201,36 +201,6 @@ export const settingsSearchEntries: SettingsSearchEntry[] = [
 		description: message('app.shortcut-settings.nav-worlds-description', 'Jump to your worlds.'),
 	},
 	{
-		id: 'shortcuts-nav-discover',
-		categoryId: 'shortcut-settings',
-		targetId: 'settings-target-shortcuts-nav',
-		label: message('app.shortcut-settings.nav-discover', 'Discover content'),
-		description: message(
-			'app.shortcut-settings.nav-discover-description',
-			'Jump to browsing content.',
-		),
-	},
-	{
-		id: 'shortcuts-nav-skins',
-		categoryId: 'shortcut-settings',
-		targetId: 'settings-target-shortcuts-nav',
-		label: message('app.shortcut-settings.nav-skins', 'Skin selector'),
-		description: message(
-			'app.shortcut-settings.nav-skins-description',
-			'Jump to the skin selector.',
-		),
-	},
-	{
-		id: 'shortcuts-nav-multiplayer',
-		categoryId: 'shortcut-settings',
-		targetId: 'settings-target-shortcuts-nav',
-		label: message('app.shortcut-settings.nav-multiplayer', 'Multiplayer'),
-		description: message(
-			'app.shortcut-settings.nav-multiplayer-description',
-			'Jump to multiplayer.',
-		),
-	},
-	{
 		id: 'shortcuts-nav-library',
 		categoryId: 'shortcut-settings',
 		targetId: 'settings-target-shortcuts-nav',
@@ -238,28 +208,11 @@ export const settingsSearchEntries: SettingsSearchEntry[] = [
 		description: message('app.shortcut-settings.nav-library-description', 'Jump to your library.'),
 	},
 	{
-		id: 'shortcuts-nav-lab',
-		categoryId: 'shortcut-settings',
-		targetId: 'settings-target-shortcuts-nav',
-		label: message('app.shortcut-settings.nav-lab', 'Lab'),
-		description: message('app.shortcut-settings.nav-lab-description', 'Jump to the Lab.'),
-	},
-	{
 		id: 'shortcuts-nav-downloads',
 		categoryId: 'shortcut-settings',
 		targetId: 'settings-target-shortcuts-nav',
 		label: message('app.shortcut-settings.nav-downloads', 'Downloads'),
 		description: message('app.shortcut-settings.nav-downloads-description', 'Jump to downloads.'),
-	},
-	{
-		id: 'shortcuts-nav-create',
-		categoryId: 'shortcut-settings',
-		targetId: 'settings-target-shortcuts-nav',
-		label: message('app.shortcut-settings.nav-create', 'Create new instance'),
-		description: message(
-			'app.shortcut-settings.nav-create-description',
-			'Jump to creating a new instance.',
-		),
 	},
 	{
 		id: 'shortcuts-nav-settings',

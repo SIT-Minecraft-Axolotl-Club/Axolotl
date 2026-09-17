@@ -71,14 +71,16 @@ defineExpose({ showIfNeeded })
 			</p>
 			<p class="m-0 leading-relaxed">
 				{{ formatMessage(messages.feedbackPrefix)
-				}}<span class="font-semibold text-contrast">{{ AxolotlBrandConfig.qqGroupNumber }}</span
+				}}<span v-if="AxolotlBrandConfig.qqGroupNumber" class="font-semibold text-contrast">{{
+					AxolotlBrandConfig.qqGroupNumber
+				}}</span
 				>{{ formatMessage(messages.feedbackMiddle)
 				}}<a
 					:href="AxolotlBrandConfig.supportUrl"
 					target="_blank"
 					rel="noopener noreferrer"
 					class="font-medium text-brand hover:underline"
-					>GitHub Issues</a
+					>{{ AxolotlBrandConfig.productName }}</a
 				>{{ formatMessage(messages.feedbackSuffix) }}
 			</p>
 		</div>

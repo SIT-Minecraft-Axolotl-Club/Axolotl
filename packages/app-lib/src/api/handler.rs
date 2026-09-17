@@ -10,13 +10,25 @@ use crate::{
 use url::form_urlencoded;
 use urlencoding::decode;
 
+/// Entry points that would create an instance or install content outside
+/// the instances published by the club server are refused with this text.
+const MANAGED_INSTANCES_ONLY: &str =
+    "This launcher only installs the instances published by the club server";
+
+/// Refuses an external entry point that manages an instance the club
+/// server did not publish.
+async fn reject_unmanaged_entry() -> crate::Result<CommandPayload> {
+    let _ = emit_warning(MANAGED_INSTANCES_ONLY).await;
+    Err(crate::ErrorKind::InputError(MANAGED_INSTANCES_ONLY.to_string()).into())
+}
+
 /// Handles external functions (such as through URL deep linkage)
 /// Link is extracted value (link) in somewhat URL format, such as
 /// subdomain1/subdomain2
 /// (Does not include axolotl://)
 pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
     if sublink == "discovery" {
-        return Ok(CommandPayload::OpenDiscovery);
+        return reject_unmanaged_entry().await;
     }
 
     if let Some(query) = sublink.strip_prefix("launch?") {
@@ -37,29 +49,28 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
         .into());
     }
 
-    // /seed-map?{query}   -    Opens the Lab seed map with a shared state
+    // /seed-map?{query}   -    Used to open the Lab seed map
     if let Some(rest) = sublink.strip_prefix("seed-map")
         && (rest.is_empty() || rest.starts_with('?') || rest.starts_with('/'))
     {
-        let query = rest.trim_start_matches('/').trim_start_matches('?');
-        return Ok(CommandPayload::OpenSeedMap {
-            query: query.to_string(),
-        });
+        return reject_unmanaged_entry().await;
     }
     Ok(match sublink.split_once('/') {
         // /mod/{id}   -    Installs a mod of mod id
-        Some(("mod", id)) => CommandPayload::InstallMod { id: id.to_string() },
+        Some(("mod", _)) => {
+            return reject_unmanaged_entry().await;
+        }
         // /version/{id}   -    Installs a specific version of id
-        Some(("version", id)) => {
-            CommandPayload::InstallVersion { id: id.to_string() }
+        Some(("version", _)) => {
+            return reject_unmanaged_entry().await;
         }
         // /modpack/{id}   -    Installs a modpack of modpack id
-        Some(("modpack", id)) => {
-            CommandPayload::InstallModpack { id: id.to_string() }
+        Some(("modpack", _)) => {
+            return reject_unmanaged_entry().await;
         }
         // /server/{id}   -    Opens a server project page and triggers play flow
-        Some(("server", id)) => {
-            CommandPayload::InstallServer { id: id.to_string() }
+        Some(("server", _)) => {
+            return reject_unmanaged_entry().await;
         }
         // /launch/instance/{id}   -    Launches an instance
         Some(("launch", rest)) if rest.starts_with("instance/") => {
@@ -132,13 +143,15 @@ pub async fn parse_command(
         Ok(handle_url(sublink).await?)
     } else {
         // We assume anything else is a filepath to a modpack file; zip
-        // archives are format-sniffed by the pack installer.
+        // archives are format-sniffed by the pack installer. Opening one
+        // would create an instance outside the club server, so it is
+        // refused here.
         let path = PathBuf::from(command_string);
         let path = io::canonicalize(path)?;
         if let Some(ext) = path.extension()
             && (ext == "mrpack" || ext == "zip")
         {
-            return Ok(CommandPayload::RunMRPack { path });
+            return reject_unmanaged_entry().await;
         }
         emit_warning(&format!(
             "Invalid command, unrecognized filetype: {}",
@@ -177,10 +190,20 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn parses_discovery_command() {
-        assert!(matches!(
-            parse_command("axolotl://discovery").await.unwrap(),
-            CommandPayload::OpenDiscovery
-        ));
+    async fn refuses_discovery_command() {
+        assert!(parse_command("axolotl://discovery").await.is_err());
+    }
+
+    #[tokio::test]
+    async fn refuses_content_install_commands() {
+        for command in [
+            "axolotl://mod/example",
+            "axolotl://version/example",
+            "axolotl://modpack/example",
+            "axolotl://server/example",
+            "axolotl://seed-map?seed=1",
+        ] {
+            assert!(parse_command(command).await.is_err(), "{command}");
+        }
     }
 }
