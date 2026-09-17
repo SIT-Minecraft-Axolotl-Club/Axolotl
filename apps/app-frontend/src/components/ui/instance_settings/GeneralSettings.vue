@@ -21,6 +21,7 @@ import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInsta
 import { trackEvent } from '@/helpers/analytics'
 import { install_duplicate_instance } from '@/helpers/install'
 import { edit, edit_icon, get_full_path, remove } from '@/helpers/instance'
+import { isManagedInstance } from '@/helpers/managed'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 
 import type { GameInstance } from '../../../helpers/types'
@@ -520,7 +521,7 @@ const messages = defineMessages({
 			</p>
 		</div>
 
-		<div class="flex flex-col gap-2.5 mt-6">
+		<div v-if="!isManagedInstance(instance.id)" class="flex flex-col gap-2.5 mt-6">
 			<h2 id="delete-instance-label" class="m-0 text-lg font-semibold text-contrast block">
 				{{ formatMessage(messages.deleteInstance) }}
 			</h2>

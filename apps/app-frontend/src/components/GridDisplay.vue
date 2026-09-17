@@ -45,6 +45,7 @@ import {
 	getLastLibraryDisplayMode,
 	setLastLibraryDisplayMode,
 } from '@/helpers/library-display-mode'
+import { isManagedInstance } from '@/helpers/managed'
 
 const { handleError } = injectNotificationManager()
 
@@ -77,6 +78,10 @@ const messages = defineMessages({
 	none: { id: 'app.instances.group.none', defaultMessage: 'No grouping' },
 	ungrouped: { id: 'app.instances.group.ungrouped', defaultMessage: 'No group' },
 	editGroups: { id: 'app.instances.edit-groups', defaultMessage: 'Edit groups' },
+	managedDeleteBlocked: {
+		id: 'app.instances.managed-delete-blocked',
+		defaultMessage: 'Instances published by the club server cannot be deleted.',
+	},
 	selectAll: { id: 'app.instances.select-all', defaultMessage: 'Select all' },
 	deselectAll: { id: 'app.instances.deselect-all', defaultMessage: 'Deselect all' },
 	selectedCount: {
@@ -224,11 +229,17 @@ const handleRightClick = (event, instanceId) => {
 		{ name: item.instance.pinned_at ? 'unpin' : 'pin' },
 		{ name: 'open' },
 		{ name: 'copy' },
-		{ type: 'divider' },
-		{
-			name: 'delete',
-			color: 'danger',
-		},
+		// A managed instance belongs to the club server catalog; offering to
+		// delete it would only produce a failure the player cannot act on.
+		...(isManagedInstance(item.instance.id)
+			? []
+			: [
+					{ type: 'divider' },
+					{
+						name: 'delete',
+						color: 'danger',
+					},
+				]),
 	]
 
 	instanceOptions.value.showMenu(
@@ -358,13 +369,22 @@ function openBatchEdit() {
 
 const batchDeleteConfirmModal = ref(null)
 
+/** Selected instances the player is actually allowed to delete. */
+const deletableSelectedIds = computed(() =>
+	[...selectedInstanceIds.value].filter((id) => !isManagedInstance(id)),
+)
+
 function openBatchDelete() {
-	batchDeleteCount.value = selectedInstanceIds.value.size
+	if (deletableSelectedIds.value.length === 0) {
+		handleError(new Error(formatMessage(messages.managedDeleteBlocked)))
+		return
+	}
+	batchDeleteCount.value = deletableSelectedIds.value.length
 	batchDeleteConfirmModal.value?.show()
 }
 
 async function batchDeleteInstances() {
-	for (const id of selectedInstanceIds.value) {
+	for (const id of deletableSelectedIds.value) {
 		instanceComponents.value = instanceComponents.value.filter((x) => x.instance.id !== id)
 		await remove(id).catch(handleError)
 	}

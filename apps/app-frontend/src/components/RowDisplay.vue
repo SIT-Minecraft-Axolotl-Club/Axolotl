@@ -31,6 +31,7 @@ import { useNetworkStatus } from '@/composables/useNetworkStatus'
 import { trackEvent } from '@/helpers/analytics'
 import { install_duplicate_instance } from '@/helpers/install'
 import { kill, remove, run } from '@/helpers/instance'
+import { isManagedInstance } from '@/helpers/managed'
 import { get_by_instance_id } from '@/helpers/process.js'
 import { showInstanceInFolder } from '@/helpers/utils.js'
 import { injectContentInstall } from '@/providers/content-install'
@@ -99,11 +100,17 @@ const handleInstanceRightClick = async (event, passedInstance) => {
 		{ name: 'duplicate' },
 		{ name: 'open_folder' },
 		{ name: 'copy_path' },
-		{ type: 'divider' },
-		{
-			name: 'delete',
-			color: 'danger',
-		},
+		// Managed instances belong to the club server catalog and cannot be
+		// deleted locally, so the action is not offered for them.
+		...(isManagedInstance(passedInstance.id)
+			? []
+			: [
+					{ type: 'divider' },
+					{
+						name: 'delete',
+						color: 'danger',
+					},
+				]),
 	]
 
 	const runningProcesses = await get_by_instance_id(passedInstance.id).catch(handleError)

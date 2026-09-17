@@ -13,6 +13,7 @@ import {
 	managed_list,
 	managed_sync,
 	managedPendingActions,
+	refreshManagedInstanceIds,
 } from '@/helpers/managed'
 import { compareSemanticVersions } from '@/helpers/version-compatibility'
 
@@ -70,6 +71,9 @@ const specsById = computed(() => {
 
 async function refreshRecords(): Promise<void> {
 	records.value = await managed_list()
+	// Keeps the "this instance belongs to the server" set in step with the
+	// records, so the instance menus never offer to delete a managed instance.
+	await refreshManagedInstanceIds()
 }
 
 /**

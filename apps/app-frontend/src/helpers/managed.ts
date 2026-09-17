@@ -1,4 +1,5 @@
 import { invoke } from '@tauri-apps/api/core'
+import { ref } from 'vue'
 
 import type { CreatePackLocation } from './install'
 import {
@@ -91,6 +92,35 @@ export interface ManagedInstanceRecord {
 
 /** Only pack format the launcher can install today. */
 export const MANAGED_PACK_KIND = 'mrpack'
+
+/**
+ * Local instance ids the club server owns, from the last successful sync.
+ *
+ * The launcher refuses to delete a managed instance in its own instance layer as
+ * well, so this is only what keeps the action out of the menus; a stale set can
+ * therefore never delete anything, it can only show an action that fails.
+ */
+const managedInstanceIds = ref<Set<string>>(new Set())
+
+/** Re-reads the managed instance ids. Safe to call before any sync. */
+export async function refreshManagedInstanceIds(): Promise<Set<string>> {
+	try {
+		const records = await managed_list()
+		managedInstanceIds.value = new Set(
+			records.map((record) => record.instance_id).filter((id) => id.length > 0),
+		)
+	} catch {
+		// Offline, or the launcher never synced: keep whatever was known last.
+	}
+
+	return managedInstanceIds.value
+}
+
+/** Whether a local instance is owned by the club server, per the last sync. */
+export function isManagedInstance(instanceId: string | null | undefined): boolean {
+	if (!instanceId) return false
+	return managedInstanceIds.value.has(instanceId)
+}
 
 export async function managed_fetch_manifest(manifestUrl: string) {
 	return await invoke<ManagedManifest>('plugin:instance|managed_fetch_manifest', { manifestUrl })

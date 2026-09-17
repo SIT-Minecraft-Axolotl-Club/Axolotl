@@ -175,6 +175,20 @@ pub async fn edit_icon(
 #[tracing::instrument]
 pub async fn remove(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
+
+    // A club-managed instance belongs to the server catalog: deleting it locally
+    // would only leave the launcher in a state where the server still publishes
+    // it and the player can no longer start it. Removing it from the server
+    // catalog is the supported way to retire an instance.
+    if let Some(server_instance_id) =
+        crate::api::managed::server_instance_id_for(instance_id).await?
+    {
+        return Err(crate::ErrorKind::LauncherError(format!(
+            "Instance {instance_id} is managed by the club server as \"{server_instance_id}\" and cannot be deleted"
+        ))
+        .as_error());
+    }
+
     let instance =
         instance_rows::get_instance_display_info(instance_id, &state.pool)
             .await?;

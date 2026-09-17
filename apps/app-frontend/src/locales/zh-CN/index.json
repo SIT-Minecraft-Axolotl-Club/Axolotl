@@ -3314,6 +3314,9 @@
   "app.instances.group.ungrouped": {
     "message": "无分组"
   },
+  "app.instances.managed-delete-blocked": {
+    "message": "社团服务端发布的实例不能删除。"
+  },
   "app.instances.pin-to-home": {
     "message": "固定到主页"
   },

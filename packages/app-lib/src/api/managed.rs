@@ -276,9 +276,27 @@ pub async fn sync_manifest(
         };
         store_spec(&state, spec, target, updated).await?;
 
+        // A record alone is not proof that the instance is usable: the local
+        // instance may have been deleted, or an earlier install may never have
+        // finished. Both have to end in an install, and only the local instance
+        // can tell the difference, so it is consulted here rather than trusted
+        // from the record.
+        let linked_stage = match instance_id.as_deref() {
+            Some(local_id) => crate::state::get_instance(local_id, &state.pool)
+                .await?
+                .map(|metadata| metadata.instance.install_stage),
+            None => None,
+        };
+
         let action = match (instance_id.as_deref(), applied) {
             (None, _) => ManagedInstanceActionKind::Create,
-            (Some(_), Some(applied)) if applied == target => {
+            (Some(_), Some(_)) if linked_stage.is_none() => {
+                ManagedInstanceActionKind::Create
+            }
+            (Some(_), Some(applied))
+                if applied == target
+                    && linked_stage == Some(InstanceInstallStage::Installed) =>
+            {
                 ManagedInstanceActionKind::Current
             }
             (Some(_), _) => ManagedInstanceActionKind::Update,
@@ -337,6 +355,25 @@ pub async fn list_managed_instances()
         .into_iter()
         .map(ManagedInstanceRecord::from)
         .collect())
+}
+
+/// The server-side id of the managed instance owning a local instance, if any.
+///
+/// Callers use this to refuse actions that would break the server's ownership of
+/// an instance, such as deleting it.
+#[tracing::instrument]
+pub async fn server_instance_id_for(
+    instance_id: &str,
+) -> crate::Result<Option<String>> {
+    let state = State::get().await?;
+
+    Ok(sqlx::query_scalar::<_, String>(
+        "SELECT server_instance_id FROM managed_instances
+         WHERE instance_id = ? LIMIT 1",
+    )
+    .bind(instance_id)
+    .fetch_optional(&state.pool)
+    .await?)
 }
 
 /// Downloads and verifies the pack of a managed instance and returns the local
