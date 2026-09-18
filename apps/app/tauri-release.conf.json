@@ -1,6 +1,6 @@
 {
 	"bundle": {
-		"createUpdaterArtifacts": false
+		"createUpdaterArtifacts": true
 	},
 	"build": {
 		"features": ["updater"]
@@ -12,8 +12,10 @@
 	},
 	"plugins": {
 		"updater": {
-			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDNGNEE1MkMxOTI0MDA4NzYKUldSMkNFQ1N3VkpLUC9kcEtlZFRWak5FRXJsWUw3YllxWGh6bkg3ZEh3K1ZQa1VNZHl6Y0IvQysK",
-			"endpoints": ["https://update.axlmc.org/latest"],
+			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEFCRUQ2RkM3NDk2NTBCNEYKUldSUEMyVkp4Mi90cTdycTk0bVpuVlpFRnNsYmRsMy9Yb1U2bjhHM2t4NDB6aUswakg0SGVGSFQK",
+			"endpoints": [
+				"https://skin.sitmc.club/api/launcher/update/{{target}}/{{arch}}/{{current_version}}"
+			],
 			"windows": {
 				"installMode": "quiet"
 			}

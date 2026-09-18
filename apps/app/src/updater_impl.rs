@@ -15,9 +15,16 @@ use theseus::{
 use tokio::time::Instant;
 use url::Url;
 
-const UPDATE_SERVER_LATEST_URL: &str = "https://update.axlmc.org/latest";
-const UPDATE_SERVER_API: &str = "https://update.axlmc.org/api/versions";
-const UPDATE_SERVER_BASE: &str = "https://update.axlmc.org/";
+/// The society's update service. The endpoint is the Tauri dynamic template: the
+/// updater fills in the target, the architecture and the installed version, and
+/// the service answers with the update document — or 204 when there is nothing
+/// newer to install.
+const UPDATE_SERVER_ENDPOINT: &str =
+    "https://skin.sitmc.club/api/launcher/update/{{target}}/{{arch}}/{{current_version}}";
+/// Linux only: the apt catalog the .deb fallback reads.
+const UPDATE_SERVER_API: &str = "https://skin.sitmc.club/api/launcher/update/versions";
+/// Linux only: where the apt catalog's relative artifact paths are resolved.
+const UPDATE_SERVER_BASE: &str = "https://skin.sitmc.club/api/launcher/update/artifacts/";
 
 // The updater plugin builds `Update` with no request timeout, so a stalled
 // connection would hang the download forever. Bound the whole download.
@@ -183,7 +190,7 @@ fn update_platform() -> Result<&'static str> {
 }
 
 fn update_endpoint() -> Result<Url> {
-    Url::parse(UPDATE_SERVER_LATEST_URL).map_err(|error| {
+    Url::parse(UPDATE_SERVER_ENDPOINT).map_err(|error| {
         theseus::Error::from(theseus::ErrorKind::OtherError(error.to_string()))
             .into()
     })

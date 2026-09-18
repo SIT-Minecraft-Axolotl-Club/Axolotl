@@ -314,7 +314,7 @@ pnpm app:dev          # 开发运行
 | --- | --- | --- |
 | `packages/app-lib/src/brand.rs` | `WEBSITE`(`ghs.red`,目前无引用点)、`user_agent`(`garbage-human-studio/axolotl/...`)、`PRODUCT_NAME`/`SHORT_PRODUCT_NAME`、`BUNDLE_IDENTIFIER`(`red.ghs.axolotl`)、`DEEP_LINK_SCHEME`(`axolotl`) | `WEBSITE` 可直接改成社团官网;改 `user_agent` 需同步该文件里的单测。**不要**改 `BUNDLE_IDENTIFIER` 或数据目录:玩家数据目录会随之改变(等于全新安装) |
 | `apps/app/tauri.conf.json` | `productName`(`Axolotl Launcher`)、`identifier`、`shortDescription`/`longDescription`(空)、CSP 里的上游域名(`admin.axlmc.org`、`mod.mcimirror.top`、`mod.tianpao.top`) | 按需替换描述与域名;**清单域名不需要加进 CSP**(请见 §6.3),但整合包/图标域名要 |
-| `apps/app/tauri-release.conf.json` + `apps/app/src/updater_impl.rs` | 自更新服务 `https://update.axlmc.org/*` 与上游 minisign 公钥 | 这两处**只在带 `updater` 特性的发布变体里编译**。社团自建更新服务之前,建议用 CI 里的 native 变体出包(`pnpm --filter @modrinth/app tauri build`):它不编译更新器,因此不会去连上游更新服务;需要自更新时再同时改这两处与 `apps/app/capabilities/plugins.json` 的 http 作用域 |
+| `apps/app/tauri-release.conf.json` + `apps/app/src/updater_impl.rs` | 自更新服务 `https://update.axlmc.org/*` 与上游 minisign 公钥 | **已处理**:两处都指向 `https://skin.sitmc.club/api/launcher/update/*`,公钥换成社团自己的 minisign 公钥(`ABED6FC749650B4F`),`createUpdaterArtifacts` 打开。发布流程见 `docs/launcher-update-guide.md` |
 | `apps/app-frontend/src/announcements/catalog.ts` | 上游 Axolotl 的历史发布说明 | 这是**启动器更新后弹给玩家的更新公告**;社团应写入自己的条目(需要你提供确切版本号) |
 | `packages/app-lib/src/sitmc.rs` | 站点/注册/登录/Yggdrasil API 根/Janus 基址/`client_id`/scope 串 | 站点域名或 `client_id` 变化时改这里;启动器的其他部分都引用这些常量 |
 | `apps/website`(Nuxt) | 上游政策页与介绍页 | 若社团不部署这个站点可忽略;若要部署,隐私政策应改指社团自己的条款(启动器内已指向 `https://www.sitmc.club/privacy`) |
