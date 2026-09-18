@@ -4,11 +4,11 @@ export const AxolotlBrandConfig = Object.freeze({
 	productName: 'Axolotl Launcher',
 	shortProductName: 'Axolotl',
 	website: 'https://www.sitmc.club/',
-	// The launcher is a fork of the upstream Axolotl project, so the repository
-	// stays pointed at upstream: it is where the source, LICENSE, and third-party
-	// attributions linked from the About page actually live.
-	repositoryUrl: 'https://github.com/Mystic-Stars/Axolotl',
-	supportUrl: 'https://www.sitmc.club/',
+	repositoryUrl: 'https://github.com/SIT-Minecraft-Axolotl-Club/Axolotl',
+	// The AGPL LICENSE text only exists upstream; the society fork carries COPYING.md
+	// and the third-party attributions that the About page links to as well.
+	upstreamRepositoryUrl: 'https://github.com/Mystic-Stars/Axolotl',
+	supportUrl: 'https://qm.qq.com/q/rCtTVlDhEk',
 	qqGroupNumber: '',
 	qqChannelUrl: '',
 	sponsorUrl: '',
@@ -49,11 +49,11 @@ export const config = {
 }
 
 /**
- * The club services this build talks to.
+ * The society services this build talks to.
  *
- * Accounts live on the club's Blessing Skin site and nowhere else, and the game
+ * Accounts live on the society's Blessing Skin site and nowhere else, and the game
  * instances come from the server-side catalog described in
- * `docs/launcher-protocol.md`. Every address the club has to publish itself is a
+ * `docs/launcher-protocol.md`. Every address the society has to publish itself is a
  * build-time variable that defaults to empty, which disables the feature instead
  * of falling back to another community's server.
  */

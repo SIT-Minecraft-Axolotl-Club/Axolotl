@@ -37,7 +37,7 @@ let longPressTimer: ReturnType<typeof window.setTimeout> | undefined
 let pressStart = { x: 0, y: 0 }
 let suppressNextMemberClick = false
 
-const licenseUrl = `${AxolotlBrandConfig.repositoryUrl}/blob/main/LICENSE`
+const licenseUrl = `${AxolotlBrandConfig.upstreamRepositoryUrl}/blob/main/LICENSE`
 const copyingUrl = `${AxolotlBrandConfig.repositoryUrl}/blob/main/COPYING.md`
 const thirdPartyLicensesUrl = `${AxolotlBrandConfig.repositoryUrl}/tree/main/third-party/licenses`
 
@@ -341,7 +341,7 @@ const projectLinks = [
 						@contextmenu="handleMemberContextMenu(member, $event)"
 					>
 						<Avatar :src="member.avatarUrl" :alt="member.name" size="4rem" circle no-shadow />
-						<span class="block truncate text-center font-semibold text-contrast">{{
+						<span class="line-clamp-2 break-words text-center font-semibold text-contrast">{{
 							member.name
 						}}</span>
 					</component>
