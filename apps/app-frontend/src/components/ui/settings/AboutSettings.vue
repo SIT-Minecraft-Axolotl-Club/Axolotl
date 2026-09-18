@@ -357,7 +357,7 @@ const projectLinks = [
 			<div class="grid gap-3 sm:grid-cols-2">
 				<a
 					v-for="link in projectLinks"
-					:key="link.label"
+					:key="link.href"
 					:href="link.href"
 					target="_blank"
 					rel="noopener noreferrer"
