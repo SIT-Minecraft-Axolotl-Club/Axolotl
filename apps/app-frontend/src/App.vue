@@ -1340,7 +1340,8 @@ async function setupApp() {
 	// reconcile at startup rather than only when the home page happens to mount:
 	// the blocking update notice must not depend on the page the player lands on.
 	// Waiting for privacy consent keeps large downloads from starting before the
-	// player has agreed to the launcher using the network at all.
+	// player has agreed to the launcher using the network at all, and the managed
+	// sync holds its own downloads back until the player has signed in.
 	if (!privacyConsentPending.value) {
 		void ensureInstancesSynced()
 	}
@@ -2116,7 +2117,20 @@ watch(
 const {
 	launcherUpdateRequired: managedLauncherUpdateRequired,
 	ensureSynced: ensureInstancesSynced,
+	setDownloadsAllowed: setManagedDownloadsAllowed,
 } = useManagedInstances()
+
+/**
+ * Nothing is downloaded on the player's behalf before they sign in.
+ *
+ * The manifest is read either way — the blocking launcher-update notice must
+ * work behind the sign-in gate — but the managed sync only downloads the
+ * required instances, and the game files their install pulls in, once an
+ * account is present.
+ */
+watch(minecraftAccounts, (loaded) => setManagedDownloadsAllowed(loaded.length > 0), {
+	immediate: true,
+})
 
 const updateGateBusy = ref(false)
 const updateGateMessage = ref<string | null>(null)

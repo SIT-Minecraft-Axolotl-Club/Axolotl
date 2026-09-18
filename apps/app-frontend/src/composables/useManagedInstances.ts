@@ -34,6 +34,17 @@ const updatingName = ref<string | null>(null)
 /** Minimum launcher version the server demands, while this build is below it. */
 const launcherUpdateRequired = ref<string | null>(null)
 
+/**
+ * Whether the player has signed in yet.
+ *
+ * The launcher cannot start the game without a society account, so the sync does
+ * not download anything on its own before the sign-in gate has been passed. The
+ * manifest is still read — the blocking launcher-update notice must not wait for
+ * a sign-in — but the required instances, and the game files their install pulls
+ * in, wait for the first sync after the player signs in.
+ */
+const downloadsAllowed = ref(false)
+
 let inFlight: Promise<void> | null = null
 let syncedThisSession = false
 
@@ -159,7 +170,7 @@ async function runSync(): Promise<void> {
 	report.value = result
 	await applyLauncherPolicy(result.launcher ?? null)
 
-	const pendingActions = managedRequiredActions(result)
+	const pendingActions = downloadsAllowed.value ? managedRequiredActions(result) : []
 	totalUpdates.value = pendingActions.length
 	completedUpdates.value = 0
 
@@ -204,6 +215,30 @@ async function syncNow(): Promise<void> {
 		updatingName.value = null
 		inFlight = null
 	}
+}
+
+/**
+ * Reports the sign-in state from the shell.
+ *
+ * Signing in starts the downloads the earlier syncs held back; signing out only
+ * keeps the next ones from starting, so a pack already downloading finishes.
+ */
+function setDownloadsAllowed(allowed: boolean): void {
+	if (downloadsAllowed.value === allowed) return
+	downloadsAllowed.value = allowed
+	if (allowed) void resyncAfterSignIn()
+}
+
+/**
+ * Runs the sync the sign-in gate held back.
+ *
+ * A sync may already be running when the player signs in; it is awaited first
+ * because a sync that started without permission never downloads, and only the
+ * run after it sees the sign-in state.
+ */
+async function resyncAfterSignIn(): Promise<void> {
+	if (inFlight) await inFlight.catch(() => {})
+	await syncNow()
 }
 
 /** Syncs once per launcher session, for pages that just need the current list. */
@@ -252,6 +287,8 @@ export function useManagedInstances() {
 		report,
 		launcherPolicy,
 		launcherUpdateRequired,
+		downloadsAllowed,
+		setDownloadsAllowed,
 		records,
 		activeRecords,
 		retiredRecords,
