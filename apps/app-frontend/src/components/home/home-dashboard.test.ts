@@ -84,8 +84,6 @@ test('accepts draggable order and restores the complete default layout', () => {
 			{ kind: 'greeting', size: '2x1' },
 			{ kind: 'calendar', size: '1x2' },
 			{ kind: 'recent', size: '2x2' },
-			{ kind: 'pinned-worlds', size: '1x2' },
-			{ kind: 'pinned-servers', size: '2x2' },
 			{ kind: 'pinned-instances', size: '2x1' },
 		],
 	)

@@ -159,18 +159,6 @@ const catalogSections = computed(() => [
 				description: formatMessage(messages.pinnedInstancesDescription),
 				icon: GridIcon,
 			},
-			{
-				kind: 'pinned-worlds' as const,
-				label: formatMessage(messages.pinnedWorlds),
-				description: formatMessage(messages.pinnedWorldsDescription),
-				icon: GameIcon,
-			},
-			{
-				kind: 'pinned-servers' as const,
-				label: formatMessage(messages.pinnedServers),
-				description: formatMessage(messages.pinnedServersDescription),
-				icon: ServerIcon,
-			},
 		],
 	},
 	{

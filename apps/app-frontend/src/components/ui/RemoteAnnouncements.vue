@@ -225,7 +225,12 @@ async function refresh() {
 		const text = await response.text()
 		if (text.length > 4500000) return
 		const result = JSON.parse(text)
-		const parsed = parseAnnouncements(result.announcements)
+		// The club backend serves the list as a bare array; the upstream service
+		// wrapped it in an object. Both shapes are accepted so either backend can
+		// be pointed at without a client change.
+		const parsed = parseAnnouncements(
+			Array.isArray(result) ? result : (result as { announcements?: unknown })?.announcements,
+		)
 		if (!parsed || disposed) return
 		sync(parsed, true)
 		try {
