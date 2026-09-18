@@ -8870,6 +8870,12 @@
   "app.settings.resources.download-mirrors-description": {
     "message": "Automatic mode chooses between official and mirror sources based on your local environment and recent connection quality."
   },
+  "app.settings.resources.ignore-ssl-errors": {
+    "message": "Ignore SSL certificate errors"
+  },
+  "app.settings.resources.ignore-ssl-errors-description": {
+    "message": "Allows downloads through proxies or network tools that replace HTTPS certificates. This disables certificate verification and can expose downloads to tampering. Enable it only when necessary."
+  },
   "app.settings.resources.maximum-downloads": {
     "message": "Maximum concurrent downloads"
   },
@@ -10990,6 +10996,21 @@
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Deleting..."
+  },
+  "instance.settings.tabs.general.desktop-shortcut": {
+    "message": "Desktop shortcut"
+  },
+  "instance.settings.tabs.general.desktop-shortcut.create": {
+    "message": "Create desktop shortcut"
+  },
+  "instance.settings.tabs.general.desktop-shortcut.created": {
+    "message": "Desktop shortcut created"
+  },
+  "instance.settings.tabs.general.desktop-shortcut.creating": {
+    "message": "Creating shortcut..."
+  },
+  "instance.settings.tabs.general.desktop-shortcut.description": {
+    "message": "Create a desktop shortcut that launches this instance directly."
   },
   "instance.settings.tabs.general.duplicate-button": {
     "message": "Duplicate"

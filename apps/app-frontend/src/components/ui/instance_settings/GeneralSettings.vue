@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { CopyIcon, EditIcon, SpinnerIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
+import {
+	CopyIcon,
+	EditIcon,
+	MonitorIcon,
+	SpinnerIcon,
+	TrashIcon,
+	UploadIcon,
+} from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Chips,
@@ -22,11 +29,12 @@ import { trackEvent } from '@/helpers/analytics'
 import { install_duplicate_instance } from '@/helpers/install'
 import { edit, edit_icon, get_full_path, remove } from '@/helpers/instance'
 import { isManagedInstance } from '@/helpers/managed'
+import { createInstanceShortcutOnDesktop } from '@/helpers/utils'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 
 import type { GameInstance } from '../../../helpers/types'
 
-const { handleError } = injectNotificationManager()
+const { addNotification, handleError } = injectNotificationManager()
 const filePicker = injectFilePicker()
 const { formatMessage } = useVIntl()
 const router = useRouter()
@@ -54,6 +62,27 @@ async function duplicateInstance() {
 		loader: instance.value.loader,
 		game_version: instance.value.game_version,
 	})
+}
+
+const creatingDesktopShortcut = ref(false)
+async function createDesktopShortcut() {
+	if (creatingDesktopShortcut.value) return
+
+	creatingDesktopShortcut.value = true
+	try {
+		await createInstanceShortcutOnDesktop(
+			title.value.trim() || instance.value.name,
+			instance.value.id,
+		)
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.desktopShortcutCreated),
+		})
+	} catch (error) {
+		handleError(error)
+	} finally {
+		creatingDesktopShortcut.value = false
+	}
 }
 
 function formatReleaseChannelLabel(channel: ReleaseChannel) {
@@ -304,6 +333,26 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.general.duplicate-button',
 		defaultMessage: 'Duplicate',
 	},
+	desktopShortcut: {
+		id: 'instance.settings.tabs.general.desktop-shortcut',
+		defaultMessage: 'Desktop shortcut',
+	},
+	desktopShortcutDescription: {
+		id: 'instance.settings.tabs.general.desktop-shortcut.description',
+		defaultMessage: 'Create a desktop shortcut that launches this instance directly.',
+	},
+	createDesktopShortcut: {
+		id: 'instance.settings.tabs.general.desktop-shortcut.create',
+		defaultMessage: 'Create desktop shortcut',
+	},
+	creatingDesktopShortcut: {
+		id: 'instance.settings.tabs.general.desktop-shortcut.creating',
+		defaultMessage: 'Creating shortcut...',
+	},
+	desktopShortcutCreated: {
+		id: 'instance.settings.tabs.general.desktop-shortcut.created',
+		defaultMessage: 'Desktop shortcut created',
+	},
 	gameDir: {
 		id: 'instance.settings.tabs.general.game-dir',
 		defaultMessage: 'Game directory',
@@ -474,6 +523,30 @@ const messages = defineMessages({
 				</p>
 			</div>
 		</template>
+		<div class="flex flex-col gap-2.5 mt-6">
+			<h2 id="desktop-shortcut-label" class="m-0 text-lg font-semibold text-contrast block">
+				{{ formatMessage(messages.desktopShortcut) }}
+			</h2>
+			<ButtonStyled>
+				<button
+					aria-labelledby="desktop-shortcut-label"
+					:disabled="creatingDesktopShortcut"
+					class="w-max !shadow-none"
+					@click="createDesktopShortcut"
+				>
+					<SpinnerIcon v-if="creatingDesktopShortcut" class="animate-spin" />
+					<MonitorIcon v-else aria-hidden="true" />
+					{{
+						creatingDesktopShortcut
+							? formatMessage(messages.creatingDesktopShortcut)
+							: formatMessage(messages.createDesktopShortcut)
+					}}
+				</button>
+			</ButtonStyled>
+			<p class="m-0">
+				{{ formatMessage(messages.desktopShortcutDescription) }}
+			</p>
+		</div>
 		<div class="flex flex-col gap-2.5 mt-6">
 			<h2 class="m-0 text-lg font-semibold text-contrast block">
 				{{ formatMessage(messages.gameDir) }}
