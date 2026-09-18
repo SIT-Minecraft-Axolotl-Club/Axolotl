@@ -261,9 +261,12 @@ async fn check_with_updater<R: Runtime>(
         update.download_url = fetch_apt_deb_asset(&update.version).await?.url;
     }
 
+    // The release delay is computed from this timestamp, so a service that only
+    // serves the Tauri field (`pub_date`) is read as well.
     let published_at = update
         .raw_json
         .get("published_at")
+        .or_else(|| update.raw_json.get("pub_date"))
         .and_then(serde_json::Value::as_str)
         .map(str::to_owned);
     let force_update = update
