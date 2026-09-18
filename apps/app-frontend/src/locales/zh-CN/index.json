@@ -12482,7 +12482,12 @@
   "app.map.host-failed": {
     "message": "无法在启动器内显示此地图。"
   },
-  "app.action-bar.account": {
+  "app.action-bar.account.characters": {
+    "message": "角色"
+  },
+  "app.action-bar.account.other-accounts": {
+    "message": "其他账号"
+  },  "app.action-bar.account": {
     "message": "账号"
   },
   "app.action-bar.sign-in": {

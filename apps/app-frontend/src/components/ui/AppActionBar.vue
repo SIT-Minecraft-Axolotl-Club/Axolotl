@@ -93,7 +93,7 @@
 			>
 				<template v-if="selectedAccount">
 					<Avatar
-						:src="accountHeadUrl ?? defaultSteveHeadUrl"
+						:src="getAccountHeadUrl(selectedAccount)"
 						size="22px"
 						circle
 						pixelated
@@ -108,13 +108,125 @@
 				</template>
 			</button>
 			<template #popper>
-				<div class="w-[24rem] max-w-[calc(100vw-2rem)] p-2">
-					<suspense>
-						<AccountsCard ref="accountsCardRef" @change="refreshAccount" />
-					</suspense>
+				<div class="flex w-[24rem] max-w-[calc(100vw-2rem)] flex-col gap-2 p-2">
+					<template v-if="selectedAccount">
+						<div class="flex items-center gap-3 rounded-xl bg-surface-4 p-3">
+							<Avatar
+								:src="getAccountHeadUrl(selectedAccount)"
+								size="36px"
+								circle
+								pixelated
+								:unframed-natural-width="72"
+							/>
+							<div class="flex min-w-0 flex-col">
+								<span class="truncate font-semibold text-contrast">{{
+									selectedAccount.profile.name
+								}}</span>
+								<span class="truncate text-xs text-secondary">
+									{{ SitmcConfig.serverLabel }} · {{ shortProfileId(selectedAccount.profile.id) }}
+								</span>
+							</div>
+						</div>
+						<div class="flex max-h-[24rem] flex-col gap-1 overflow-auto">
+							<template v-for="entry in accountListEntries" :key="entry.key">
+								<span
+									v-if="entry.type === 'heading'"
+									class="px-2 pt-2 text-xs font-semibold text-secondary"
+								>
+									{{ entry.label }}
+								</span>
+								<div
+									v-else
+									class="flex items-center gap-1 rounded-lg"
+									:class="entry.active ? 'bg-surface-4' : 'hover:bg-button-bg'"
+								>
+									<button
+										class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 p-2"
+										@click="selectAccount(entry.account)"
+									>
+										<RadioButtonCheckedIcon
+											v-if="entry.active"
+											class="size-5 shrink-0 text-brand"
+										/>
+										<RadioButtonIcon v-else class="size-5 shrink-0 text-secondary" />
+										<Avatar
+											:src="getAccountHeadUrl(entry.account)"
+											size="24px"
+											circle
+											pixelated
+											:unframed-natural-width="72"
+										/>
+										<div class="flex min-w-0 flex-1 flex-col">
+											<span
+												class="truncate text-left"
+												:class="entry.active ? 'font-semibold text-contrast' : 'text-primary'"
+											>
+												{{ entry.account.profile.name }}
+											</span>
+											<span
+												v-if="duplicateAccountNames.has(entry.account.profile.name)"
+												class="truncate text-left text-xs text-secondary"
+											>
+												{{ entry.account.profile.id }}
+											</span>
+										</div>
+									</button>
+									<div class="flex shrink-0 items-center">
+										<button
+											v-tooltip="formatMessage(messages.copyUuid)"
+											:aria-label="formatMessage(messages.copyUuid)"
+											class="cursor-pointer p-1.5 text-secondary hover:text-brand"
+											@click="copyAccountUuid(entry.account)"
+										>
+											<CopyIcon />
+										</button>
+										<button
+											v-tooltip="formatMessage(messages.removeAccount)"
+											:aria-label="formatMessage(messages.removeAccount)"
+											class="cursor-pointer p-1.5 text-secondary hover:text-red"
+											@click="removeAccount(entry.account)"
+										>
+											<TrashIcon />
+										</button>
+									</div>
+								</div>
+							</template>
+						</div>
+						<div class="flex flex-col gap-2 border-0 border-t border-solid border-divider pt-2">
+							<ButtonStyled v-if="!offline" class="w-full">
+								<button @click="openSignInGate">
+									<PlusIcon />
+									{{ formatMessage(messages.addAccount) }}
+								</button>
+							</ButtonStyled>
+							<div class="flex items-center justify-between gap-3 px-1">
+								<button
+									v-if="!offline"
+									class="cursor-pointer text-xs text-secondary hover:text-contrast"
+									@click="openRegisterPage"
+								>
+									{{ formatMessage(messages.registerAccount) }}
+								</button>
+								<button
+									class="cursor-pointer text-xs text-secondary hover:text-contrast"
+									@click="openSkinSite"
+								>
+									{{ formatMessage(messages.openSkinSite) }}
+								</button>
+							</div>
+						</div>
+					</template>
 				</div>
 			</template>
 		</Dropdown>
+		<Teleport to="body">
+			<SitmcLoginGate
+				v-if="signInGateShown"
+				overlay
+				@complete="completeSignIn"
+				@close="closeSignInGate"
+			/>
+		</Teleport>
 		<ButtonStyled
 			v-if="!isDownloadsPage && hasActiveDownloads && !hasVisibleActiveDownloadToasts"
 			color="brand"
@@ -234,13 +346,18 @@
 import {
 	BellIcon,
 	ChevronDownIcon,
+	CopyIcon,
 	DownloadIcon,
 	DropdownIcon,
 	LogInIcon,
 	OnlineIndicatorIcon,
+	PlusIcon,
+	RadioButtonCheckedIcon,
+	RadioButtonIcon,
 	StarIcon,
 	StopCircleIcon,
 	TerminalSquareIcon,
+	TrashIcon,
 	UnplugIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -256,17 +373,20 @@ import {
 	type WebNotification,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { Dropdown } from 'floating-vue'
-import { computed, inject, onBeforeUnmount, type Ref, ref, watch } from 'vue'
+import { computed, inject, onBeforeUnmount, reactive, type Ref, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import steveSkinTexture from '@/assets/skins/steve.png?inline'
-import AccountsCard from '@/components/ui/AccountsCard.vue'
 import AppUpdateButton from '@/components/ui/app-update-button/index.vue'
+import SitmcLoginGate from '@/components/ui/login/SitmcLoginGate.vue'
 import { useInstallJobNotifications } from '@/composables/browse/install-job-notifications'
 import { useNetworkStatus } from '@/composables/useNetworkStatus'
+import { SitmcConfig } from '@/config'
+import { sortMinecraftAccounts } from '@/helpers/accounts'
 import { trackEvent } from '@/helpers/analytics'
-import { get_default_user, users as getUsers } from '@/helpers/auth'
+import { get_default_user, remove_user, set_default_user, users as getUsers } from '@/helpers/auth'
 import { loading_listener, process_listener } from '@/helpers/events'
 import { get_many as getInstances } from '@/helpers/instance'
 import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
@@ -456,11 +576,44 @@ const messages = defineMessages({
 		id: 'app.action-bar.sign-in',
 		defaultMessage: 'Sign in',
 	},
+	characters: {
+		id: 'app.action-bar.account.characters',
+		defaultMessage: 'Characters',
+	},
+	otherAccounts: {
+		id: 'app.action-bar.account.other-accounts',
+		defaultMessage: 'Other accounts',
+	},
+	copyUuid: {
+		id: 'minecraft-account.copy-uuid',
+		defaultMessage: 'Copy UUID',
+	},
+	removeAccount: {
+		id: 'minecraft-account.remove-account',
+		defaultMessage: 'Remove account',
+	},
+	addAccount: {
+		id: 'sitmc-account.add',
+		defaultMessage: 'Add a SIT-Minecraft account',
+	},
+	registerAccount: {
+		id: 'sitmc-account.register',
+		defaultMessage: 'Register a SIT-Minecraft account',
+	},
+	openSkinSite: {
+		id: 'sitmc-account.open-site',
+		defaultMessage: 'Open the skin site',
+	},
 })
 
 type MinecraftCredential = {
 	account_id: string
 	account_type: 'microsoft' | 'offline' | 'yggdrasil'
+	yggdrasil?: {
+		api_root: string
+		server_name: string
+		login: string
+	} | null
 	profile: {
 		id: string
 		name: string
@@ -473,7 +626,11 @@ type MinecraftCredential = {
 	}
 }
 
-/** The account card the popover renders, also reachable through the app's ref. */
+/**
+ * What the rest of the shell reaches the account UI through: the error modals
+ * call `login()` and the app follows `accountChangeRevision`, so the popover has
+ * to keep publishing both now that it renders its own list.
+ */
 type AccountsCardHandle = {
 	accountChangeRevision?: number
 	accounts?: MinecraftCredential[]
@@ -482,8 +639,89 @@ type AccountsCardHandle = {
 }
 
 const accountsCard = inject<Ref<AccountsCardHandle | null> | null>('accountsCard', null)
-const accountsCardRef = ref<AccountsCardHandle | null>(null)
 const accountMenuShown = ref(false)
+const signInGateShown = ref(false)
+const accounts = ref<MinecraftCredential[]>([])
+const defaultUser = ref<string | undefined>()
+const accountHeadUrls = ref(new Map<string, string>())
+const accountChangeRevision = ref(0)
+let accountRefreshGeneration = 0
+let lastAccountSignature: string | null = null
+let defaultUserUpdateQueue = Promise.resolve()
+
+const selectedAccount = computed(
+	() => accounts.value.find((account) => account.account_id === defaultUser.value) ?? null,
+)
+const accountName = computed(() => selectedAccount.value?.profile.name ?? null)
+
+const duplicateAccountNames = computed(() => {
+	const counts = new Map<string, number>()
+	for (const account of accounts.value) {
+		counts.set(account.profile.name, (counts.get(account.profile.name) ?? 0) + 1)
+	}
+	return new Set([...counts].filter(([, count]) => count > 1).map(([name]) => name))
+})
+
+/**
+ * Characters picked from one account site login are stored as separate
+ * credentials that still belong to the same remembered account, which is what
+ * lets the popover list them as that account's characters.
+ */
+function accountGroupKey(account: MinecraftCredential): string {
+	if (account.yggdrasil) {
+		return `${account.account_type}:${account.yggdrasil.api_root}:${account.yggdrasil.login}`
+	}
+	return account.account_id
+}
+
+const currentAccountCharacters = computed(() => {
+	const account = selectedAccount.value
+	if (!account) return []
+	const key = accountGroupKey(account)
+	return accounts.value.filter((item) => accountGroupKey(item) === key)
+})
+
+const otherAccounts = computed(() => {
+	const account = selectedAccount.value
+	if (!account) return []
+	const key = accountGroupKey(account)
+	return accounts.value.filter((item) => accountGroupKey(item) !== key)
+})
+
+type AccountListEntry =
+	| { type: 'heading'; key: string; label: string }
+	| { type: 'account'; key: string; account: MinecraftCredential; active: boolean }
+
+/**
+ * One flat list instead of collapsible levels: the active account's characters
+ * first, then every other remembered account, separated by headings only.
+ */
+const accountListEntries = computed<AccountListEntry[]>(() => {
+	const active = selectedAccount.value
+	if (!active) return []
+	const entries: AccountListEntry[] = [
+		{ type: 'heading', key: 'characters', label: formatMessage(messages.characters) },
+	]
+	for (const account of currentAccountCharacters.value) {
+		entries.push({
+			type: 'account',
+			key: account.account_id,
+			account,
+			active: account.account_id === active.account_id,
+		})
+	}
+	if (otherAccounts.value.length > 0) {
+		entries.push({
+			type: 'heading',
+			key: 'other-accounts',
+			label: formatMessage(messages.otherAccounts),
+		})
+		for (const account of otherAccounts.value) {
+			entries.push({ type: 'account', key: account.account_id, account, active: false })
+		}
+	}
+	return entries
+})
 
 const currentProcesses = ref<RunningProcess[]>([])
 const selectedProcess = ref<RunningProcess | undefined>()
@@ -521,29 +759,18 @@ await refresh()
 const { offline } = useNetworkStatus()
 
 /**
- * The error modals reach the account card through the ref the app provides, so
- * keep that ref pointing at the card the popover renders.
+ * Publishes the account surface the error modals and the app's login gate reach
+ * through the provided ref, now that the popover renders the accounts itself
+ * instead of rendering the account card component.
  */
-watch(
-	accountsCardRef,
-	(card) => {
-		if (accountsCard) accountsCard.value = card
-	},
-	{ immediate: true },
-)
+const accountsCardHandle: AccountsCardHandle = reactive({
+	accountChangeRevision,
+	accounts,
+	login: () => openSignInGate(),
+	refreshValues: () => refreshAccount(),
+})
 
-/**
- * The account list the card publishes changes whenever the signed-in account
- * does, including sign-ins the card did not start itself.
- */
-watch(
-	() => accountsCard.value?.accounts,
-	() => void refreshAccount(),
-)
-
-const selectedAccount = ref<MinecraftCredential | null>(null)
-const accountHeadUrl = ref<string | null>(null)
-let accountRefreshGeneration = 0
+if (accountsCard) accountsCard.value = accountsCardHandle
 
 const defaultSteveHeadUrl = createSkinHeadDataUrl(steveSkinTexture)
 
@@ -573,10 +800,48 @@ function getAccountSkin(account: MinecraftCredential): Skin | undefined {
 	}
 }
 
+function getAccountHeadUrl(account: MinecraftCredential): string {
+	return accountHeadUrls.value.get(account.account_id) ?? defaultSteveHeadUrl
+}
+
+/** Only the leading UUID segment is shown, which is enough to identify a character. */
+function shortProfileId(profileId: string): string {
+	return profileId.split('-')[0]
+}
+
+function hasMissingAccountHeads() {
+	return accounts.value.some((account) => {
+		const skin = getAccountSkin(account)
+		return Boolean(skin && !accountHeadUrls.value.has(account.account_id))
+	})
+}
+
+async function renderAccountHeads(accountList: MinecraftCredential[]) {
+	const generation = accountRefreshGeneration
+	const renderedHeads = await Promise.all(
+		accountList.map(async (account) => {
+			const skin = getAccountSkin(account)
+			if (!skin) return null
+			const headUrl = await getPlayerHeadUrl(skin).catch((error) => {
+				console.warn('Failed to render an account head in the action bar', error)
+				return null
+			})
+			return headUrl ? ([account.account_id, headUrl] as const) : null
+		}),
+	)
+	if (generation !== accountRefreshGeneration) return
+
+	const nextHeadUrls = new Map(accountHeadUrls.value)
+	for (const entry of renderedHeads) {
+		if (entry) nextHeadUrls.set(entry[0], entry[1])
+	}
+	accountHeadUrls.value = nextHeadUrls
+}
+
 /**
- * Reads the account the launcher will start the game with and renders its head
- * exactly like the account card does, so the chip is correct before the popover
- * has ever been opened.
+ * Reads the accounts the launcher can start the game with and renders their
+ * heads, so the chip and every list row are correct before the popover has ever
+ * been opened. This is also what the app calls through `refreshValues`.
  */
 async function refreshAccount() {
 	const generation = ++accountRefreshGeneration
@@ -584,19 +849,62 @@ async function refreshAccount() {
 	const userList = await getUsers(offline.value).catch(() => [])
 	if (generation !== accountRefreshGeneration) return
 
-	const accounts = Array.isArray(userList) ? (userList as unknown as MinecraftCredential[]) : []
-	selectedAccount.value = accounts.find((item) => item.account_id === selectedUserId) ?? null
-	accountHeadUrl.value = null
+	const loaded = Array.isArray(userList) ? (userList as unknown as MinecraftCredential[]) : []
+	accounts.value = sortMinecraftAccounts(loaded)
+	defaultUser.value = selectedUserId
+	void renderAccountHeads(accounts.value)
+	publishAccountChange()
+}
 
-	const skin = selectedAccount.value ? getAccountSkin(selectedAccount.value) : undefined
-	if (!skin) return
+/**
+ * The app follows this revision to learn that the signed-in accounts changed,
+ * including sign-ins the popover did not start itself.
+ */
+function publishAccountChange() {
+	const signature = `${defaultUser.value ?? ''}|${accounts.value
+		.map((account) => account.account_id)
+		.sort()
+		.join(',')}`
+	if (signature === lastAccountSignature) return
+	lastAccountSignature = signature
+	accountChangeRevision.value += 1
+}
 
-	const headUrl = await getPlayerHeadUrl(skin).catch((error) => {
-		console.warn('Failed to render the account head in the action bar', error)
-		return null
+function persistDefaultUser(accountId: string) {
+	const update = defaultUserUpdateQueue.then(async () => {
+		await set_default_user(accountId).catch(handleError)
 	})
-	if (generation !== accountRefreshGeneration) return
-	accountHeadUrl.value = headUrl
+	defaultUserUpdateQueue = update.catch(() => {})
+	return update
+}
+
+/** Switches the character the launcher starts the game with. */
+async function selectAccount(account: MinecraftCredential) {
+	const accountId = account.account_id
+	if (accountId === defaultUser.value) return
+	accountRefreshGeneration += 1
+	defaultUser.value = accountId
+	await persistDefaultUser(accountId)
+	if (defaultUser.value !== accountId) return
+	await refreshAccount()
+}
+
+/** Signs one remembered character out and forgets it. */
+async function removeAccount(account: MinecraftCredential) {
+	await remove_user(account.account_id).catch(handleError)
+	await refreshAccount()
+	if (!selectedAccount.value && accounts.value.length > 0) {
+		await selectAccount(accounts.value[0])
+	}
+	trackEvent('AccountLogOut')
+}
+
+async function copyAccountUuid(account: MinecraftCredential) {
+	try {
+		await navigator.clipboard.writeText(account.profile.id)
+	} catch (error) {
+		handleError(error as Error)
+	}
 }
 
 // Deliberately not awaited: this component sits inside a Suspense in the status
@@ -606,12 +914,43 @@ void refreshAccount()
 
 watch(offline, () => void refreshAccount())
 
-const accountName = computed(() => selectedAccount.value?.profile.name ?? null)
+/**
+ * The account card retried heads that failed to render on a timer. Re-rendering
+ * them each time the popover opens recovers the same way without a background
+ * loop that would keep hitting the skin renderer while it is failing.
+ */
+watch(accountMenuShown, (shown) => {
+	if (shown && hasMissingAccountHeads()) void renderAccountHeads(accounts.value)
+})
 
-/** Starts the same sign-in the account card's own button starts. */
+/** Opens the club sign-in gate the account card used to own. */
+function openSignInGate() {
+	if (offline.value) return
+	signInGateShown.value = true
+}
+
+/** Starts the same sign-in the account card's own button started. */
 function startSignIn() {
 	if (selectedAccount.value) return
-	accountsCardRef.value?.login?.()
+	openSignInGate()
+}
+
+function closeSignInGate() {
+	signInGateShown.value = false
+}
+
+async function completeSignIn() {
+	closeSignInGate()
+	await refreshAccount()
+	trackEvent('AccountLogIn')
+}
+
+async function openRegisterPage() {
+	await openUrl(SitmcConfig.registerUrl).catch(() => {})
+}
+
+async function openSkinSite() {
+	await openUrl(SitmcConfig.site).catch(() => {})
 }
 
 const unlistenProcess = await process_listener(async () => {
@@ -963,6 +1302,7 @@ onBeforeUnmount(() => {
 		clearTimeout(loadingNotificationTimer)
 		loadingNotificationTimer = null
 	}
+	if (accountsCard?.value === accountsCardHandle) accountsCard.value = null
 	removeNotification()
 	dismissed.value = false
 	unlistenProcess()
