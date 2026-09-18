@@ -44,6 +44,20 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 						'未登录前不再下载任何内容：服务端强制下发的实例及其所需的游戏文件都保持不动，登录完成后立即开始下载。',
 				},
 			],
+			fixed: [
+				{
+					'en-US':
+						'Downloads no longer fail with a timeout while several transfers are running at once: the launcher falls back to its other download path instead of aborting the file, so instance installs and game downloads finish again.',
+					'zh-CN':
+						'修复了同时下载多个文件时出现的「等待下载额度超时」错误：启动器会改用另一条下载通道继续，而不是中断整个文件，实例安装与游戏下载恢复正常。',
+				},
+				{
+					'en-US':
+						"An instance created from a modpack no longer starts out as a 1.19.4 vanilla instance: the pack's own game version and loader are used from the start, so a failed install cannot leave a wrong instance behind.",
+					'zh-CN':
+						'从整合包创建实例时不再先落成 1.19.4 原版实例：直接采用整合包声明的游戏版本与加载器，安装失败也不会再留下版本错误的实例。',
+				},
+			],
 		},
 	},
 	{
