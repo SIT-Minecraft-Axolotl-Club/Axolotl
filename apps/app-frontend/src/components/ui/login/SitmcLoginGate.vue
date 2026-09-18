@@ -124,7 +124,7 @@ const messages = defineMessages({
 	passwordLabel: { id: 'sitmc-login.password-label', defaultMessage: 'Password' },
 	rememberPassword: {
 		id: 'sitmc-login.remember-password',
-		defaultMessage: 'Remember this password (stored by the system credential manager)',
+		defaultMessage: 'Remember this password',
 	},
 	signIn: { id: 'sitmc-login.sign-in', defaultMessage: 'Sign in' },
 	savedAccounts: { id: 'sitmc-login.saved-accounts', defaultMessage: 'Remembered accounts' },
@@ -411,9 +411,6 @@ defineExpose({ resetAll })
 								{{ formatMessage(messages.signInWithSite) }}
 							</button>
 						</ButtonStyled>
-						<p class="m-0 text-center text-xs text-secondary">
-							{{ formatMessage(messages.signInHint) }}
-						</p>
 					</div>
 
 					<div v-if="flow" class="flex flex-col gap-3 rounded-lg bg-surface-3 p-4">
@@ -518,7 +515,11 @@ defineExpose({ resetAll })
 						/>
 					</label>
 					<label class="flex items-center gap-2 text-xs text-secondary">
-						<input v-model="rememberPassword" type="checkbox" />
+						<input
+						v-model="rememberPassword"
+						type="checkbox"
+						class="size-3.5 shrink-0 cursor-pointer accent-[var(--color-brand)]"
+					/>
 						{{ formatMessage(messages.rememberPassword) }}
 					</label>
 

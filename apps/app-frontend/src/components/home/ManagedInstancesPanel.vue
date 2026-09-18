@@ -11,6 +11,22 @@ import { managed_ensure_runnable } from '@/helpers/managed'
 
 const { formatMessage } = useVIntl()
 
+/** Tauri rejects a command with a string or a plain object, not always an Error. */
+function describeError(error: unknown): string {
+	if (error instanceof Error) return error.message
+	if (typeof error === 'string') return error
+	if (error && typeof error === 'object') {
+		const message = (error as { message?: unknown }).message
+		if (typeof message === 'string' && message.length > 0) return message
+		try {
+			return JSON.stringify(error)
+		} catch {
+			// Fall through to the plain conversion below.
+		}
+	}
+	return String(error)
+}
+
 const messages = defineMessages({
 	title: { id: 'managed-instances.title', defaultMessage: 'Club game instances' },
 	subtitle: {
@@ -132,7 +148,7 @@ async function launch(instanceId: string, serverInstanceId: string) {
 		await refresh()
 	} catch (launchFailure) {
 		launchError.value =
-			launchFailure instanceof Error ? launchFailure.message : String(launchFailure)
+			describeError(launchFailure)
 	} finally {
 		launchingId.value = null
 	}
@@ -176,7 +192,7 @@ async function removeOptional(record: ManagedInstanceRecord) {
 		await syncNow()
 	} catch (removalFailure) {
 		launchError.value =
-			removalFailure instanceof Error ? removalFailure.message : String(removalFailure)
+			describeError(removalFailure)
 	} finally {
 		removingId.value = null
 	}
@@ -289,7 +305,7 @@ onMounted(() => {
 				</div>
 
 				<div class="flex shrink-0 items-center gap-2">
-					<ButtonStyled v-if="!record.required && record.instance_id">
+					<ButtonStyled v-if="!record.required && record.instance_id && !pendingAction(record.server_instance_id)">
 						<button
 							v-tooltip="formatMessage(messages.removeHint)"
 							:disabled="isBusy || removingId !== null"

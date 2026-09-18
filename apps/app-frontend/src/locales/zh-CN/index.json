@@ -12560,7 +12560,7 @@
     "message": "密码"
   },
   "sitmc-login.remember-password": {
-    "message": "记住密码（保存在系统凭据管理器）"
+    "message": "记住密码"
   },
   "sitmc-login.sign-in": {
     "message": "登录"
