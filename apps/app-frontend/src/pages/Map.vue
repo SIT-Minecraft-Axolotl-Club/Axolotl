@@ -99,14 +99,16 @@ watch(selectedId, (id) => {
 		<!--
 			The club removed the X-Frame-Options header from these map paths, so the
 			pages can be embedded directly and the switcher stays usable above them.
+			The sandbox keeps an embedded map from capturing the pointer or opening
+			itself fullscreen, which used to leave the rest of the launcher dead.
 		-->
 		<iframe
 			:key="selectedMap.id"
 			:src="selectedMap.url"
 			:title="selectedMap.url"
 			class="min-h-96 w-full flex-1 rounded-[var(--radius-lg)] border border-solid border-divider bg-surface-4"
+			sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
 			referrerpolicy="strict-origin-when-cross-origin"
-			allowfullscreen
 		/>
 	</div>
 </template>
