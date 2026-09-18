@@ -1442,7 +1442,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn bmclapi_default_migration_keeps_explicit_download_choices() {
+    async fn mirror_default_migrations_keep_explicit_download_choices() {
         let pool = sqlx::sqlite::SqlitePoolOptions::new()
             .max_connections(1)
             .connect("sqlite::memory:")
@@ -1450,16 +1450,36 @@ mod tests {
             .unwrap();
         sqlx::migrate!().run(&pool).await.unwrap();
 
+        // The whole chain ends on the health-ranked default: the mirror-first
+        // default is reverted by the migration that follows it.
         let settings = Settings::get(&pool).await.unwrap();
         assert_eq!(
             settings.minecraft_metadata_source,
-            DownloadSourceMode::MirrorPreferred
+            DownloadSourceMode::Auto
         );
+        assert_eq!(settings.minecraft_file_source, DownloadSourceMode::Auto);
+
+        let mirror_default = include_str!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/migrations/20260918000000_default-download-sources-to-bmclapi.sql"
+        ));
+        let restored_default = include_str!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/migrations/20260918180000_restore-health-ranked-download-sources.sql"
+        ));
+
+        // An untouched row moves to the mirror default and back again.
+        sqlx::query(mirror_default).execute(&pool).await.unwrap();
+        let settings = Settings::get(&pool).await.unwrap();
         assert_eq!(
             settings.minecraft_file_source,
             DownloadSourceMode::MirrorPreferred
         );
+        sqlx::query(restored_default).execute(&pool).await.unwrap();
+        let settings = Settings::get(&pool).await.unwrap();
+        assert_eq!(settings.minecraft_file_source, DownloadSourceMode::Auto);
 
+        // A source the player picked survives both migrations.
         sqlx::query(
             "
             UPDATE settings
@@ -1471,13 +1491,9 @@ mod tests {
         .execute(&pool)
         .await
         .unwrap();
-        sqlx::query(include_str!(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/migrations/20260918000000_default-download-sources-to-bmclapi.sql"
-        )))
-        .execute(&pool)
-        .await
-        .unwrap();
+        for migration in [mirror_default, restored_default] {
+            sqlx::query(migration).execute(&pool).await.unwrap();
+        }
 
         let settings = Settings::get(&pool).await.unwrap();
         assert_eq!(
