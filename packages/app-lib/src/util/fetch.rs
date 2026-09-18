@@ -5308,8 +5308,13 @@ async fn download_to_path_inner(
     // Prefer one stream on a healthy shared HTTP/2 connection when the file
     // size and transport reputation justify it. Larger or slow H2 transfers
     // fall through to independent HTTP/1.1 range connections.
-    let h2_failed_nonofficial = if let Some((h2_route, h2_policy)) =
-        select_h2_download_route(&request, &routes, &part_path).await
+    //
+    // A pool with no free slot is not a reason to wait on this path either: the
+    // HTTP/1.1 attempts below queue for the same slots and start immediately, so
+    // a busy install keeps moving instead of spending the wait timeout per file.
+    let h2_failed_nonofficial = if semaphore.0.available_permits() > 0
+        && let Some((h2_route, h2_policy)) =
+            select_h2_download_route(&request, &routes, &part_path).await
     {
         match try_h2_download(
             &request,
