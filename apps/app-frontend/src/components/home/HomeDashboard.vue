@@ -52,6 +52,7 @@ import {
 	setHomeWidgetPosition,
 } from '@/components/home/home-dashboard'
 import { provideHomeDashboardRuntime } from '@/components/home/home-dashboard-runtime'
+import HomeAnnouncement from '@/components/home/HomeAnnouncement.vue'
 import HomeCalendar from '@/components/home/HomeCalendar.vue'
 import HomeGreeting from '@/components/home/HomeGreeting.vue'
 import HomeGreetingSettingsModal from '@/components/home/HomeGreetingSettingsModal.vue'
@@ -638,6 +639,10 @@ defineExpose({ openWidgetPicker, setLayout })
 								:greeting-text="widget.options?.greetingText"
 								:greeting-font="widget.options?.greetingFont"
 								:greeting-font-size="widget.options?.greetingFontSize"
+							/>
+							<HomeAnnouncement
+								v-else-if="widget.kind === 'announcement'"
+								:dashboard-size="effectiveSize(widget)"
 							/>
 							<HomeRecentWorlds
 								v-else-if="widget.kind === 'recent'"

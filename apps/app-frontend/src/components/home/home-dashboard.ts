@@ -1,4 +1,5 @@
-export const HOME_DASHBOARD_VERSION = 1 as const
+export const HOME_DASHBOARD_VERSION = 2 as const
+export const HOME_DASHBOARD_LEGACY_VERSIONS = [1] as const
 export const HOME_WIDGET_LAYOUTS = ['grid', 'free'] as const
 export const HOME_WIDGET_STANDARD_SIZES = ['1x1', '2x1', '1x2', '2x2'] as const
 export const HOME_WIDGET_SIZES = [...HOME_WIDGET_STANDARD_SIZES, '3x1', '3x2'] as const
@@ -21,6 +22,7 @@ export type HomeGreetingMode = (typeof HOME_GREETING_MODES)[number]
 export type HomeGreetingFont = (typeof HOME_GREETING_FONTS)[number]
 export type HomeWidgetKind =
 	| 'greeting'
+	| 'announcement'
 	| 'recent'
 	| 'calendar'
 	| 'pinned-instances'
@@ -77,6 +79,7 @@ export type HomeDashboardSaveQueue = {
 
 export const HOME_WIDGET_SIZE_OPTIONS: Record<HomeWidgetKind, readonly HomeWidgetSize[]> = {
 	greeting: ['2x1'],
+	announcement: HOME_WIDGET_STANDARD_SIZES,
 	recent: ['2x1', '2x2', '3x1', '3x2'],
 	calendar: ['1x2'],
 	'pinned-instances': HOME_WIDGET_STANDARD_SIZES,
@@ -87,6 +90,7 @@ export const HOME_WIDGET_SIZE_OPTIONS: Record<HomeWidgetKind, readonly HomeWidge
 
 export const HOME_WIDGET_DEFAULT_SIZE: Record<HomeWidgetKind, HomeWidgetSize> = {
 	greeting: '2x1',
+	announcement: '1x1',
 	recent: '2x2',
 	calendar: '1x2',
 	'pinned-instances': '2x2',
@@ -137,6 +141,7 @@ export function createDefaultHomeDashboard(includeRecent = true): HomeDashboardC
 		layout: 'grid',
 		widgets: [
 			createPlacement('greeting'),
+			createPlacement('announcement'),
 			createPlacement('calendar'),
 			...(includeRecent ? [createPlacement('recent')] : []),
 			createPlacement('pinned-instances', '2x1'),
@@ -219,12 +224,12 @@ function normalizeGreetingFontSize(value: unknown): number {
 	)
 }
 
+function isSupportedDashboardVersion(value: unknown): boolean {
+	return value === HOME_DASHBOARD_VERSION || HOME_DASHBOARD_LEGACY_VERSIONS.some((v) => v === value)
+}
+
 export function normalizeHomeDashboard(value: unknown): HomeDashboardConfig | null {
-	if (
-		!isRecord(value) ||
-		value.version !== HOME_DASHBOARD_VERSION ||
-		!Array.isArray(value.widgets)
-	) {
+	if (!isRecord(value) || !isSupportedDashboardVersion(value.version) || !Array.isArray(value.widgets)) {
 		return null
 	}
 
@@ -264,6 +269,15 @@ export function normalizeHomeDashboard(value: unknown): HomeDashboardConfig | nu
 			},
 		]
 	})
+
+	// Layouts saved before the announcement card existed are upgraded in place, so a
+	// customized arrangement keeps its widgets and simply gains the new card.
+	if (
+		value.version !== HOME_DASHBOARD_VERSION &&
+		!widgets.some((widget) => widget.kind === 'announcement')
+	) {
+		widgets.splice(1, 0, createPlacement('announcement'))
+	}
 
 	return { version: HOME_DASHBOARD_VERSION, layout, widgets }
 }

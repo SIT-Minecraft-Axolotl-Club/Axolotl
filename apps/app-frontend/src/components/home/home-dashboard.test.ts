@@ -10,6 +10,8 @@ import {
 	getHomeGridColumnCount,
 	getHomeWidgetDimensions,
 	getHomeWidgetSpan,
+	HOME_DASHBOARD_LEGACY_VERSIONS,
+	HOME_DASHBOARD_VERSION,
 	moveHomeWidget,
 	normalizeHomeDashboard,
 	packHomeWidgets,
@@ -82,6 +84,7 @@ test('accepts draggable order and restores the complete default layout', () => {
 		createDefaultHomeDashboard().widgets.map(({ kind, size }) => ({ kind, size })),
 		[
 			{ kind: 'greeting', size: '2x1' },
+			{ kind: 'announcement', size: '1x1' },
 			{ kind: 'calendar', size: '1x2' },
 			{ kind: 'recent', size: '2x2' },
 			{ kind: 'pinned-instances', size: '2x1' },
@@ -143,11 +146,11 @@ test('normalizes a saved layout when entering Home again', () => {
 
 test('normalizes legacy layouts and persisted free positions', () => {
 	const legacy = normalizeHomeDashboard({
-		version: 1,
+		version: HOME_DASHBOARD_LEGACY_VERSIONS[0],
 		widgets: [{ id: 'legacy', kind: 'calendar', size: '1x2' }],
 	})
 	const free = normalizeHomeDashboard({
-		version: 1,
+		version: HOME_DASHBOARD_LEGACY_VERSIONS[0],
 		layout: 'free',
 		widgets: [
 			{ id: 'valid', kind: 'calendar', size: '1x2', position: { column: 2, row: 4 } },
@@ -156,9 +159,30 @@ test('normalizes legacy layouts and persisted free positions', () => {
 	})
 
 	assert.equal(legacy?.layout, 'grid')
+	assert.deepEqual(
+		legacy?.widgets.map(({ kind, size }) => ({ kind, size })),
+		[
+			{ kind: 'calendar', size: '1x2' },
+			{ kind: 'announcement', size: '1x1' },
+		],
+	)
 	assert.equal(free?.layout, 'free')
 	assert.deepEqual(free?.widgets[0].position, { column: 2, row: 4 })
-	assert.equal(free?.widgets[1].position, undefined)
+	assert.equal(free?.widgets[1].kind, 'announcement')
+	assert.equal(free?.widgets[2].position, undefined)
+})
+
+test('keeps a removed announcement card removed once the layout is current', () => {
+	const config = createDefaultHomeDashboard()
+	const announcement = config.widgets.find((widget) => widget.kind === 'announcement')!
+	const restored = normalizeHomeDashboard(
+		JSON.parse(JSON.stringify(removeHomeWidget(config, announcement.id))),
+	)
+
+	assert.equal(
+		restored?.widgets.some((widget) => widget.kind === 'announcement'),
+		false,
+	)
 })
 
 test('packs widgets into the earliest available cells', () => {
@@ -173,18 +197,17 @@ test('packs widgets into the earliest available cells', () => {
 		})),
 		[
 			{ column: 1, row: 1, effectiveColumns: 2, effectiveRows: 1 },
-			{ column: 3, row: 1, effectiveColumns: 1, effectiveRows: 2 },
-			{ column: 1, row: 2, effectiveColumns: 2, effectiveRows: 2 },
+			{ column: 3, row: 1, effectiveColumns: 1, effectiveRows: 1 },
 			{ column: 4, row: 1, effectiveColumns: 1, effectiveRows: 2 },
-			{ column: 3, row: 3, effectiveColumns: 2, effectiveRows: 2 },
-			{ column: 1, row: 4, effectiveColumns: 2, effectiveRows: 1 },
+			{ column: 1, row: 2, effectiveColumns: 2, effectiveRows: 2 },
+			{ column: 3, row: 3, effectiveColumns: 2, effectiveRows: 1 },
 		],
 	)
 })
 
 test('normalizes malformed sizes while retaining duplicate widgets', () => {
 	const normalized = normalizeHomeDashboard({
-		version: 1,
+		version: HOME_DASHBOARD_VERSION,
 		widgets: [
 			{ id: 'one', kind: 'calendar', size: '9x9' },
 			{ id: 'two', kind: 'calendar', size: '1x1' },
@@ -203,7 +226,7 @@ test('normalizes malformed sizes while retaining duplicate widgets', () => {
 
 test('normalizes every persisted calendar placement to the fixed 1x2 size', () => {
 	const normalized = normalizeHomeDashboard({
-		version: 1,
+		version: HOME_DASHBOARD_VERSION,
 		widgets: [
 			{ id: 'small', kind: 'calendar', size: '1x1' },
 			{ id: 'wide', kind: 'calendar', size: '2x2' },
@@ -218,7 +241,7 @@ test('normalizes every persisted calendar placement to the fixed 1x2 size', () =
 
 test('normalizes every persisted greeting placement to the fixed 2x1 size', () => {
 	const normalized = normalizeHomeDashboard({
-		version: 1,
+		version: HOME_DASHBOARD_VERSION,
 		widgets: [
 			{ id: 'small', kind: 'greeting', size: '1x1' },
 			{
@@ -264,7 +287,7 @@ test('normalizes every persisted greeting placement to the fixed 2x1 size', () =
 
 test('normalizes greeting font settings and clamps font size', () => {
 	const normalized = normalizeHomeDashboard({
-		version: 1,
+		version: HOME_DASHBOARD_VERSION,
 		widgets: [
 			{
 				id: 'large',
@@ -295,7 +318,7 @@ test('normalizes greeting font settings and clamps font size', () => {
 
 test('normalizes and updates recently played item limits', () => {
 	const normalized = normalizeHomeDashboard({
-		version: 1,
+		version: HOME_DASHBOARD_VERSION,
 		widgets: [
 			{ id: 'legacy', kind: 'recent', size: '2x2' },
 			{ id: 'valid', kind: 'recent', size: '2x1', options: { recentLimit: 8 } },
@@ -312,7 +335,7 @@ test('normalizes and updates recently played item limits', () => {
 
 test('accepts and resizes the recent widget to 3-column layouts', () => {
 	const normalized = normalizeHomeDashboard({
-		version: 1,
+		version: HOME_DASHBOARD_VERSION,
 		widgets: [{ id: 'recent', kind: 'recent', size: '3x2' }],
 	})!
 	const config = createDefaultHomeDashboard()

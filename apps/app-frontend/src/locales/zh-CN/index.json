@@ -2045,6 +2045,27 @@
   "app.gc-notice.fallback": {
     "message": "Java 不接受 {preferred}，已改用 {chosen}。"
   },
+  "app.home.announcement.empty": {
+    "message": "暂时没有公告。"
+  },
+  "app.home.announcement.loading": {
+    "message": "正在加载公告…"
+  },
+  "app.home.announcement.priority-critical": {
+    "message": "紧急"
+  },
+  "app.home.announcement.priority-high": {
+    "message": "重要"
+  },
+  "app.home.announcement.published": {
+    "message": "发布于 {date}"
+  },
+  "app.home.announcement.title": {
+    "message": "最新公告"
+  },
+  "app.home.announcement.view": {
+    "message": "查看"
+  },
   "app.home.breadcrumb": {
     "message": "主页"
   },
@@ -2338,6 +2359,12 @@
   },
   "app.home.widgets.add-title": {
     "message": "添加小组件"
+  },
+  "app.home.widgets.announcement": {
+    "message": "最新公告"
+  },
+  "app.home.widgets.announcement-description": {
+    "message": "显示俱乐部发布的最新一条公告。"
   },
   "app.home.widgets.back": {
     "message": "返回"

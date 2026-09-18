@@ -1901,6 +1901,27 @@
   "app.gc-notice.fallback": {
     "message": "Java did not accept {preferred}; using {chosen}."
   },
+  "app.home.announcement.empty": {
+    "message": "No announcements right now."
+  },
+  "app.home.announcement.loading": {
+    "message": "Loading announcements..."
+  },
+  "app.home.announcement.priority-critical": {
+    "message": "Urgent"
+  },
+  "app.home.announcement.priority-high": {
+    "message": "Important"
+  },
+  "app.home.announcement.published": {
+    "message": "Published {date}"
+  },
+  "app.home.announcement.title": {
+    "message": "Latest announcement"
+  },
+  "app.home.announcement.view": {
+    "message": "Read"
+  },
   "app.home.breadcrumb": {
     "message": "Home"
   },
@@ -2194,6 +2215,12 @@
   },
   "app.home.widgets.add-title": {
     "message": "Add widget"
+  },
+  "app.home.widgets.announcement": {
+    "message": "Latest announcement"
+  },
+  "app.home.widgets.announcement-description": {
+    "message": "Show the newest announcement published by the club."
   },
   "app.home.widgets.back": {
     "message": "Back"

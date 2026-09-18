@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+	BellRingIcon,
 	CalendarIcon,
 	ChevronLeftIcon,
 	ChevronRightIcon,
@@ -69,6 +70,11 @@ const messages = defineMessages({
 	recentDescription: {
 		id: 'app.home.widgets.recent-description',
 		defaultMessage: 'Resume the worlds and instances you played most recently.',
+	},
+	announcement: { id: 'app.home.widgets.announcement', defaultMessage: 'Latest announcement' },
+	announcementDescription: {
+		id: 'app.home.widgets.announcement-description',
+		defaultMessage: 'Show the newest announcement published by the club.',
 	},
 	calendar: { id: 'app.home.widgets.calendar', defaultMessage: 'Calendar' },
 	calendarDescription: {
@@ -145,6 +151,12 @@ const catalogSections = computed(() => [
 				label: formatMessage(messages.calendar),
 				description: formatMessage(messages.calendarDescription),
 				icon: CalendarIcon,
+			},
+			{
+				kind: 'announcement' as const,
+				label: formatMessage(messages.announcement),
+				description: formatMessage(messages.announcementDescription),
+				icon: BellRingIcon,
 			},
 		],
 	},
