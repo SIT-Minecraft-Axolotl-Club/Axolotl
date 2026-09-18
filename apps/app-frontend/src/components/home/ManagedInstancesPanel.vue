@@ -308,9 +308,7 @@ onMounted(() => {
 							{{
 								launchingId === record.instance_id
 									? formatMessage(messages.starting)
-									: pendingAction(record.server_instance_id)
-										? formatMessage(messages.playDownloads)
-										: formatMessage(messages.play)
+									: formatMessage(messages.play)
 							}}
 						</button>
 					</ButtonStyled>

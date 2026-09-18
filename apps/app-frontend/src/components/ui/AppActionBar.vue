@@ -599,7 +599,10 @@ async function refreshAccount() {
 	accountHeadUrl.value = headUrl
 }
 
-await refreshAccount()
+// Deliberately not awaited: this component sits inside a Suspense in the status
+// bar, so awaiting here kept the whole bar, window controls included, pending
+// for as long as the head render took to settle.
+void refreshAccount()
 
 watch(offline, () => void refreshAccount())
 

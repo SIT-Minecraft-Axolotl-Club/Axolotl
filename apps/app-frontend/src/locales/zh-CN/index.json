@@ -12595,7 +12595,25 @@
   "sitmc-account.add": {
     "message": "添加 SIT-Minecraft 账户"
   },
-  "managed-instances.title": {
+
+  "managed-instances.play-downloads": {
+    "message": "开始游戏（需先下载）"
+  },
+  "managed-instances.not-downloaded": {
+    "message": "尚未下载"
+  },
+  "managed-instances.remove": {
+    "message": "从本机删除"
+  },
+  "managed-instances.remove-hint": {
+    "message": "删除可以释放磁盘空间；实例仍会留在列表里，随时可以重新下载。"
+  },
+  "managed-instances.badge-required": {
+    "message": "强制下发"
+  },
+  "managed-instances.badge-optional": {
+    "message": "按需下载"
+  },  "managed-instances.title": {
     "message": "社团游戏实例"
   },
   "managed-instances.subtitle": {
