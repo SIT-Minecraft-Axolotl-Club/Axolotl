@@ -10,13 +10,9 @@ export type ShortcutGroupId = 'scroll' | 'nav'
 export type ShortcutEnabledField =
 	| 'quickScrollEnabled'
 	| 'shortcutNavHome'
-	| 'shortcutNavWorlds'
-	| 'shortcutNavDiscover'
-	| 'shortcutNavLibrary'
-	| 'shortcutNavLab'
 	| 'shortcutNavDownloads'
-	| 'shortcutNavCreate'
 	| 'shortcutNavSettings'
+	| 'shortcutNavMap'
 
 export interface ShortcutContext {
 	worldsTabEnabled: boolean
@@ -81,10 +77,10 @@ const messages = defineMessages({
 		id: 'app.shortcut-settings.nav-home-description',
 		defaultMessage: 'Jump to the Home page.',
 	},
-	navWorlds: { id: 'app.shortcut-settings.nav-worlds', defaultMessage: 'Worlds' },
-	navWorldsDescription: {
-		id: 'app.shortcut-settings.nav-worlds-description',
-		defaultMessage: 'Jump to your worlds.',
+	navMap: { id: 'app.shortcut-settings.nav-map', defaultMessage: 'Map' },
+	navMapDescription: {
+		id: 'app.shortcut-settings.nav-map-description',
+		defaultMessage: 'Open the map.',
 	},
 	navDiscover: {
 		id: 'app.shortcut-settings.nav-discover',
@@ -93,11 +89,6 @@ const messages = defineMessages({
 	navDiscoverDescription: {
 		id: 'app.shortcut-settings.nav-discover-description',
 		defaultMessage: 'Jump to browsing content.',
-	},
-	navLibrary: { id: 'app.shortcut-settings.nav-library', defaultMessage: 'Library' },
-	navLibraryDescription: {
-		id: 'app.shortcut-settings.nav-library-description',
-		defaultMessage: 'Jump to your library.',
 	},
 	navLab: { id: 'app.shortcut-settings.nav-lab', defaultMessage: 'Lab' },
 	navLabDescription: {
@@ -204,23 +195,13 @@ export const SHORTCUT_ACTIONS: ShortcutAction[] = [
 		target: () => '/',
 	},
 	{
-		id: 'shortcutNavWorlds',
+		id: 'shortcutNavMap',
 		group: 'nav',
-		enabledField: 'shortcutNavWorlds',
-		defaultBinding: keyboard('Digit2', true),
-		label: messages.navWorlds,
-		description: messages.navWorldsDescription,
-		target: () => '/worlds',
-		unavailable: (context) => !context.worldsTabEnabled,
-	},
-	{
-		id: 'shortcutNavLibrary',
-		group: 'nav',
-		enabledField: 'shortcutNavLibrary',
-		defaultBinding: keyboard('Digit6', true),
-		label: messages.navLibrary,
-		description: messages.navLibraryDescription,
-		target: () => '/library',
+		enabledField: 'shortcutNavMap',
+		defaultBinding: keyboard('Digit5', true),
+		label: messages.navMap,
+		description: messages.navMapDescription,
+		target: () => '/map',
 	},
 	{
 		id: 'shortcutNavDownloads',

@@ -21,17 +21,11 @@ import {
 const settingsComponentFiles = {
 	interface: ['./AppearanceSettings.vue'],
 	'home-navigation': ['./AppearanceSettings.vue'],
-	'language-translation': ['./LanguageSettings.vue', './TranslationSettings.vue'],
-	ai: ['./AISettings.vue'],
+	'language-translation': ['./LanguageTranslationSettings.vue', './LanguageSettings.vue'],
 	'shortcut-settings': ['./KeybindSettings.vue'],
 	'java-performance': ['./JavaSettings.vue'],
-	'launch-defaults': [
-		'./DefaultInstanceSettings.vue',
-		'./LogShareSettings.vue',
-		'./SharedLogsSettings.vue',
-	],
+	'instance-sync': ['./instances/index.vue'],
 	'content-downloads': ['./AppearanceSettings.vue', './ResourceManagementSettings.vue'],
-	'network-multiplayer': ['./ResourceManagementSettings.vue', './MultiplayerSettings.vue'],
 	'storage-backups': ['./ResourceManagementSettings.vue', './StorageSettings.vue'],
 	'privacy-data': ['./PrivacySettings.vue'],
 	updates: ['./UpdateSettings.vue'],
@@ -127,7 +121,6 @@ test('legacy category names remain searchable after the taxonomy change', () => 
 		.join(' ')
 
 	assert.equal(keywordText.includes('Resource management'), true)
-	assert.equal(keywordText.includes('Default instance options'), true)
 })
 
 test('developer-only settings stay out of the normal search categories', () => {
@@ -167,13 +160,11 @@ test('settings navigation groups preserve the intended Axolotl information archi
 		'home-navigation',
 		'shortcut-settings',
 		'language-translation',
-		'ai',
 	])
 	assert.deepEqual(categoriesForGroup('game'), [
-		'launch-defaults',
+		'instance-sync',
 		'java-performance',
 		'content-downloads',
-		'network-multiplayer',
 	])
 	assert.deepEqual(categoriesForGroup('data-privacy'), ['storage-backups', 'privacy-data'])
 	assert.deepEqual(categoriesForGroup('support'), ['updates', 'about', 'logs'])
@@ -205,6 +196,12 @@ test('every settings search result resolves to a category and a scroll target', 
 		const template = settingsComponentFiles[entry.categoryId]
 			.map((file) => readFileSync(new URL(file, import.meta.url), 'utf8'))
 			.join('\n')
-		assert.equal(template.includes(`id="${targetId}"`), true)
+		// Shortcut rows derive their anchor from the action id, so the literal
+		// id only exists once Vue renders the row.
+		const hasTarget =
+			template.includes(`id="${targetId}"`) ||
+			(entry.categoryId === 'shortcut-settings' &&
+				template.includes('`settings-target-${action.id}`'))
+		assert.equal(hasTarget, true, `${entry.id} -> ${targetId}`)
 	}
 })

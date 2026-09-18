@@ -239,14 +239,6 @@ const messages = defineMessages({
 		defaultMessage:
 			'Download required dependencies when installing content. You can adjust the selection in the confirmation dialog before each install.',
 	},
-	hideNametagTitle: {
-		id: 'app.appearance-settings.hide-nametag.title',
-		defaultMessage: 'Hide nametag',
-	},
-	hideNametagDescription: {
-		id: 'app.appearance-settings.hide-nametag.description',
-		defaultMessage: 'Disables the nametag above your player on the skins page.',
-	},
 	nativeDecorationsTitle: {
 		id: 'app.appearance-settings.native-decorations.title',
 		defaultMessage: 'Native decorations',
@@ -291,10 +283,6 @@ const messages = defineMessages({
 		id: 'app.appearance-settings.default-landing-page.library',
 		defaultMessage: 'Library',
 	},
-	defaultLandingPageDiscoverContent: {
-		id: 'app.appearance-settings.default-landing-page.discover-content',
-		defaultMessage: 'Discover content',
-	},
 	homeLayoutTitle: {
 		id: 'app.appearance-settings.home-layout.title',
 		defaultMessage: 'Home layout',
@@ -314,14 +302,6 @@ const messages = defineMessages({
 	selectOption: {
 		id: 'app.appearance-settings.select-option',
 		defaultMessage: 'Select an option',
-	},
-	toggleSidebarTitle: {
-		id: 'app.appearance-settings.toggle-sidebar.title',
-		defaultMessage: 'Toggle sidebar',
-	},
-	toggleSidebarDescription: {
-		id: 'app.appearance-settings.toggle-sidebar.description',
-		defaultMessage: 'Enables the ability to toggle the sidebar.',
 	},
 	unknownPackWarningTitle: {
 		id: 'app.appearance-settings.unknown-pack-warning.title',
@@ -378,6 +358,14 @@ const messages = defineMessages({
 
 const os = ref(await getOS())
 const settings = ref(await get())
+
+// Content browsing is unrouted, so a stored "Discover content" landing choice is
+// migrated to Home, which is the page it already opened.
+if (settings.value.default_page === 'DiscoverContent') {
+	settings.value.default_page = 'Home'
+	await set(settings.value)
+}
+
 const customBackgroundPreview = computed(() =>
 	settings.value.custom_background_path
 		? convertFileSrc(settings.value.custom_background_path)
@@ -1050,10 +1038,6 @@ watch(
 									label: formatMessage(messages.defaultLandingPageHome),
 								},
 								{
-									value: 'DiscoverContent',
-									label: formatMessage(messages.defaultLandingPageDiscoverContent),
-								},
-								{
 									value: 'Library',
 									label: formatMessage(messages.defaultLandingPageLibrary),
 								},
@@ -1218,26 +1202,6 @@ watch(
 							{ value: 'lightweight', label: formatMessage(messages.closeBehaviorLightweight) },
 						]"
 						@update:model-value="(value) => (themeStore.closeBehavior = value as CloseBehavior)"
-					/>
-				</template>
-			</SettingsRow>
-			<SettingsRow>
-				<template #label>
-					<span id="settings-target-appearance-hide-nametag" tabindex="-1">
-						{{ formatMessage(messages.hideNametagTitle) }}
-					</span>
-				</template>
-				<template #description>{{ formatMessage(messages.hideNametagDescription) }}</template>
-				<template #control>
-					<Toggle
-						id="hide-nametag-skins-page"
-						:model-value="themeStore.hideNametagSkinsPage"
-						@update:model-value="
-							(e) => {
-								themeStore.hideNametagSkinsPage = !!e
-								settings.hide_nametag_skins_page = themeStore.hideNametagSkinsPage
-							}
-						"
 					/>
 				</template>
 			</SettingsRow>

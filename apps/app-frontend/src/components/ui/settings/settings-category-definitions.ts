@@ -5,12 +5,9 @@ export type SettingsCategoryId =
 	| 'home-navigation'
 	| 'language-translation'
 	| 'shortcut-settings'
-	| 'ai'
-	| 'launch-defaults'
 	| 'instance-sync'
 	| 'java-performance'
 	| 'content-downloads'
-	| 'network-multiplayer'
 	| 'storage-backups'
 	| 'privacy-data'
 	| 'updates'
@@ -31,7 +28,7 @@ export interface SettingsCategoryDefinition {
 
 /**
  * Ordered by daily-use priority within each group:
- * - launcher: how the shell looks and is operated, then optional AI
+ * - launcher: how the shell looks and is operated
  * - game: how Minecraft launches and gets content
  * - data-privacy: disk footprint and what leaves the machine
  * - support: update, identity, then diagnostics
@@ -68,30 +65,11 @@ export const settingsCategoryDefinitions: SettingsCategoryDefinition[] = [
 	{
 		id: 'language-translation',
 		name: defineMessage({
-			id: 'app.settings.tabs.language-translation',
-			defaultMessage: 'Language & translation',
+			id: 'app.settings.tabs.language',
+			defaultMessage: 'Language',
 		}),
 		group: 'launcher',
 		onboardingId: 'settings-tab-language-translation',
-	},
-	{
-		id: 'ai',
-		name: defineMessage({
-			id: 'app.settings.tabs.ai',
-			defaultMessage: 'AI features',
-		}),
-		group: 'launcher',
-		flushContent: true,
-		onboardingId: 'settings-tab-ai',
-	},
-	{
-		id: 'launch-defaults',
-		name: defineMessage({
-			id: 'app.settings.tabs.launch-defaults',
-			defaultMessage: 'Launch defaults',
-		}),
-		group: 'game',
-		onboardingId: 'settings-tab-launch-defaults',
 	},
 	{
 		id: 'instance-sync',
@@ -116,15 +94,6 @@ export const settingsCategoryDefinitions: SettingsCategoryDefinition[] = [
 		}),
 		group: 'game',
 		onboardingId: 'settings-tab-content-downloads',
-	},
-	{
-		id: 'network-multiplayer',
-		name: defineMessage({
-			id: 'app.settings.tabs.network-multiplayer',
-			defaultMessage: 'Network & multiplayer',
-		}),
-		group: 'game',
-		onboardingId: 'settings-tab-network-multiplayer',
 	},
 	{
 		id: 'storage-backups',

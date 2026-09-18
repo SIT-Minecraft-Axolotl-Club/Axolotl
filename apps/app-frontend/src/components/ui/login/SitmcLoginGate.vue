@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ExternalIcon } from '@modrinth/assets'
+import { CheckIcon, CopyIcon, ExternalIcon } from '@modrinth/assets'
 import { ButtonStyled, defineMessages, useVIntl } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, onUnmounted, ref } from 'vue'
 
-import { SitmcConfig } from '@/config'
+import minecraftTitle from '@/assets/sitmc/minecraft-title.png'
 import {
 	begin_sitmc_device_login,
 	begin_yggdrasil_login,
@@ -15,6 +15,12 @@ import {
 	poll_sitmc_device_login,
 	set_yggdrasil_password,
 } from '@/helpers/auth'
+
+/** The club's player guide, opened in the system browser from the sign-in card. */
+const PLAY_GUIDE_URL = 'https://www.sitmc.club/guide'
+
+/** How long the "copied" confirmation stays visible after the code is copied. */
+const COPY_FEEDBACK_MS = 2000
 
 type SitmcProfile = {
 	id: string
@@ -39,8 +45,7 @@ type YggdrasilLoginResult =
  * only ever reports pending or complete.
  */
 type SitmcDeviceLoginPoll =
-	| { status: 'pending'; slow_down: boolean }
-	| { status: 'complete'; credentials: unknown }
+	{ status: 'pending'; slow_down: boolean } | { status: 'complete'; credentials: unknown }
 
 type SavedLogin = {
 	api_root: string
@@ -58,23 +63,25 @@ const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	title: { id: 'sitmc-login.title', defaultMessage: 'Sign in to SIT-Minecraft' },
-	subtitle: {
-		id: 'sitmc-login.subtitle',
-		defaultMessage: 'This launcher only accepts SIT-Minecraft skin site accounts. Sign in to install and launch the club game instances.',
-	},
+	subtitle: { id: 'sitmc-login.subtitle', defaultMessage: 'Sign in to begin your adventure' },
 	signInWithSite: {
 		id: 'sitmc-login.sign-in-with-site',
 		defaultMessage: 'Sign in with a SIT-Minecraft account',
 	},
 	signInHint: {
 		id: 'sitmc-login.sign-in-hint',
-		defaultMessage: 'A browser window opens to authorize the launcher. Your password is never shared with it.',
+		defaultMessage: 'Opens your browser to authorize',
 	},
-	starting: { id: 'sitmc-login.starting', defaultMessage: 'Requesting an authorization code from the account site...' },
+	starting: {
+		id: 'sitmc-login.starting',
+		defaultMessage: 'Requesting an authorization code from the account site...',
+	},
 	deviceDescription: {
 		id: 'sitmc-login.device-description',
 		defaultMessage: 'If the browser did not open, visit the address below and enter this code:',
 	},
+	copyCode: { id: 'sitmc-login.copy-code', defaultMessage: 'Copy the code' },
+	codeCopied: { id: 'sitmc-login.code-copied', defaultMessage: 'Copied' },
 	openVerification: {
 		id: 'sitmc-login.open-verification',
 		defaultMessage: 'Open the authorization page again',
@@ -100,12 +107,9 @@ const messages = defineMessages({
 		id: 'sitmc-login.device-expired',
 		defaultMessage: 'The authorization code expired. Start the sign-in again.',
 	},
-	registerTitle: { id: 'sitmc-login.register-title', defaultMessage: 'No account yet?' },
-	register: { id: 'sitmc-login.register', defaultMessage: 'Register on the skin site' },
-	visitSite: { id: 'sitmc-login.visit-site', defaultMessage: 'Open the skin site' },
 	passwordFallback: {
 		id: 'sitmc-login.password-fallback',
-		defaultMessage: 'Sign in with a password instead',
+		defaultMessage: 'Use username and password instead',
 	},
 	deviceFallback: {
 		id: 'sitmc-login.device-fallback',
@@ -113,7 +117,8 @@ const messages = defineMessages({
 	},
 	passwordHint: {
 		id: 'sitmc-login.password-hint',
-		defaultMessage: 'When browser sign-in is unavailable, use your skin site account name and password directly.',
+		defaultMessage:
+			'When browser sign-in is unavailable, use your skin site account name and password directly.',
 	},
 	accountLabel: { id: 'sitmc-login.account-label', defaultMessage: 'Account (email or username)' },
 	passwordLabel: { id: 'sitmc-login.password-label', defaultMessage: 'Password' },
@@ -124,6 +129,7 @@ const messages = defineMessages({
 	signIn: { id: 'sitmc-login.sign-in', defaultMessage: 'Sign in' },
 	savedAccounts: { id: 'sitmc-login.saved-accounts', defaultMessage: 'Remembered accounts' },
 	forgetAccount: { id: 'sitmc-login.forget-account', defaultMessage: 'Remove' },
+	playGuide: { id: 'sitmc-login.play-guide', defaultMessage: 'Play guide' },
 	close: { id: 'sitmc-login.close', defaultMessage: 'Not now' },
 })
 
@@ -134,6 +140,7 @@ const error = ref<string | null>(null)
 const flow = ref<SitmcDeviceLoginFlow | null>(null)
 const pendingFlowId = ref<string | null>(null)
 const profiles = ref<SitmcProfile[]>([])
+const codeCopied = ref(false)
 
 const account = ref('')
 const password = ref('')
@@ -143,6 +150,7 @@ const savedLogins = ref<SavedLogin[]>([])
 let pollTimer: ReturnType<typeof setTimeout> | undefined
 let pollGeneration = 0
 let expiresAt = 0
+let copyFeedbackTimer: ReturnType<typeof setTimeout> | undefined
 
 const verificationUrl = computed(
 	() => flow.value?.verification_uri_complete || flow.value?.verification_uri || '',
@@ -176,8 +184,17 @@ function stopPolling() {
 	}
 }
 
+function clearCopyFeedback() {
+	codeCopied.value = false
+	if (copyFeedbackTimer !== undefined) {
+		clearTimeout(copyFeedbackTimer)
+		copyFeedbackTimer = undefined
+	}
+}
+
 function resetFlow() {
 	stopPolling()
+	clearCopyFeedback()
 	flow.value = null
 	pendingFlowId.value = null
 	profiles.value = []
@@ -196,13 +213,30 @@ async function complete(credentials: unknown) {
 	emit('complete', credentials)
 }
 
-async function openVerification() {
-	if (!verificationUrl.value) return
-	await openUrl(verificationUrl.value).catch(() => {})
-}
-
 async function openUrlSafely(url: string) {
 	await openUrl(url).catch(() => {})
+}
+
+async function openVerification() {
+	if (!verificationUrl.value) return
+	await openUrlSafely(verificationUrl.value)
+}
+
+async function copyUserCode() {
+	const code = flow.value?.user_code
+	if (!code) return
+	try {
+		await navigator.clipboard.writeText(code)
+	} catch (copyError) {
+		reportError(copyError)
+		return
+	}
+	codeCopied.value = true
+	if (copyFeedbackTimer !== undefined) clearTimeout(copyFeedbackTimer)
+	copyFeedbackTimer = setTimeout(() => {
+		codeCopied.value = false
+		copyFeedbackTimer = undefined
+	}, COPY_FEEDBACK_MS)
 }
 
 async function pollDeviceLogin(generation: number) {
@@ -331,7 +365,10 @@ async function selectPasswordProfile(profileId: string) {
 	}
 }
 
-onUnmounted(stopPolling)
+onUnmounted(() => {
+	stopPolling()
+	clearCopyFeedback()
+})
 
 defineExpose({ resetAll })
 </script>
@@ -343,10 +380,8 @@ defineExpose({ resetAll })
 	>
 		<div class="w-full max-w-lg rounded-xl border border-divider bg-surface-2 p-8 shadow-2xl">
 			<div class="flex flex-col gap-6">
-				<header class="flex flex-col gap-2">
-					<span class="text-xs font-semibold tracking-[0.2em] text-brand">{{
-						SitmcConfig.serverLabel
-					}}</span>
+				<header class="flex flex-col items-center gap-3 text-center">
+					<img :src="minecraftTitle" alt="" class="h-auto w-full max-w-xs" />
 					<h1 class="m-0 text-2xl font-semibold text-contrast">
 						{{ formatMessage(messages.title) }}
 					</h1>
@@ -370,13 +405,13 @@ defineExpose({ resetAll })
 				</template>
 
 				<template v-else-if="mode === 'device'">
-					<div class="flex flex-col gap-3">
+					<div class="flex flex-col gap-2">
 						<ButtonStyled color="brand" class="w-full">
 							<button :disabled="busy" @click="startDeviceLogin">
 								{{ formatMessage(messages.signInWithSite) }}
 							</button>
 						</ButtonStyled>
-						<p class="m-0 text-xs text-secondary">
+						<p class="m-0 text-center text-xs text-secondary">
 							{{ formatMessage(messages.signInHint) }}
 						</p>
 					</div>
@@ -385,11 +420,27 @@ defineExpose({ resetAll })
 						<p class="m-0 text-sm text-secondary">
 							{{ formatMessage(messages.deviceDescription) }}
 						</p>
-						<code
-							class="rounded-lg bg-surface-2 px-4 py-3 text-center text-2xl font-bold tracking-[0.2em] text-contrast"
-						>
-							{{ flow.user_code }}
-						</code>
+						<div class="flex flex-col items-center gap-2">
+							<button
+								class="flex w-full cursor-pointer select-text items-center justify-center gap-3 rounded-lg border border-solid border-divider bg-surface-2 px-4 py-3 transition-colors hover:border-brand"
+								type="button"
+								:title="formatMessage(messages.copyCode)"
+								:aria-label="formatMessage(messages.copyCode)"
+								@click="copyUserCode"
+							>
+								<code class="select-text text-2xl font-bold tracking-[0.2em] text-contrast">
+									{{ flow.user_code }}
+								</code>
+								<CheckIcon v-if="codeCopied" class="size-4 text-brand" />
+								<CopyIcon v-else class="size-4 text-secondary" />
+							</button>
+							<p class="m-0 h-4 text-xs" role="status">
+								<span v-if="codeCopied" class="inline-flex items-center gap-1 text-brand">
+									<CheckIcon class="size-3.5" />
+									{{ formatMessage(messages.codeCopied) }}
+								</span>
+							</p>
+						</div>
 						<ButtonStyled class="w-full">
 							<button @click="openVerification">
 								<ExternalIcon /> {{ formatMessage(messages.openVerification) }}
@@ -402,12 +453,12 @@ defineExpose({ resetAll })
 							{{ formatMessage(messages.selectProfileOnSite) }}
 						</p>
 					</div>
-					<p v-else-if="busy" class="m-0 text-sm text-secondary">
+					<p v-else-if="busy" class="m-0 text-center text-sm text-secondary">
 						{{ formatMessage(messages.starting) }}
 					</p>
 
 					<button
-						class="m-0 self-start text-xs text-secondary underline"
+						class="m-0 self-center text-xs text-secondary underline"
 						type="button"
 						@click="showPasswordLogin"
 					>
@@ -472,16 +523,13 @@ defineExpose({ resetAll })
 					</label>
 
 					<ButtonStyled color="brand" class="w-full">
-						<button
-							:disabled="busy || !account.trim() || !password"
-							@click="submitPasswordLogin"
-						>
+						<button :disabled="busy || !account.trim() || !password" @click="submitPasswordLogin">
 							{{ formatMessage(messages.signIn) }}
 						</button>
 					</ButtonStyled>
 
 					<button
-						class="m-0 self-start text-xs text-secondary underline"
+						class="m-0 self-center text-xs text-secondary underline"
 						type="button"
 						@click="mode = 'device'"
 					>
@@ -494,25 +542,13 @@ defineExpose({ resetAll })
 				<footer
 					class="flex flex-wrap items-center justify-between gap-3 border-0 border-t border-solid border-divider pt-4"
 				>
-					<div class="flex flex-col gap-1">
-						<span class="text-xs text-secondary">{{ formatMessage(messages.registerTitle) }}</span>
-						<div class="flex gap-3">
-							<button
-								class="m-0 flex items-center gap-1 text-sm text-brand underline"
-								type="button"
-								@click="openUrlSafely(SitmcConfig.registerUrl)"
-							>
-								<ExternalIcon /> {{ formatMessage(messages.register) }}
-							</button>
-							<button
-								class="m-0 flex items-center gap-1 text-sm text-secondary underline"
-								type="button"
-								@click="openUrlSafely(SitmcConfig.site)"
-							>
-								<ExternalIcon /> {{ formatMessage(messages.visitSite) }}
-							</button>
-						</div>
-					</div>
+					<button
+						class="m-0 flex items-center gap-1 text-sm text-brand underline"
+						type="button"
+						@click="openUrlSafely(PLAY_GUIDE_URL)"
+					>
+						<ExternalIcon /> {{ formatMessage(messages.playGuide) }}
+					</button>
 					<ButtonStyled v-if="props.overlay">
 						<button @click="emit('close')">{{ formatMessage(messages.close) }}</button>
 					</ButtonStyled>

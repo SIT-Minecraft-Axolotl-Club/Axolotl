@@ -175,12 +175,6 @@ export const onboardingMessages = defineMessages({
 		defaultMessage:
 			'The Java runtimes that start Minecraft live here. Technical, but well-behaved.',
 	},
-	defaultsTitle: { id: 'app.onboarding.defaults.title', defaultMessage: 'Start ahead' },
-	defaultsDescription: {
-		id: 'app.onboarding.defaults.description',
-		defaultMessage:
-			'New instances inherit these choices, so you do not have to repeat the homework.',
-	},
 	resourcesTitle: {
 		id: 'app.onboarding.resources.title',
 		defaultMessage: 'Do not cook the computer',
@@ -427,12 +421,6 @@ const settingsTourSteps: Array<{
 		targetId: 'settings-tab-language-translation',
 		title: onboardingMessages.languageTitle,
 		description: onboardingMessages.languageDescription,
-	},
-	{
-		id: 'settings-launch-defaults',
-		targetId: 'settings-tab-launch-defaults',
-		title: onboardingMessages.defaultsTitle,
-		description: onboardingMessages.defaultsDescription,
 	},
 	{
 		id: 'settings-content-downloads',

@@ -27,9 +27,7 @@ import {
 import { getActivePlayerName } from '@/components/home/home-utils'
 import HomeDashboard from '@/components/home/HomeDashboard.vue'
 import HomeInstancePickerModal from '@/components/home/HomeInstancePickerModal.vue'
-import HomeMinecraftNews from '@/components/home/HomeMinecraftNews.vue'
 import HomeMinimal from '@/components/home/HomeMinimal.vue'
-import HomePlayInsights from '@/components/home/HomePlayInsights.vue'
 import ManagedInstancesPanel from '@/components/home/ManagedInstancesPanel.vue'
 import { useManagedInstances } from '@/composables/useManagedInstances'
 import { useNetworkStatus } from '@/composables/useNetworkStatus'
@@ -122,11 +120,6 @@ const floatingControlsStyle = computed(() => ({
 	bottom: themeStore.getFeatureFlag('page_path') ? '3.5rem' : '1rem',
 	right: `calc(${pageContext.floatingActionBarOffsets?.right.value ?? '0px'} + 1rem)`,
 }))
-
-const animateSidebarShow = ref(false)
-setTimeout(() => {
-	animateSidebarShow.value = true
-}, 200)
 
 async function clearMissingMinimalInstance() {
 	const selectedId = themeStore.minimalHomeInstanceId
@@ -377,15 +370,6 @@ onUnmounted(() => {
 			</span>
 		</button>
 	</div>
-	<Teleport v-if="!isMinimal" to="#sidebar-default-teleport-target">
-		<div
-			class="flex min-w-0 flex-col slide-enter-active"
-			:class="{ 'slide-enter-from': !animateSidebarShow }"
-		>
-			<HomePlayInsights />
-			<HomeMinecraftNews />
-		</div>
-	</Teleport>
 </template>
 
 <style scoped>

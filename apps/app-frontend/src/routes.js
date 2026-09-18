@@ -28,6 +28,14 @@ export default new createRouter({
 			},
 		},
 		{
+			path: '/map',
+			name: 'Map',
+			component: () => import('@/pages/Map.vue'),
+			meta: {
+				breadcrumb: [{ name: 'Map' }],
+			},
+		},
+		{
 			path: '/downloads',
 			name: 'Downloads',
 			component: () => import('@/pages/Downloads.vue'),

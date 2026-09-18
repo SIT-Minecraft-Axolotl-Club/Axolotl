@@ -12476,17 +12476,43 @@
   "instance.settings.tabs.sync": {
     "message": "同步"
   },
+  "app.navigation.map": {
+    "message": "地图"
+  },
+  "app.map.host-failed": {
+    "message": "无法在启动器内显示此地图。"
+  },
+  "app.action-bar.account": {
+    "message": "账号"
+  },
+  "app.action-bar.sign-in": {
+    "message": "登录"
+  },
+  "app.shortcut-settings.nav-map": {
+    "message": "地图"
+  },
+  "app.shortcut-settings.nav-map-description": {
+    "message": "打开地图。"
+  },  "app.map.title": {
+    "message": "地图"
+  },
+  "app.map.tabs.pixelsit": {
+    "message": "像素上应"
+  },
+  "app.map.tabs.survival": {
+    "message": "生存卫星"
+  },
   "sitmc-login.title": {
     "message": "登录 SIT-Minecraft 账户"
   },
   "sitmc-login.subtitle": {
-    "message": "启动器只接受 SIT-Minecraft 皮肤站账户，登录后即可安装并启动社团游戏实例。"
+    "message": "登录以开始您的冒险"
   },
   "sitmc-login.sign-in-with-site": {
     "message": "使用 SIT-Minecraft 账户登录"
   },
   "sitmc-login.sign-in-hint": {
-    "message": "将打开浏览器完成授权，启动器不会接触你的密码。"
+    "message": "将打开浏览器进行授权"
   },
   "sitmc-login.starting": {
     "message": "正在向皮肤站申请授权码…"
@@ -12547,6 +12573,15 @@
   },
   "sitmc-login.close": {
     "message": "稍后再说"
+  },
+  "sitmc-login.code-copied": {
+    "message": "已复制"
+  },
+  "sitmc-login.copy-code": {
+    "message": "复制授权码"
+  },
+  "sitmc-login.play-guide": {
+    "message": "游玩指南"
   },
   "sitmc-account.sign-in": {
     "message": "登录 SIT-Minecraft 账户"

@@ -9,6 +9,7 @@ pub mod install;
 pub mod instance;
 pub mod jre;
 pub mod logs;
+pub mod map;
 pub mod mcarchive;
 pub mod metadata;
 pub mod minecraft_skins;

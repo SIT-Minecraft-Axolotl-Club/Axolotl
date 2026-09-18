@@ -145,6 +145,7 @@ export type ThemeStore = {
 	quickScrollEnabled: boolean
 	/** Per-nav-item quick jump shortcuts (Ctrl/Cmd + number), off by default. */
 	shortcutNavHome: boolean
+	shortcutNavMap: boolean
 	shortcutNavWorlds: boolean
 	shortcutNavDiscover: boolean
 	shortcutNavSkins: boolean
@@ -190,6 +191,7 @@ export const DEFAULT_THEME_STORE: ThemeStore = {
 	quickScrollEnabled: false,
 
 	shortcutNavHome: false,
+	shortcutNavMap: false,
 	shortcutNavWorlds: false,
 	shortcutNavDiscover: false,
 	shortcutNavSkins: false,

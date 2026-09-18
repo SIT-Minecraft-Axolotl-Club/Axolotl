@@ -8,6 +8,7 @@ import {
 	LeftArrowIcon,
 	LibraryIcon,
 	LogInIcon,
+	MapIcon,
 	RefreshCwIcon,
 	RightArrowIcon,
 	RotateCounterClockwiseIcon,
@@ -66,7 +67,6 @@ import { type RouteLocationNormalizedLoaded, RouterView, useRoute, useRouter } f
 
 import { getAnnouncementByVersion } from '@/announcements/catalog'
 import InstanceExportModal from '@/components/lab/recipe-generator/InstanceExportModal.vue'
-import AccountsCard from '@/components/ui/AccountsCard.vue'
 import UpdateAnnouncementModal from '@/components/ui/announcement/UpdateAnnouncementModal.vue'
 import AppActionBar from '@/components/ui/AppActionBar.vue'
 import AxolotlLogo from '@/components/ui/AxolotlLogo.vue'
@@ -132,7 +132,6 @@ import {
 } from '@/helpers/settings.ts'
 import { SHORTCUT_ACTIONS, type ShortcutAction } from '@/helpers/shortcut-actions'
 import { resolveAllBindings } from '@/helpers/shortcut-bindings'
-import { getSidebarExpanded, setSidebarExpanded } from '@/helpers/sidebar-state.ts'
 import { get_opening_command, initialize_state, set_discord_activity } from '@/helpers/state'
 import {
 	areUpdatesEnabled,
@@ -198,17 +197,7 @@ function getPageTransitionKey(route: RouteLocationNormalizedLoaded) {
 
 	return `${transitionGroup}:`
 }
-const APP_SIDEBAR_WIDTH = 300
 const credentials = ref()
-const sidebarToggled = ref(getSidebarExpanded())
-
-function toggleSidebar() {
-	sidebarToggled.value = !sidebarToggled.value
-	setSidebarExpanded(sidebarToggled.value)
-}
-
-const forceSidebarHidden = computed(() => route.path === '/settings')
-const sidebarVisible = computed(() => !forceSidebarHidden.value && sidebarToggled.value)
 const customBackgroundStyle = computed(() => {
 	// A custom image would sit between the desktop and the UI, defeating the
 	// transparent window entirely, so the two are mutually exclusive.
@@ -266,7 +255,7 @@ providePageContext({
 	showAds: ref(false),
 	floatingActionBarOffsets: {
 		left: ref(APP_LEFT_NAV_WIDTH),
-		right: computed(() => (sidebarVisible.value ? `${APP_SIDEBAR_WIDTH}px` : '0px')),
+		right: ref('0px'),
 	},
 	featureFlags: {
 		serverRamAsBytesAlwaysOn: computed(() =>
@@ -961,6 +950,10 @@ const messages = defineMessages({
 		id: 'app.navigation.downloads',
 		defaultMessage: 'Downloads',
 	},
+	map: {
+		id: 'app.navigation.map',
+		defaultMessage: 'Map',
+	},
 	screenshots: {
 		id: 'app.navigation.screenshots',
 		defaultMessage: 'Screenshots',
@@ -976,18 +969,6 @@ const messages = defineMessages({
 	signedInAs: {
 		id: 'app.account.signed-in-as',
 		defaultMessage: 'Signed in as',
-	},
-	playingAs: {
-		id: 'app.minecraft.playing-as',
-		defaultMessage: 'Playing as',
-	},
-	collapseSidebar: {
-		id: 'app.sidebar.collapse',
-		defaultMessage: 'Collapse sidebar',
-	},
-	expandSidebar: {
-		id: 'app.sidebar.expand',
-		defaultMessage: 'Expand sidebar',
 	},
 	warning: {
 		id: 'app.notification.warning',
@@ -1275,7 +1256,6 @@ async function setupApp() {
 		advanced_rendering,
 		onboarded,
 		default_page,
-		toggle_sidebar,
 		custom_background_path,
 		custom_background_blur,
 		custom_background_opacity,
@@ -1329,7 +1309,6 @@ async function setupApp() {
 	themeStore.collapsedNavigation = collapsed_navigation
 	themeStore.advancedRendering = advanced_rendering
 	themeStore.hideNametagSkinsPage = hide_nametag_skins_page
-	themeStore.toggleSidebar = toggle_sidebar
 	themeStore.customBackgroundPath = custom_background_path
 	themeStore.customBackgroundBlur = custom_background_blur
 	themeStore.customBackgroundOpacity = custom_background_opacity
@@ -1744,13 +1723,6 @@ let lastDiscordActivity = null
 let discordActivityUpdate = Promise.resolve()
 
 let suspensePending = false
-
-const sidebarOverlayScrollbarsOptions = Object.freeze({
-	overflow: {
-		x: 'hidden',
-		y: 'scroll',
-	},
-})
 
 router.beforeEach(() => {
 	suspensePending = false
@@ -2718,6 +2690,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 						{{ Math.min(downloadManager.activeCount.value, 99) }}
 					</span>
 				</NavButton>
+				<NavButton v-tooltip.right="formatMessage(messages.map)" to="/map">
+					<MapIcon />
+				</NavButton>
 			</NavRail>
 			<div class="h-px w-6 mx-auto my-2 bg-surface-5"></div>
 			<div class="quick-instance-scroll flex-1 min-h-0 overflow-x-hidden overflow-y-auto">
@@ -2782,7 +2757,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		v-if="stateInitialized"
 		class="app-contents"
 		:class="{
-			'sidebar-enabled': sidebarVisible,
 			'studio-mode': route.name === 'FileStudio' || route.name === 'MultiplayerServerFileStudio',
 			'disable-advanced-rendering': !themeStore.advancedRendering,
 			'has-custom-background': themeStore.customBackgroundPath && !themeStore.transparentBackground,
@@ -2839,58 +2813,15 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</div>
 			<ScrollToTopButton v-if="themeStore.showScrollTop" />
 		</div>
-		<div
-			class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid"
-		>
-			<button
-				v-if="!forceSidebarHidden"
-				v-tooltip.left="
-					sidebarToggled
-						? formatMessage(messages.collapseSidebar)
-						: formatMessage(messages.expandSidebar)
-				"
-				class="sidebar-toggle-handle"
-				:aria-label="
-					sidebarToggled
-						? formatMessage(messages.collapseSidebar)
-						: formatMessage(messages.expandSidebar)
-				"
-				type="button"
-				@click="toggleSidebar"
-			>
-				<RightArrowIcon
-					class="w-2.5 h-2.5 -translate-x-[1px] transition-transform duration-300"
-					:class="{ 'rotate-180': !sidebarToggled }"
-				/>
-			</button>
-			<div
-				v-overlay-scrollbars="sidebarOverlayScrollbarsOptions"
-				class="app-sidebar-scrollable relative min-h-0 flex-1"
-				data-overlayscrollbars-initialize
-			>
-				<div id="sidebar-teleport-target" class="sidebar-teleport-content contents"></div>
-				<div class="sidebar-default-content hidden" :class="{ 'sidebar-enabled': sidebarVisible }">
-					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
-						<h3 class="text-base text-primary font-medium m-0">
-							{{ formatMessage(messages.playingAs) }}
-						</h3>
-						<suspense>
-							<AccountsCard ref="accounts" />
-						</suspense>
-					</div>
-					<div id="sidebar-default-teleport-target"></div>
-				</div>
-			</div>
-		</div>
 	</div>
 	<I18nDebugPanel />
 	<NotificationPanel
-		:has-sidebar="sidebarVisible"
+		:has-sidebar="false"
 		:on-error-action="exportNotificationErrorLogs"
 		:error-action-label="formatMessage(messages.exportErrorLogs)"
 	/>
 	<PopupNotificationPanel
-		:has-sidebar="sidebarVisible"
+		:has-sidebar="false"
 		:on-error-action="exportNotificationErrorLogs"
 		:error-action-label="formatMessage(messages.exportErrorLogs)"
 	/>
@@ -3174,15 +3105,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 .app-contents {
 	--top-bar-height: 3rem;
 	--left-bar-width: 4rem;
-	--right-bar-width: 300px;
-}
-
-.app-contents.studio-mode {
-	grid-template-columns: 1fr 0;
-
-	.app-sidebar {
-		display: none;
-	}
+	--right-bar-width: 0px;
 }
 
 .app-contents.studio-mode {
@@ -3279,13 +3202,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	--right-bar-width: 0px;
 
 	display: grid;
-	grid-template-columns: 1fr var(--right-bar-width);
+	grid-template-columns: 1fr;
 	// 显式行高：让 .app-viewport 的 height: 100% 有确定参照（隐式 auto 行会使百分比高度失效）
 	grid-template-rows: 1fr;
-
-	&.sidebar-enabled {
-		--right-bar-width: 300px;
-	}
 
 	&.has-custom-background,
 	&.has-transparent-background {
@@ -3302,12 +3221,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		.loading-indicator-container {
 			border-top-left-radius: 0;
 		}
-	}
-}
-
-@media (prefers-reduced-motion: no-preference) {
-	.app-contents {
-		transition: --right-bar-width 320ms cubic-bezier(0.22, 1, 0.36, 1);
 	}
 }
 
@@ -3374,25 +3287,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	overflow: hidden;
 }
 
-.app-sidebar {
-	overflow: visible;
-	width: 300px;
-	position: relative;
-	z-index: 11;
-	height: calc(100vh - var(--top-bar-height));
-	background: var(--brand-gradient-bg);
-
-	--color-button-bg: var(--brand-gradient-button);
-	--color-button-bg-hover: var(--brand-gradient-border);
-	--color-divider: var(--brand-gradient-border);
-	--color-divider-dark: var(--brand-gradient-border);
-}
-
 .disable-advanced-rendering {
-	.app-sidebar::before {
-		box-shadow: none;
-	}
-
 	&.app-contents::before {
 		box-shadow: none;
 	}
@@ -3401,77 +3296,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	:deep(*) {
 		box-shadow: none !important;
 		--tw-drop-shadow: initial;
-	}
-}
-
-.app-sidebar::before {
-	content: '';
-	box-shadow: -15px 0 15px -15px rgba(0, 0, 0, 0.1) inset;
-	top: 0;
-	bottom: 0;
-	left: -2rem;
-	width: 2rem;
-	position: absolute;
-	pointer-events: none;
-}
-
-.sidebar-toggle-handle {
-	--handle-bg: color-mix(in srgb, var(--color-brand) 12%, var(--color-bg));
-	--handle-bg-hover: color-mix(in srgb, var(--color-brand) 20%, var(--color-bg));
-	--handle-border: var(--brand-gradient-border);
-	--handle-border-hover: color-mix(in srgb, var(--color-brand) 45%, transparent);
-
-	position: absolute;
-	top: 50%;
-	left: -15px;
-	transform: translateY(-50%);
-	z-index: 12;
-
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 15px;
-	height: 40px;
-	padding: 0;
-
-	// 只让外侧(左边)圆润,右边与 Sidebar 完全贴合,单一元素完成形状
-	border: 1px solid var(--handle-border);
-	border-right: none;
-	border-radius: 12px 0 0 12px;
-
-	background-color: var(--handle-bg);
-	color: var(--color-contrast);
-	cursor: pointer;
-
-	box-shadow: -4px 0 10px rgba(0, 0, 0, 0.08);
-
-	transition:
-		background-color 180ms ease,
-		border-color 180ms ease,
-		color 180ms ease;
-
-	&:hover {
-		color: var(--color-button-text-selected);
-		background-color: var(--handle-bg-hover);
-		border-color: var(--handle-border-hover);
-	}
-
-	&:hover svg {
-		transform: scale(1.12);
-	}
-
-	&:active svg {
-		transform: scale(0.9);
-	}
-
-	&:focus-visible {
-		outline: 2px solid var(--color-button-text-selected);
-		outline-offset: 1px;
-	}
-
-	svg {
-		transform-origin: center;
-		transition: transform 180ms ease;
 	}
 }
 
@@ -3498,10 +3322,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	border-width: 1px;
 	border-style: solid;
 	pointer-events: none;
-}
-
-.sidebar-teleport-content:empty + .sidebar-default-content.sidebar-enabled {
-	display: contents;
 }
 
 .popup-survey-enter-active {

@@ -194,18 +194,11 @@ export const settingsSearchEntries: SettingsSearchEntry[] = [
 		description: message('app.shortcut-settings.nav-home-description', 'Jump to the Home page.'),
 	},
 	{
-		id: 'shortcuts-nav-worlds',
+		id: 'shortcuts-nav-map',
 		categoryId: 'shortcut-settings',
 		targetId: 'settings-target-shortcuts-nav',
-		label: message('app.shortcut-settings.nav-worlds', 'Worlds'),
-		description: message('app.shortcut-settings.nav-worlds-description', 'Jump to your worlds.'),
-	},
-	{
-		id: 'shortcuts-nav-library',
-		categoryId: 'shortcut-settings',
-		targetId: 'settings-target-shortcuts-nav',
-		label: message('app.shortcut-settings.nav-library', 'Library'),
-		description: message('app.shortcut-settings.nav-library-description', 'Jump to your library.'),
+		label: message('app.shortcut-settings.nav-map', 'Map'),
+		description: message('app.shortcut-settings.nav-map-description', 'Open the map.'),
 	},
 	{
 		id: 'shortcuts-nav-downloads',
@@ -242,31 +235,10 @@ export const settingsSearchEntries: SettingsSearchEntry[] = [
 		],
 	},
 	{
-		id: 'launch-minimize-launcher',
-		categoryId: 'launch-defaults',
-		targetId: 'settings-target-launch-minimize',
-		label: message('app.appearance-settings.minimize-launcher.title', 'Minimize launcher'),
-	},
-	{
-		id: 'launch-lightweight-mode',
-		categoryId: 'launch-defaults',
-		targetId: 'settings-target-launch-lightweight-mode',
-		label: message(
-			'app.appearance-settings.lightweight-mode.title',
-			'Enter lightweight mode after launching a game',
-		),
-	},
-	{
 		id: 'appearance-show-play-time',
 		categoryId: 'home-navigation',
 		targetId: 'settings-target-appearance-show-play-time',
 		label: message('app.appearance-settings.show-play-time.title', 'Show play time'),
-	},
-	{
-		id: 'appearance-hide-nametag',
-		categoryId: 'interface',
-		targetId: 'settings-target-appearance-hide-nametag',
-		label: message('app.appearance-settings.hide-nametag.title', 'Hide nametag'),
 	},
 	{
 		id: 'appearance-unknown-pack-warning',
@@ -302,51 +274,6 @@ export const settingsSearchEntries: SettingsSearchEntry[] = [
 		label: message('app.settings.tabs.language', 'Language'),
 	},
 	{
-		id: 'translation-service',
-		categoryId: 'language-translation',
-		targetId: 'settings-target-translation-service',
-		label: message('app.translation-settings.provider', 'Translation service'),
-	},
-	{
-		id: 'translation-auto-translate',
-		categoryId: 'language-translation',
-		targetId: 'settings-target-translation-auto-translate',
-		label: message(
-			'app.translation-settings.auto-translate',
-			'Translate project pages automatically',
-		),
-	},
-	{
-		id: 'translation-cache',
-		categoryId: 'language-translation',
-		targetId: 'settings-target-translation-cache',
-		label: message('app.translation-settings.cache', 'Translation cache'),
-	},
-	{
-		id: 'ai-providers',
-		categoryId: 'ai',
-		targetId: 'settings-target-ai-providers',
-		label: message('app.ai-settings.title', 'AI providers'),
-		keywords: [message('app.settings.tabs.ai', 'AI')],
-	},
-	{
-		id: 'log-share',
-		categoryId: 'launch-defaults',
-		targetId: 'settings-target-log-share',
-		label: message('app.log-share.settings.title', 'Log sharing & AI analysis'),
-		keywords: [
-			message('app.log-share.settings.share-provider', 'Log sharing service'),
-			message('app.log-share.settings.ai-source', 'AI analysis source'),
-		],
-	},
-	{
-		id: 'shared-logs',
-		categoryId: 'launch-defaults',
-		targetId: 'settings-target-shared-logs',
-		label: message('app.log-share.shared-logs.title', 'Shared logs'),
-		keywords: [message('app.log-share.settings.title', 'Log sharing & AI analysis')],
-	},
-	{
 		id: 'privacy-telemetry',
 		categoryId: 'privacy-data',
 		targetId: 'settings-target-privacy-telemetry',
@@ -376,32 +303,6 @@ export const settingsSearchEntries: SettingsSearchEntry[] = [
 		label: message('app.settings.defaults.java-arguments', 'Java arguments'),
 	},
 	{
-		id: 'defaults-window',
-		categoryId: 'launch-defaults',
-		targetId: 'settings-target-defaults-window',
-		label: message('app.settings.defaults.fullscreen', 'Fullscreen'),
-		keywords: [
-			message('app.settings.defaults.width', 'Window width'),
-			message('app.settings.tabs.default-instance-options', 'Default instance options'),
-		],
-	},
-	{
-		id: 'defaults-environment',
-		categoryId: 'launch-defaults',
-		targetId: 'settings-target-defaults-environment',
-		label: message('app.settings.defaults.environment-variables', 'Environment variables'),
-	},
-	{
-		id: 'defaults-launch-hooks',
-		categoryId: 'launch-defaults',
-		targetId: 'settings-target-defaults-launch-hooks',
-		label: message('app.settings.defaults.pre-launch-hook', 'Pre-launch hook'),
-		keywords: [
-			message('app.settings.defaults.wrapper-hook', 'Wrapper hook'),
-			message('app.settings.defaults.post-exit-hook', 'Post-exit hook'),
-		],
-	},
-	{
 		id: 'resources-download-mirrors',
 		categoryId: 'content-downloads',
 		targetId: 'settings-target-resources-download-mirrors',
@@ -420,22 +321,6 @@ export const settingsSearchEntries: SettingsSearchEntry[] = [
 		targetId: 'settings-target-resources-maximum-downloads',
 		label: message('app.settings.resources.maximum-downloads', 'Maximum concurrent downloads'),
 		keywords: [message('app.settings.resources.maximum-writes', 'Maximum concurrent writes')],
-	},
-	{
-		id: 'resources-proxy',
-		categoryId: 'network-multiplayer',
-		targetId: 'settings-target-resources-proxy',
-		label: message('app.settings.resources.proxy-settings', 'Proxy settings'),
-		keywords: [
-			message('app.settings.resources.proxy-mode', 'Proxy mode'),
-			message('app.settings.tabs.resource-management', 'Resource management'),
-		],
-	},
-	{
-		id: 'network-mojang-auth-source',
-		categoryId: 'network-multiplayer',
-		targetId: 'settings-target-network-mojang-auth-source',
-		label: message('app.settings.resources.mojang-auth-service', 'Mojang authentication service'),
 	},
 	{
 		id: 'resources-missing-content-import',
@@ -472,12 +357,6 @@ export const settingsSearchEntries: SettingsSearchEntry[] = [
 		label: message('app.settings.resources.app-cache', 'App cache'),
 	},
 	{
-		id: 'multiplayer-public-nodes',
-		categoryId: 'network-multiplayer',
-		targetId: 'terracotta-public-nodes-title',
-		label: message('app.multiplayer.terracotta.public-nodes', 'Terracotta public nodes'),
-	},
-	{
 		id: 'storage-overview',
 		categoryId: 'storage-backups',
 		targetId: 'settings-target-storage-overview',
@@ -486,7 +365,7 @@ export const settingsSearchEntries: SettingsSearchEntry[] = [
 	{
 		id: 'updates-source',
 		categoryId: 'updates',
-		targetId: 'settings-target-updates-source',
+		targetId: 'settings-target-updates-channel',
 		label: message('app.settings.updates.title', 'Update source'),
 	},
 	{

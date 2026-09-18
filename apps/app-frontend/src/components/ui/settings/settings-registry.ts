@@ -1,6 +1,5 @@
 import {
 	ArchiveIcon,
-	BotIcon,
 	CoffeeIcon,
 	CpuIcon,
 	FileTextIcon,
@@ -14,7 +13,6 @@ import {
 	RefreshCwIcon,
 	ShieldIcon,
 	ToggleRightIcon,
-	UsersIcon,
 } from '@modrinth/assets'
 import { commonMessages, defineMessages, type MessageDescriptor } from '@modrinth/ui'
 import { type Component, defineAsyncComponent } from 'vue'
@@ -54,7 +52,6 @@ const categoryContent: Record<SettingsCategoryId, Pick<SettingsCategory, 'icon' 
 		icon: LanguagesIcon,
 		content: defineAsyncComponent(() => import('./LanguageTranslationSettings.vue')),
 	},
-	ai: { icon: BotIcon, content: defineAsyncComponent(() => import('./AISettings.vue')) },
 	'shortcut-settings': {
 		icon: KeyboardIcon,
 		content: defineAsyncComponent(() => import('./KeybindSettings.vue')),
@@ -63,10 +60,6 @@ const categoryContent: Record<SettingsCategoryId, Pick<SettingsCategory, 'icon' 
 		icon: CoffeeIcon,
 		content: defineAsyncComponent(() => import('./JavaSettings.vue')),
 	},
-	'launch-defaults': {
-		icon: GameIcon,
-		content: defineAsyncComponent(() => import('./DefaultInstanceSettings.vue')),
-	},
 	'instance-sync': {
 		icon: RefreshCwIcon,
 		content: defineAsyncComponent(() => import('./instances/index.vue')),
@@ -74,10 +67,6 @@ const categoryContent: Record<SettingsCategoryId, Pick<SettingsCategory, 'icon' 
 	'content-downloads': {
 		icon: GaugeIcon,
 		content: defineAsyncComponent(() => import('./ContentDownloadSettings.vue')),
-	},
-	'network-multiplayer': {
-		icon: UsersIcon,
-		content: defineAsyncComponent(() => import('./NetworkMultiplayerSettings.vue')),
 	},
 	'storage-backups': {
 		icon: ArchiveIcon,

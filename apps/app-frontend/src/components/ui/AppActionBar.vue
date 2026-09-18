@@ -67,6 +67,54 @@
 				</div>
 			</template>
 		</Dropdown>
+		<Dropdown
+			v-model:shown="accountMenuShown"
+			eager-mount
+			placement="bottom-end"
+			:triggers="['click']"
+			:hide-triggers="['click']"
+			:disabled="!selectedAccount"
+		>
+			<!--
+				One stable trigger element for both states: the popover only opens
+				while an account is signed in, so its click listeners stay on the
+				element they were registered on.
+			-->
+			<button
+				v-tooltip="
+					selectedAccount ? formatMessage(messages.account) : formatMessage(messages.signIn)
+				"
+				:aria-label="
+					selectedAccount ? formatMessage(messages.account) : formatMessage(messages.signIn)
+				"
+				class="flex max-w-[12rem] min-w-0 cursor-pointer items-center gap-1.5 rounded-full border border-solid border-divider bg-button-bg py-1 pl-1.5 pr-2 transition-all hover:brightness-110"
+				:class="selectedAccount ? 'text-contrast' : 'text-brand'"
+				@click="startSignIn"
+			>
+				<template v-if="selectedAccount">
+					<Avatar
+						:src="accountHeadUrl ?? defaultSteveHeadUrl"
+						size="22px"
+						circle
+						pixelated
+						:unframed-natural-width="72"
+					/>
+					<span class="truncate text-sm font-medium">{{ accountName }}</span>
+					<ChevronDownIcon class="size-3.5 shrink-0 text-secondary" />
+				</template>
+				<template v-else>
+					<LogInIcon class="size-4 shrink-0" />
+					<span class="truncate text-sm font-medium">{{ formatMessage(messages.signIn) }}</span>
+				</template>
+			</button>
+			<template #popper>
+				<div class="w-[24rem] max-w-[calc(100vw-2rem)] p-2">
+					<suspense>
+						<AccountsCard ref="accountsCardRef" @change="refreshAccount" />
+					</suspense>
+				</div>
+			</template>
+		</Dropdown>
 		<ButtonStyled
 			v-if="!isDownloadsPage && hasActiveDownloads && !hasVisibleActiveDownloadToasts"
 			color="brand"
@@ -185,8 +233,10 @@
 <script setup lang="ts">
 import {
 	BellIcon,
+	ChevronDownIcon,
 	DownloadIcon,
 	DropdownIcon,
+	LogInIcon,
 	OnlineIndicatorIcon,
 	StarIcon,
 	StopCircleIcon,
@@ -195,6 +245,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Avatar,
 	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
@@ -206,16 +257,21 @@ import {
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { Dropdown } from 'floating-vue'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, inject, onBeforeUnmount, type Ref, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import steveSkinTexture from '@/assets/skins/steve.png?inline'
+import AccountsCard from '@/components/ui/AccountsCard.vue'
 import AppUpdateButton from '@/components/ui/app-update-button/index.vue'
 import { useInstallJobNotifications } from '@/composables/browse/install-job-notifications'
 import { useNetworkStatus } from '@/composables/useNetworkStatus'
 import { trackEvent } from '@/helpers/analytics'
+import { get_default_user, users as getUsers } from '@/helpers/auth'
 import { loading_listener, process_listener } from '@/helpers/events'
 import { get_many as getInstances } from '@/helpers/instance'
 import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
+import { getPlayerHeadUrl } from '@/helpers/rendering/batch-skin-renderer.ts'
+import type { Skin } from '@/helpers/skins'
 import type { LoadingBar } from '@/helpers/state'
 import { progress_bars_list } from '@/helpers/state'
 import type { GameInstance } from '@/helpers/types'
@@ -392,7 +448,42 @@ const messages = defineMessages({
 		id: 'app.action-bar.exporting-modpack',
 		defaultMessage: 'Exporting modpack',
 	},
+	account: {
+		id: 'app.action-bar.account',
+		defaultMessage: 'Account',
+	},
+	signIn: {
+		id: 'app.action-bar.sign-in',
+		defaultMessage: 'Sign in',
+	},
 })
+
+type MinecraftCredential = {
+	account_id: string
+	account_type: 'microsoft' | 'offline' | 'yggdrasil'
+	profile: {
+		id: string
+		name: string
+		skins?: Array<{
+			state: string
+			url: string
+			variant: Skin['variant']
+			textureKey?: string
+		}>
+	}
+}
+
+/** The account card the popover renders, also reachable through the app's ref. */
+type AccountsCardHandle = {
+	accountChangeRevision?: number
+	accounts?: MinecraftCredential[]
+	login?: () => void
+	refreshValues?: () => unknown
+}
+
+const accountsCard = inject<Ref<AccountsCardHandle | null> | null>('accountsCard', null)
+const accountsCardRef = ref<AccountsCardHandle | null>(null)
+const accountMenuShown = ref(false)
 
 const currentProcesses = ref<RunningProcess[]>([])
 const selectedProcess = ref<RunningProcess | undefined>()
@@ -428,6 +519,97 @@ const refresh = async () => {
 await refresh()
 
 const { offline } = useNetworkStatus()
+
+/**
+ * The error modals reach the account card through the ref the app provides, so
+ * keep that ref pointing at the card the popover renders.
+ */
+watch(
+	accountsCardRef,
+	(card) => {
+		if (accountsCard) accountsCard.value = card
+	},
+	{ immediate: true },
+)
+
+/**
+ * The account list the card publishes changes whenever the signed-in account
+ * does, including sign-ins the card did not start itself.
+ */
+watch(
+	() => accountsCard.value?.accounts,
+	() => void refreshAccount(),
+)
+
+const selectedAccount = ref<MinecraftCredential | null>(null)
+const accountHeadUrl = ref<string | null>(null)
+let accountRefreshGeneration = 0
+
+const defaultSteveHeadUrl = createSkinHeadDataUrl(steveSkinTexture)
+
+function createSkinHeadDataUrl(textureUrl: string) {
+	const escapedTextureUrl = textureUrl
+		.replaceAll('&', '&amp;')
+		.replaceAll('"', '&quot;')
+		.replaceAll('<', '&lt;')
+		.replaceAll('>', '&gt;')
+	const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 8 8" shape-rendering="crispEdges"><image href="${escapedTextureUrl}" x="-8" y="-8" width="64" height="64" style="image-rendering:pixelated"/><image href="${escapedTextureUrl}" x="-40" y="-8" width="64" height="64" style="image-rendering:pixelated"/></svg>`
+
+	return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
+}
+
+function getAccountSkin(account: MinecraftCredential): Skin | undefined {
+	if (account.account_type === 'offline') return undefined
+	const skin =
+		account.profile.skins?.find((item) => item.state === 'ACTIVE') ?? account.profile.skins?.[0]
+	if (!skin?.url) return undefined
+
+	return {
+		texture_key: skin.textureKey ?? `${account.profile.id}:${skin.url}`,
+		variant: skin.variant ?? 'UNKNOWN',
+		texture: skin.url,
+		source: 'custom_external',
+		is_equipped: true,
+	}
+}
+
+/**
+ * Reads the account the launcher will start the game with and renders its head
+ * exactly like the account card does, so the chip is correct before the popover
+ * has ever been opened.
+ */
+async function refreshAccount() {
+	const generation = ++accountRefreshGeneration
+	const selectedUserId = await get_default_user(offline.value).catch(() => undefined)
+	const userList = await getUsers(offline.value).catch(() => [])
+	if (generation !== accountRefreshGeneration) return
+
+	const accounts = Array.isArray(userList) ? (userList as unknown as MinecraftCredential[]) : []
+	selectedAccount.value = accounts.find((item) => item.account_id === selectedUserId) ?? null
+	accountHeadUrl.value = null
+
+	const skin = selectedAccount.value ? getAccountSkin(selectedAccount.value) : undefined
+	if (!skin) return
+
+	const headUrl = await getPlayerHeadUrl(skin).catch((error) => {
+		console.warn('Failed to render the account head in the action bar', error)
+		return null
+	})
+	if (generation !== accountRefreshGeneration) return
+	accountHeadUrl.value = headUrl
+}
+
+await refreshAccount()
+
+watch(offline, () => void refreshAccount())
+
+const accountName = computed(() => selectedAccount.value?.profile.name ?? null)
+
+/** Starts the same sign-in the account card's own button starts. */
+function startSignIn() {
+	if (selectedAccount.value) return
+	accountsCardRef.value?.login?.()
+}
 
 const unlistenProcess = await process_listener(async () => {
 	await refresh()

@@ -911,6 +911,10 @@ fn main() {
             lightweight_mode::lightweight_mode_frontend_ready,
             lightweight_mode::lightweight_mode_set_route,
             lightweight_mode::lightweight_mode_enter,
+            api::map::map_webview_open,
+            api::map::map_webview_set_bounds,
+            api::map::map_webview_navigate,
+            api::map::map_webview_close,
         ]);
 
     tracing::info!("Initializing app...");

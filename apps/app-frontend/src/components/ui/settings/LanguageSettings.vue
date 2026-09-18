@@ -25,6 +25,14 @@ import SettingsSaveStatus from './SettingsSaveStatus.vue'
 
 const { formatMessage } = useVIntl()
 
+/**
+ * This launcher keeps only English and Simplified Chinese, so the switcher
+ * offers exactly those two even though the shared list defines more locales.
+ */
+const SELECTABLE_LOCALE_CODES = ['en-US', 'zh-CN']
+
+const selectableLocales = LOCALES.filter((locale) => SELECTABLE_LOCALE_CODES.includes(locale.code))
+
 const platform = computed(() => formatMessage(languageSelectorMessages.platformApp))
 
 const settings = ref(await get())
@@ -81,7 +89,7 @@ const systemToggleTooltip = computed(() =>
 )
 
 const localeOptions = computed<ComboboxOption<string>[]>(() =>
-	LOCALES.map((locale) => ({
+	selectableLocales.map((locale) => ({
 		value: locale.code,
 		label: `${locale.name} — ${formatMessage(locale.translatedName)}`,
 		searchTerms: [locale.code, locale.name, formatMessage(locale.translatedName)],
