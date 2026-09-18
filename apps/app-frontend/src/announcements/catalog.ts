@@ -28,6 +28,42 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-2.0.2',
+		version: '2.0.2',
+		publishedAt: '2026-09-18',
+		title: {
+			'en-US': 'Axolotl Launcher 2.0.2',
+			'zh-CN': 'Axolotl 启动器 2.0.2',
+		},
+		changes: {
+			added: [
+				{
+					'en-US':
+						'Game instances can be sent to the desktop as shortcuts, and each shortcut can use its own icon.',
+					'zh-CN': '游戏实例可以发送到桌面创建快捷方式，并且可以为每条快捷方式单独设置图标。',
+				},
+				{
+					'en-US':
+						'Added an option to ignore invalid SSL certificates, for networks that break certificate validation.',
+					'zh-CN': '新增「忽略 SSL 错误」选项，适用于证书校验被干扰的网络环境。',
+				},
+			],
+			fixed: [
+				{
+					'en-US':
+						'The full-screen launcher update notice no longer claims no update is available while the update is already downloading in the background.',
+					'zh-CN':
+						'全屏的启动器更新提示不再在更新已经开始后台下载时误报「暂时获取不到可用更新」。',
+				},
+				{
+					'en-US':
+						'Updates published by the society service are now offered even when the service omits the release timestamp.',
+					'zh-CN': '社团更新服务未提供发布时间时，启动器仍会正常推送该更新。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-2.0.1',
 		version: '2.0.1',
 		publishedAt: '2026-09-18',
