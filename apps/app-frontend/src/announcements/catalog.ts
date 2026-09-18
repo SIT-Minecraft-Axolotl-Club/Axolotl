@@ -28,6 +28,33 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-2.0.4',
+		version: '2.0.4',
+		publishedAt: '2026-09-18',
+		title: {
+			'en-US': 'Axolotl Launcher 2.0.4',
+			'zh-CN': 'Axolotl 启动器 2.0.4',
+		},
+		changes: {
+			changed: [
+				{
+					'en-US':
+						'Download sources are back to the automatic default: the official hosts are tried first and a mirror is used when it is actually healthier, so one slow mirror can no longer drag every download down with it.',
+					'zh-CN':
+						'下载来源恢复为「自动」：官方源优先，镜像只在确实更健康时参与，单个变慢的镜像不会再拖慢全部下载。',
+				},
+			],
+			fixed: [
+				{
+					'en-US':
+						'Fixed downloads that crawled and then failed with a resource-wait timeout: a file no longer spends the whole wait timeout on a download path whose slots are busy, so instance installs and game downloads keep going.',
+					'zh-CN':
+						'修复了下载极慢、随后报「等待下载资源超时」而失败的问题：某个下载通道没有空闲额度时不再为一个文件白等到超时，实例安装与游戏下载可以继续。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-2.0.3',
 		version: '2.0.3',
 		publishedAt: '2026-09-18',
