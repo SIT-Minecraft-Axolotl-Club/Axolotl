@@ -6,6 +6,7 @@ use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use tauri::{AppHandle, Runtime};
 use tauri_plugin_opener::OpenerExt;
 use theseus::DownloadReason;
 use theseus::data::{

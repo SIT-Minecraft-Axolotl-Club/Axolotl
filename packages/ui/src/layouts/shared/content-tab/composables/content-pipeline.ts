@@ -83,7 +83,6 @@ export function useContentPipeline(config: ContentPipelineConfig) {
 		getItemId,
 		showTypeFilters = false,
 		showUpdateFilter = false,
-		isPackLocked,
 		memoryKey = '',
 		searchKeys = ['project.title', 'owner.name', 'file_name'],
 		initialFilters,
