@@ -28,6 +28,92 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-2.0.0',
+		version: '2.0.0',
+		publishedAt: '2026-09-18',
+		title: {
+			'en-US': 'Axolotl Launcher 2.0.0 · SIT-Minecraft',
+			'zh-CN': 'Axolotl 启动器 2.0.0 · SIT-Minecraft',
+		},
+		changes: {
+			added: [
+				{
+					'en-US':
+						'Sign in with a SIT-Minecraft account, either through the browser authorization page or with the device code, and switch between characters from the account menu.',
+					'zh-CN':
+						'支持使用 SIT-Minecraft 账户登录（浏览器授权或设备码），并可在账户菜单中切换角色。',
+				},
+				{
+					'en-US':
+						'Game instances are published by the SIT-Minecraft server: required ones are downloaded and updated automatically, on-demand ones are downloaded when you start them.',
+					'zh-CN':
+						'游戏实例由 SIT-Minecraft 服务端统一下发：强制下发的实例会自动下载并保持更新，按需下载的实例在你点击开始游戏时下载。',
+				},
+				{
+					'en-US': 'New map page for the PixelSIT and Survival Satellite maps.',
+					'zh-CN': '新增地图页，可查看像素生存与生存卫星地图。',
+				},
+				{
+					'en-US': 'New "Latest announcement" card on Home showing the newest club announcement.',
+					'zh-CN': '首页新增「最新公告」卡片，显示俱乐部发布的最新公告。',
+				},
+				{
+					'en-US': 'Added a play guide entry that opens the club guide.',
+					'zh-CN': '新增游玩指南入口，直达俱乐部指南。',
+				},
+			],
+			changed: [
+				{
+					'en-US':
+						'Home was redesigned: the right sidebar is gone, the dashboard is made of widgets you can rearrange, and the account with its characters moved into the top bar.',
+					'zh-CN':
+						'主页改版：移除右侧栏，主页改为可自由排列的小组件，账户与角色移到顶栏。',
+				},
+				{
+					'en-US': 'The account menu is now a flat list, so switching characters takes fewer clicks.',
+					'zh-CN': '账户菜单改为平铺列表，切换角色更直接。',
+				},
+				{
+					'en-US':
+						'Settings were trimmed: only Simplified Chinese and English remain, and unused pages were dropped.',
+					'zh-CN': '设置页精简：语言只保留简体中文与英语，并移除无用页面。',
+				},
+			],
+			removed: [
+				{
+					'en-US':
+						'Removed features unrelated to the club, including AI features, crash-log sharing with AI analysis, Modrinth accounts and online content, and the hidden name tag option.',
+					'zh-CN':
+						'移除与俱乐部无关的功能，包括 AI 功能、日志分享与 AI 分析、Modrinth 账户与在线内容、隐藏名牌等。',
+				},
+				{
+					'en-US': 'Instances are no longer created inside the launcher, because the server publishes them.',
+					'zh-CN': '启动器内不再提供创建实例入口，实例由服务端下发。',
+				},
+			],
+			fixed: [
+				{
+					'en-US': 'Fixed the About page in settings never finishing its loading state.',
+					'zh-CN': '修复设置中「关于」页一直加载不出来的问题。',
+				},
+				{
+					'en-US':
+						'Fixed instances removed from this computer still asking to be downloaded, and being downloadable again afterwards.',
+					'zh-CN':
+						'修复从本机删除实例后仍提示需要下载的问题，删除后依然可以重新下载。',
+				},
+				{
+					'en-US': 'Fixed the interface occasionally becoming completely unresponsive.',
+					'zh-CN': '修复界面偶尔整体无法点击的问题。',
+				},
+				{
+					'en-US': 'Fixed the map page capturing the pointer and leaving the rest of the launcher unusable.',
+					'zh-CN': '修复地图页抢占鼠标、导致其他按钮无法操作的问题。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-1.9.7-beta.1',
 		version: '1.9.7-beta.1',
 		publishedAt: '2026-09-15',
