@@ -1210,11 +1210,7 @@ export function useDropImport(options: DropImportOptions) {
 	 * would add a local instance, which this launcher must not offer.
 	 */
 	function isUnmanagedDrop(itemType: string | undefined) {
-		return (
-			itemType === 'modpack' ||
-			itemType === 'launcher' ||
-			itemType === 'hmcl_launcher'
-		)
+		return itemType === 'modpack' || itemType === 'launcher' || itemType === 'hmcl_launcher'
 	}
 
 	function refuseUnmanagedDrop() {

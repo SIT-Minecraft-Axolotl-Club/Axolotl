@@ -516,10 +516,10 @@ defineExpose({ resetAll })
 					</label>
 					<label class="flex items-center gap-2 text-xs text-secondary">
 						<input
-						v-model="rememberPassword"
-						type="checkbox"
-						class="size-3.5 shrink-0 cursor-pointer accent-[var(--color-brand)]"
-					/>
+							v-model="rememberPassword"
+							type="checkbox"
+							class="size-3.5 shrink-0 cursor-pointer accent-[var(--color-brand)]"
+						/>
 						{{ formatMessage(messages.rememberPassword) }}
 					</label>
 

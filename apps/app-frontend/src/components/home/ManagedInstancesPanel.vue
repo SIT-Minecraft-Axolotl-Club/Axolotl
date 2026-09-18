@@ -29,7 +29,10 @@ function describeError(error: unknown): string {
 
 const messages = defineMessages({
 	title: { id: 'managed-instances.title', defaultMessage: 'Society game instances' },
-	checking: { id: 'managed-instances.checking', defaultMessage: 'Checking the server for versions...' },
+	checking: {
+		id: 'managed-instances.checking',
+		defaultMessage: 'Checking the server for versions...',
+	},
 	updating: { id: 'managed-instances.updating', defaultMessage: 'Updating {name}' },
 	progress: { id: 'managed-instances.progress', defaultMessage: '{done} of {total} done' },
 	ready: { id: 'managed-instances.ready', defaultMessage: 'Up to date' },
@@ -46,7 +49,8 @@ const messages = defineMessages({
 	remove: { id: 'managed-instances.remove', defaultMessage: 'Remove from this computer' },
 	removeHint: {
 		id: 'managed-instances.remove-hint',
-		defaultMessage: 'Removing it frees the disk space; the instance stays listed so you can download it again.',
+		defaultMessage:
+			'Removing it frees the disk space; the instance stays listed so you can download it again.',
 	},
 	badgeRequired: { id: 'managed-instances.badge-required', defaultMessage: 'Required' },
 	badgeOptional: { id: 'managed-instances.badge-optional', defaultMessage: 'On demand' },
@@ -56,7 +60,8 @@ const messages = defineMessages({
 	},
 	unconfigured: {
 		id: 'managed-instances.unconfigured',
-		defaultMessage: 'No society instance manifest address is configured, so game instances cannot be fetched.',
+		defaultMessage:
+			'No society instance manifest address is configured, so game instances cannot be fetched.',
 	},
 })
 
@@ -143,8 +148,7 @@ async function launch(instanceId: string, serverInstanceId: string) {
 		await run(instanceId, quickPlayAddress(serverInstanceId))
 		await refresh()
 	} catch (launchFailure) {
-		launchError.value =
-			describeError(launchFailure)
+		launchError.value = describeError(launchFailure)
 	} finally {
 		launchingId.value = null
 	}
@@ -187,8 +191,7 @@ async function removeOptional(record: ManagedInstanceRecord) {
 		// Re-reads the manifest so the instance is offered for download again.
 		await syncNow()
 	} catch (removalFailure) {
-		launchError.value =
-			describeError(removalFailure)
+		launchError.value = describeError(removalFailure)
 	} finally {
 		removingId.value = null
 	}
@@ -269,9 +272,7 @@ onMounted(() => {
 						<span
 							class="shrink-0 rounded-full px-2 py-0.5 text-[11px]"
 							:class="
-								record.required
-									? 'bg-surface-2 text-secondary'
-									: 'bg-surface-1 text-secondary'
+								record.required ? 'bg-surface-2 text-secondary' : 'bg-surface-1 text-secondary'
 							"
 						>
 							{{
@@ -298,7 +299,11 @@ onMounted(() => {
 				</div>
 
 				<div class="flex shrink-0 items-center gap-2">
-					<ButtonStyled v-if="!record.required && record.instance_id && !pendingAction(record.server_instance_id)">
+					<ButtonStyled
+						v-if="
+							!record.required && record.instance_id && !pendingAction(record.server_instance_id)
+						"
+					>
 						<button
 							v-tooltip="formatMessage(messages.removeHint)"
 							:disabled="isBusy || removingId !== null"

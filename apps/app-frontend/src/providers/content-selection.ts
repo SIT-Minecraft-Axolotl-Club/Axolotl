@@ -946,10 +946,25 @@ export function createContentSelection({
 		const preview = selection.curseForgePreview
 		if (!preview) throw new Error('Missing CurseForge install preview')
 		const excludedDependencyProjectIds = preview.dependencies
-			.filter((dependency) => !approvedIds.has(dependencyKey('curseforge', String(dependency.projectId), String(dependency.fileId))))
+			.filter(
+				(dependency) =>
+					!approvedIds.has(
+						dependencyKey('curseforge', String(dependency.projectId), String(dependency.fileId)),
+					),
+			)
 			.map((dependency) => dependency.projectId)
 		const forceDependencyProjectIds = preview.skipped
-			.filter((skipped) => skipped.reason === 'already_installed' && approvedIds.has(dependencyKey('curseforge', String(skipped.projectId), String(skipped.fileId ?? 'skipped'))))
+			.filter(
+				(skipped) =>
+					skipped.reason === 'already_installed' &&
+					approvedIds.has(
+						dependencyKey(
+							'curseforge',
+							String(skipped.projectId),
+							String(skipped.fileId ?? 'skipped'),
+						),
+					),
+			)
 			.map((skipped) => skipped.projectId)
 		for (const fallback of preview.modrinthFallbacks ?? []) {
 			if (!approvedIds.has(dependencyKey('modrinth', fallback.projectId, fallback.versionId))) {
@@ -963,7 +978,9 @@ export function createContentSelection({
 			projectType: selection.item.contentType,
 			ownershipKind: 'user_added',
 			manualOperationKind: 'content_install',
-			gameVersion: usesTargetGameVersion(selection.item.contentType) ? instance.game_version : undefined,
+			gameVersion: usesTargetGameVersion(selection.item.contentType)
+				? instance.game_version
+				: undefined,
 			modLoaderType: curseForgeLoaderType(instance.loader),
 			installDependencies: true,
 			excludedDependencyProjectIds: [...new Set(excludedDependencyProjectIds)],
@@ -1053,14 +1070,33 @@ export function createContentSelection({
 							loaders: selection.item.preferences?.loaders ?? [],
 						},
 						excluded_project_ids: plan.dependencies
-							.filter((dependency) => !approvedIds.has(dependencyKey('modrinth', dependency.project_id, dependency.version_id)))
+							.filter(
+								(dependency) =>
+									!approvedIds.has(
+										dependencyKey('modrinth', dependency.project_id, dependency.version_id),
+									),
+							)
 							.map((dependency) => dependency.project_id),
 						force_project_ids: plan.skipped
-							.filter((skipped) => skipped.reason === 'already_installed' && !!skipped.version_id && approvedIds.has(dependencyKey('modrinth', skipped.project_id, skipped.version_id)))
+							.filter(
+								(skipped) =>
+									skipped.reason === 'already_installed' &&
+									!!skipped.version_id &&
+									approvedIds.has(
+										dependencyKey('modrinth', skipped.project_id, skipped.version_id),
+									),
+							)
 							.map((skipped) => skipped.project_id),
 					})
 				} else if (selection.item.contentType === 'world') {
-					batchItems.push({ type: 'curse_forge_world', request: { instanceId: instance.id, projectId: Number(selection.item.providerProjectId), fileId: Number(selection.item.versionId) } })
+					batchItems.push({
+						type: 'curse_forge_world',
+						request: {
+							instanceId: instance.id,
+							projectId: Number(selection.item.providerProjectId),
+							fileId: Number(selection.item.versionId),
+						},
+					})
 				} else {
 					const request = await buildCurseForgeRequest(selection, instance, approvedIds)
 					batchItems.push({ type: 'curse_forge', request })

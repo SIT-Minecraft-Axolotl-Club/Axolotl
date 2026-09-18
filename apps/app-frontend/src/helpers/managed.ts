@@ -175,7 +175,9 @@ export async function managed_ensure_runnable(instanceId: string) {
 
 /** Actions that require downloading or installing something. */
 export function managedPendingActions(report: ManagedSyncReport): ManagedInstanceAction[] {
-	return report.instances.filter((action) => action.action === 'create' || action.action === 'update')
+	return report.instances.filter(
+		(action) => action.action === 'create' || action.action === 'update',
+	)
 }
 
 /**
@@ -206,14 +208,10 @@ export function managedOptionalActions(report: ManagedSyncReport): ManagedInstan
  * retries, resume and rollback all behave like a manual install. Returns the
  * local instance id the action now refers to.
  */
-export async function applyManagedInstanceAction(
-	action: ManagedInstanceAction,
-): Promise<string> {
+export async function applyManagedInstanceAction(action: ManagedInstanceAction): Promise<string> {
 	const spec = action.spec
 	if (spec.pack.kind !== MANAGED_PACK_KIND) {
-		throw new Error(
-			`Managed instance "${spec.id}" uses unsupported pack kind "${spec.pack.kind}"`,
-		)
+		throw new Error(`Managed instance "${spec.id}" uses unsupported pack kind "${spec.pack.kind}"`)
 	}
 
 	const path = await managed_prepare_pack(spec.id, spec.revision)

@@ -229,7 +229,11 @@ function isSupportedDashboardVersion(value: unknown): boolean {
 }
 
 export function normalizeHomeDashboard(value: unknown): HomeDashboardConfig | null {
-	if (!isRecord(value) || !isSupportedDashboardVersion(value.version) || !Array.isArray(value.widgets)) {
+	if (
+		!isRecord(value) ||
+		!isSupportedDashboardVersion(value.version) ||
+		!Array.isArray(value.widgets)
+	) {
 		return null
 	}
 

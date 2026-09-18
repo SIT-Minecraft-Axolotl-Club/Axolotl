@@ -86,7 +86,8 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 					'zh-CN': '新增地图页，可查看像素生存与生存卫星地图。',
 				},
 				{
-					'en-US': 'New "Latest announcement" card on Home showing the newest society announcement.',
+					'en-US':
+						'New "Latest announcement" card on Home showing the newest society announcement.',
 					'zh-CN': '首页新增「最新公告」卡片，显示社团发布的最新公告。',
 				},
 				{
@@ -98,11 +99,11 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 				{
 					'en-US':
 						'Home was redesigned: the right sidebar is gone, the dashboard is made of widgets you can rearrange, and the account with its characters moved into the top bar.',
-					'zh-CN':
-						'主页改版：移除右侧栏，主页改为可自由排列的小组件，账户与角色移到顶栏。',
+					'zh-CN': '主页改版：移除右侧栏，主页改为可自由排列的小组件，账户与角色移到顶栏。',
 				},
 				{
-					'en-US': 'The account menu is now a flat list, so switching characters takes fewer clicks.',
+					'en-US':
+						'The account menu is now a flat list, so switching characters takes fewer clicks.',
 					'zh-CN': '账户菜单改为平铺列表，切换角色更直接。',
 				},
 				{
@@ -119,7 +120,8 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 						'移除与社团无关的功能，包括 AI 功能、日志分享与 AI 分析、Modrinth 账户与在线内容、隐藏名牌等。',
 				},
 				{
-					'en-US': 'Instances are no longer created inside the launcher, because the server publishes them.',
+					'en-US':
+						'Instances are no longer created inside the launcher, because the server publishes them.',
 					'zh-CN': '启动器内不再提供创建实例入口，实例由服务端下发。',
 				},
 			],
@@ -131,15 +133,15 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 				{
 					'en-US':
 						'Fixed instances removed from this computer still asking to be downloaded, and being downloadable again afterwards.',
-					'zh-CN':
-						'修复从本机删除实例后仍提示需要下载的问题，删除后依然可以重新下载。',
+					'zh-CN': '修复从本机删除实例后仍提示需要下载的问题，删除后依然可以重新下载。',
 				},
 				{
 					'en-US': 'Fixed the interface occasionally becoming completely unresponsive.',
 					'zh-CN': '修复界面偶尔整体无法点击的问题。',
 				},
 				{
-					'en-US': 'Fixed the map page capturing the pointer and leaving the rest of the launcher unusable.',
+					'en-US':
+						'Fixed the map page capturing the pointer and leaving the rest of the launcher unusable.',
 					'zh-CN': '修复地图页抢占鼠标、导致其他按钮无法操作的问题。',
 				},
 			],

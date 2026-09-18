@@ -51,7 +51,8 @@ const messages = defineMessages({
 	},
 	preLaunchHookHint: {
 		id: 'app.servers.settings.pre-launch-hook-hint',
-		defaultMessage: 'Runs in the server directory before the server starts. A non-zero exit code cancels the start.',
+		defaultMessage:
+			'Runs in the server directory before the server starts. A non-zero exit code cancels the start.',
 	},
 	save: { id: 'app.servers.settings.save', defaultMessage: 'Save changes' },
 	saved: { id: 'app.servers.settings.saved', defaultMessage: 'Server settings saved' },
@@ -296,10 +297,7 @@ async function confirmDelete() {
 						<span class="font-semibold text-contrast">{{
 							formatMessage(messages.preLaunchHook)
 						}}</span>
-						<StyledInput
-							id="server-settings-pre-launch-hook"
-							v-model="preLaunchHookText"
-						/>
+						<StyledInput id="server-settings-pre-launch-hook" v-model="preLaunchHookText" />
 						<span class="text-xs text-secondary">{{
 							formatMessage(messages.preLaunchHookHint)
 						}}</span>

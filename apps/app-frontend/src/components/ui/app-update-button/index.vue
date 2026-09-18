@@ -73,8 +73,7 @@ const isUpdateDownloading = computed(
 )
 const showUpdatePill = computed(
 	() =>
-		isUpdateVisible.value &&
-		(finishedDownloading.value || metered.value || isUpdateForced.value),
+		isUpdateVisible.value && (finishedDownloading.value || metered.value || isUpdateForced.value),
 )
 const animateReadyPill = ref(false)
 const updateLabel = computed(() => {

@@ -409,10 +409,7 @@ import { useSymlinkWarningDismiss } from '@/composables/useSymlinkWarningDismiss
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
 import { instance_listener, process_listener } from '@/helpers/events'
-import {
-	install_existing_instance,
-	install_pack_to_existing_instance,
-} from '@/helpers/install'
+import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
 import {
 	allow_symlink_target,
 	gcReportFellBack,

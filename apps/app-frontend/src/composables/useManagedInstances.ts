@@ -19,13 +19,7 @@ import {
 } from '@/helpers/managed'
 import { compareSemanticVersions } from '@/helpers/version-compatibility'
 
-export type ManagedSyncState =
-	| 'unconfigured'
-	| 'idle'
-	| 'syncing'
-	| 'updating'
-	| 'ready'
-	| 'error'
+export type ManagedSyncState = 'unconfigured' | 'idle' | 'syncing' | 'updating' | 'ready' | 'error'
 
 const manifestUrl = SitmcConfig.manifestUrl
 
@@ -69,9 +63,7 @@ const retiredRecords = computed(() => records.value.filter((record) => record.re
  * until the player asks for them. They are keyed by the server's instance id so
  * the panel can look one up while rendering a record.
  */
-const optionalActions = computed(() =>
-	report.value ? managedOptionalActions(report.value) : [],
-)
+const optionalActions = computed(() => (report.value ? managedOptionalActions(report.value) : []))
 
 const optionalActionsByServerId = computed(
 	() => new Map(optionalActions.value.map((action) => [action.spec.id, action])),

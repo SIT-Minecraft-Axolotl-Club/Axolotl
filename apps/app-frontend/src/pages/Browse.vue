@@ -1551,12 +1551,12 @@ function getCardActions(
 					isInstalled
 						? commonMessages.installedLabel
 						: isInstalling
-						? commonMessages.validatingLabel
-						: isSelected
-							? messages.selected
-							: activeInstance.value
-								? commonMessages.installButton
-								: messages.chooseInstance,
+							? commonMessages.validatingLabel
+							: isSelected
+								? messages.selected
+								: activeInstance.value
+									? commonMessages.installButton
+									: messages.chooseInstance,
 				),
 				compactLabel:
 					!isInstalled && !isInstalling && !isSelected && !activeInstance.value

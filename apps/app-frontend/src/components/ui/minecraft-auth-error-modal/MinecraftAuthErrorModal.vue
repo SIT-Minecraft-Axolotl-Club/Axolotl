@@ -15,7 +15,7 @@ import {
 	NewModal,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, inject, type Ref,ref } from 'vue'
+import { computed, inject, type Ref, ref } from 'vue'
 
 import { AxolotlBrandConfig } from '@/config'
 import i18n from '@/i18n.config'

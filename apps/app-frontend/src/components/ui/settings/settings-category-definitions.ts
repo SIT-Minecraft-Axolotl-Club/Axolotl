@@ -73,7 +73,10 @@ export const settingsCategoryDefinitions: SettingsCategoryDefinition[] = [
 	},
 	{
 		id: 'instance-sync',
-		name: defineMessage({ id: 'app.settings.tabs.instance-sync', defaultMessage: 'Instance synchronization' }),
+		name: defineMessage({
+			id: 'app.settings.tabs.instance-sync',
+			defaultMessage: 'Instance synchronization',
+		}),
 		group: 'game',
 		onboardingId: 'settings-tab-instance-sync',
 	},

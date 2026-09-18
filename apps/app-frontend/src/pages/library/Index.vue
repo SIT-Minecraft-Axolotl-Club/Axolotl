@@ -59,9 +59,7 @@ onUnmounted(() => {
 <template>
 	<div data-onboarding-id="library-content" class="p-6 flex flex-col gap-3">
 		<h1 class="m-0 text-2xl hidden">{{ formatMessage(messages.library) }}</h1>
-		<NavTabs
-			:links="[{ label: formatMessage(messages.allInstances), href: `/library` }]"
-		/>
+		<NavTabs :links="[{ label: formatMessage(messages.allInstances), href: `/library` }]" />
 		<template v-if="instances && instances.length > 0">
 			<RouterView v-if="route.path.startsWith('/library')" :instances="instances" />
 		</template>
