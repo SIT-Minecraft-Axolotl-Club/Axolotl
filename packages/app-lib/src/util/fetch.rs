@@ -5151,14 +5151,30 @@ async fn try_h2_download(
     part_path: &Path,
     semaphore: &FetchSemaphore,
 ) -> crate::Result<H2AttemptResult> {
-    let _permit =
-        tokio::time::timeout(RESOURCE_WAIT_TIMEOUT, semaphore.0.acquire())
-            .await
-            .map_err(|_| {
-                ErrorKind::NetworkError(
-                    "timed out waiting for HTTP/2 download permit".to_string(),
-                )
-            })??;
+    let permit = match tokio::time::timeout(
+        RESOURCE_WAIT_TIMEOUT,
+        semaphore.0.acquire(),
+    )
+    .await
+    {
+        Ok(Ok(permit)) => permit,
+        // A download slot that does not arrive must never fail the file: the
+        // HTTP/1.1 attempts below can still fetch it. Failing here instead
+        // turned one saturated pool — stuck transfers hold their permits —
+        // into the same error for every download in the install.
+        Ok(Err(_)) | Err(_) => {
+            tracing::warn!(
+                url = %sanitize_url_for_log(&route.url),
+                source = route.source.as_str(),
+                wait_s = RESOURCE_WAIT_TIMEOUT.as_secs(),
+                "No HTTP/2 download permit available; falling back to the HTTP/1.1 attempts"
+            );
+            return Ok(H2AttemptResult::Fallback {
+                failed_nonofficial: None,
+            });
+        }
+    };
+    let _permit = permit;
     let started = Instant::now();
     match crate::util::download::h2_download::try_download_via_h2(
         request,
