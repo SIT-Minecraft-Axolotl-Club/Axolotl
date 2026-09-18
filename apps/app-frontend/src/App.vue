@@ -403,6 +403,7 @@ const appUpdateDownload = {
 	version: ref(),
 }
 let unlistenUpdateDownload
+let activeUpdateDownload: Promise<void> | null = null
 
 const {
 	metered,
@@ -874,7 +875,8 @@ const messages = defineMessages({
 	},
 	launcherUpdateUnavailable: {
 		id: 'app.launcher-update-required.unavailable',
-		defaultMessage: 'No update is available right now. Try again later or contact a society administrator.',
+		defaultMessage:
+			'No update is available right now. Try again later or contact a society administrator.',
 	},
 	updateInstalledToastTitle: {
 		id: 'app.update.complete-toast.title',
@@ -2074,9 +2076,7 @@ const minecraftAccounts = ref<unknown[]>([])
  */
 const loginGateVisible = computed(
 	() =>
-		stateInitialized.value &&
-		!privacyConsentPending.value &&
-		minecraftAccounts.value.length === 0,
+		stateInitialized.value && !privacyConsentPending.value && minecraftAccounts.value.length === 0,
 )
 
 /**
@@ -2113,8 +2113,10 @@ watch(
 	() => void refreshMinecraftAccounts(),
 )
 
-const { launcherUpdateRequired: managedLauncherUpdateRequired, ensureSynced: ensureInstancesSynced } =
-	useManagedInstances()
+const {
+	launcherUpdateRequired: managedLauncherUpdateRequired,
+	ensureSynced: ensureInstancesSynced,
+} = useManagedInstances()
 
 const updateGateBusy = ref(false)
 const updateGateMessage = ref<string | null>(null)
@@ -2131,8 +2133,10 @@ async function runLauncherUpdateFromGate() {
 	updateGateBusy.value = true
 	updateGateMessage.value = null
 	try {
-		const channel = await getUpdateChannel()
-		const update = await checkAppUpdate(channel)
+		// When the startup check already discovered the mandatory update (and may
+		// even be mid-download), join that instead of re-querying the endpoint.
+		const known = downloading.value || finishedDownloading.value ? availableUpdate.value : null
+		const update = known ?? (await checkAppUpdate(await getUpdateChannel()))
 		if (!update) {
 			updateGateMessage.value = formatMessage(messages.launcherUpdateUnavailable)
 			return
@@ -2461,34 +2465,40 @@ async function downloadUpdate(versionToDownload) {
 		return
 	}
 
-	if (downloading.value || appUpdateDownload.progress.value !== 0) {
-		console.error(`Update ${versionToDownload.version} already downloading`)
+	if (finishedDownloading.value) {
 		return
+	}
+
+	if (downloading.value || appUpdateDownload.progress.value !== 0 || activeUpdateDownload) {
+		console.error(`Update ${versionToDownload.version} already downloading`)
+		return activeUpdateDownload
 	}
 
 	console.log(`Downloading update ${versionToDownload.version} from Update Server`)
 	downloading.value = true
 
+	const completion = enqueueUpdateForInstallation(versionToDownload.rid)
+		.then(() => {
+			downloading.value = false
+			finishedDownloading.value = true
+			unlistenUpdateDownload?.().then(() => {
+				unlistenUpdateDownload = null
+			})
+			console.log('Finished downloading!')
+			markAppUpdateActionable(versionToDownload.version, 'downloaded')
+			scheduleDelayedUpdatePopup()
+		})
+		.catch((error) => {
+			downloading.value = false
+			appUpdateDownload.progress.value = 0
+			unlistenUpdateDownload?.().then(() => {
+				unlistenUpdateDownload = null
+			})
+			handleError(error)
+		})
+	activeUpdateDownload = completion
+
 	try {
-		enqueueUpdateForInstallation(versionToDownload.rid)
-			.then(() => {
-				downloading.value = false
-				finishedDownloading.value = true
-				unlistenUpdateDownload?.().then(() => {
-					unlistenUpdateDownload = null
-				})
-				console.log('Finished downloading!')
-				markAppUpdateActionable(versionToDownload.version, 'downloaded')
-				scheduleDelayedUpdatePopup()
-			})
-			.catch((error) => {
-				downloading.value = false
-				appUpdateDownload.progress.value = 0
-				unlistenUpdateDownload?.().then(() => {
-					unlistenUpdateDownload = null
-				})
-				handleError(error)
-			})
 		unlistenUpdateDownload = await subscribeToDownloadProgress(
 			appUpdateDownload,
 			versionToDownload.version,
@@ -2498,6 +2508,10 @@ async function downloadUpdate(versionToDownload) {
 		appUpdateDownload.progress.value = 0
 		handleError(error)
 	}
+
+	return completion.finally(() => {
+		activeUpdateDownload = null
+	})
 }
 
 async function installUpdate() {
@@ -2983,12 +2997,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 
 	<!-- Processing overlay -->
 	<div
-		v-if="
-			(isProcessing || scanningInstances) &&
-			!isDragging &&
-			!onSettingsPage &&
-			!batchActive
-		"
+		v-if="(isProcessing || scanningInstances) && !isDragging && !onSettingsPage && !batchActive"
 		class="fixed inset-0 z-[9999] bg-black/20 flex items-center justify-center"
 	>
 		<div class="flex flex-col items-center gap-3">
