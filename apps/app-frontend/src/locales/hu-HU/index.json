@@ -74,12 +74,6 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Alapértelmezett nyitóoldal"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Letiltja a játékosod felett megjelenő névcímkét a Kinézetek oldalon."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Névcímke eltüntetése"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimalizáld az indítót a Minecraft indításakor."
   },
@@ -100,12 +94,6 @@
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Játékidő megjelenítése"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Lehetővé teszi az oldalsáv be- és kikapcsolását."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Oldalsáv megjelenítése/elrejtése"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "Ha olyan Modrinth Csomagfájlt (.mrpack) próbálsz telepíteni, amely nem a Modrinth szerverén található, a telepítés előtt gondoskodunk arról, hogy tisztában legyél a kockázatokkal."
@@ -254,42 +242,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Keresés {count} világ között..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Szükséges tartalom"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Telepítés a játékhoz"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Telepítés"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count} mod"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Szükséges modcsomag"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ehhez a szerverhez modok szükségesek a játékhoz. Kattints a Telepítés gombra, hogy telepítsd a szükséges fájlokat a Modrinth-ról, majd indítsd el közvetlenül a szervert."
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Megosztott profil"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Megosztott szerverprofil"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "Tartalom megtekintése"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Frissítsd a játékhoz"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Frissítés szükséges"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Frissítés szükséges ehhez: {name}. Kérlek, frissíts a legújabb verzióra a játék elindításához."
-  },
   "app.project.install-button.already-installed": {
     "message": "Ez a projekt már telepítve van"
   },
@@ -311,23 +263,8 @@
   "app.skins.add-button.drag-and-drop": {
     "message": "Húzd ide a fájlt"
   },
-  "app.skins.apply-button": {
-    "message": "Alkalmazás"
-  },
   "app.skins.delete-button": {
     "message": "Kinézet törlése"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "Ezzel a kiválasztott kinézet véglegesen törlődik. Ez a művelet visszafordíthatatlan."
-  },
-  "app.skins.delete-modal.title": {
-    "message": "Biztos, hogy le akarod törölni ezt a kinézetet?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "Nem sikerült beolvasni a feltöltött fájlt."
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "Hiba a fájl feldolgozása közben"
   },
   "app.skins.edit-button": {
     "message": "Kinézet szerkesztése"
@@ -380,65 +317,8 @@
   "app.skins.modal.upload-skin-first-tooltip": {
     "message": "Először tölts fel egy kinézetet!"
   },
-  "app.skins.preview.edit-button": {
-    "message": "Kinézet szerkesztése"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Előnézet"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "Túl gyakran cseréled a kinézetedet. A Mojang szerverei ideiglenesen letiltották a további cseréket. Kérlek várj egy pillanatot, majd próbáld meg újra."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Lassíts!"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "Builders & Biomes"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
-  },
-  "app.skins.section.default-skins": {
-    "message": "Alap kinézetek"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
-  },
   "app.skins.section.saved-skins": {
     "message": "Mentett kinézetek"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Bejelentkezés"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Kérlek jelentkezz be a Minecraft-fiókodba, hogy használni tudd a Axolotl Launcher kinézetkezelési funkcióit."
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Kérlek jelentkezz be"
-  },
-  "app.skins.title": {
-    "message": "Kinézetváltó"
   },
   "app.update-popup.body.download-complete": {
     "message": "A Axolotl Launcher v{version} letöltése befejeződött. Frissítéshez válaszd ki a Frissítés opciót, vagy az alkalmazás a bezárásakor automatikusan frissül."
@@ -800,9 +680,6 @@
   "instance.worlds.world_in_use": {
     "message": "A világ használatban van"
   },
-  "minecraft-account.label": {
-    "message": "Minecraft-fiók"
-  },
   "minecraft-account.not-signed-in": {
     "message": "Nem vagy bejelentkezve"
   },
@@ -811,9 +688,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Fiók kiválasztása"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Bejelentkezés a Minecraftba"
   },
   "search.filter.locked.instance": {
     "message": "Pédány által megadva"

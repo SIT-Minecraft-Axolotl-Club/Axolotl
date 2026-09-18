@@ -62,12 +62,6 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "デフォルトの起動ページ"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "スキンページでプレイヤー上部のネームタグを非表示にします。"
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "ネームタグを非表示にする"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minecraftが起動した時、ランチャーを最小化します。"
   },
@@ -88,12 +82,6 @@
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "プレイ時間を表示"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "サイドバーの表示/非表示を切り替える機能を有効にします。"
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "サイドバーの表示切替を有効化"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "Modrinthで配布されていないModrinth Pack（.mrpack）をインストールする場合、事前にリスクについて警告します。"
@@ -224,42 +212,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count} 個のワールドを検索…"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "必須コンテンツ"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "インストールしてプレイ"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "インストール"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, other {#個のMod}}"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "必須のModパック"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "このサーバーをプレイするにはModが必要です。インストールをクリックしてModrinthから必要なファイルを設定し、サーバーに接続してください。"
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "共有インスタンス"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "共有サーバーインスタンス"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "コンテンツを見る"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "更新してプレイ"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "更新が必要です"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "{name}をプレイするには更新が必要です。ゲームを起動するには最新版に更新してください。"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "開発者モードがオンになっています。"
   },
@@ -287,41 +239,8 @@
   "app.skins.modal.texture-section": {
     "message": "テクスチャ"
   },
-  "app.skins.preview.edit-button": {
-    "message": "編集"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "ビルダーズ＆バイオーム"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "チェイス・ザ・スカイ"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "マウント・オブ・メイヘム"
-  },
   "app.skins.section.saved-skins": {
     "message": "保存済みのスキン"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "銅の時代"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "ガーデン・アウェイケンズ"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "タイニー・テイクオーバー"
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
   },
   "app.update-popup.body.download-complete": {
     "message": "Axolotl Launcher v{version} のダウンロードが完了しました。今すぐ更新するには再読み込みするか、Axolotl Launcherを閉じる際に自動更新されます。"
@@ -641,9 +560,6 @@
   "instance.worlds.world_in_use": {
     "message": "ワールドは使用中"
   },
-  "minecraft-account.label": {
-    "message": "Minecraftアカウント"
-  },
   "minecraft-account.not-signed-in": {
     "message": "サインインしていません"
   },
@@ -652,9 +568,6 @@
   },
   "minecraft-account.select-account": {
     "message": "アカウントを選択"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Minecraftにサインイン"
   },
   "search.filter.locked.instance": {
     "message": "インスタンスによる条件"

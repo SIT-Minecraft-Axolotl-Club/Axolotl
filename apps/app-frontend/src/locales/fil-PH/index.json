@@ -68,12 +68,6 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Panimulang pahina ng paglapag"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Pagtatago ng nametag na nasa itaas ng iyong manlalaro sa loob ng pahina ng mga skin."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Itago ang nametag"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Liitan ang launcher kung nag-start ang isang proseso ng Minecraft."
   },
@@ -91,12 +85,6 @@
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Magpapakita ang katagal ng iyong paglalaro sa isang instansiya."
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Pagpapagana na mata-toggle ang sidebar."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "I-toggle ang sidebar"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "Kung susubukan mong mag-install ng Modrinth Pack file (.mrpack) na hindi naka-host sa Modrinth, titiyakin namin na nakaaalam ka sa mga panganib bago ito ma-install."
@@ -239,42 +227,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Hanapin sa {count} mundo..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Nangangailangan ng kontento"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Mag-install upang malaro"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "I-install"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {# mod} other {# na mod}}"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Kinailangan na modpack"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ang server rna ito ay nangangailangan ng mga mod upang makalaro. Pindutin ang install upang maihanda ang mga kinakailangang file galing sa Modrinth, matapos ay ilunsad nang diretso sa server."
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Binahaging instansiya"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Binahaging instansiyang pang-server"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "Tingnan ang mga kontento"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Mag-update upang malaro"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Kailangang mag-update"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Kailangang mag-update upang malaro ang {name}. Mangyaring mag-update sa pinakabagong bersiyon upang ma-launch ang laro."
-  },
   "app.project.install-button.already-installed": {
     "message": "Naka-install na ang proyektong ito"
   },
@@ -286,9 +238,6 @@
   },
   "app.settings.downloading": {
     "message": "Dina-download ang v{version}"
-  },
-  "app.skins.apply-button": {
-    "message": "Ilapat"
   },
   "app.skins.modal.arm-style-slim": {
     "message": "Payat"
@@ -310,9 +259,6 @@
   },
   "app.skins.modal.texture-section": {
     "message": "Texture"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
   },
   "app.update-popup.body.download-complete": {
     "message": "Tapos nang ma-download ang Axolotl Launcher v{version}. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Axolotl Launcher."
@@ -635,9 +581,6 @@
   "instance.worlds.world_in_use": {
     "message": "Ginagamit ang mundo"
   },
-  "minecraft-account.label": {
-    "message": "Minecraft account"
-  },
   "minecraft-account.not-signed-in": {
     "message": "Hindi pa naka sign in"
   },
@@ -646,9 +589,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Pumili ng account"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Mag sign in kay Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Sagot na ng instansiya"

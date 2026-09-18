@@ -698,9 +698,6 @@
   "content.filter.updates": {
     "defaultMessage": "更新"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "警告"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "瀏覽內容"
   },
@@ -1639,24 +1636,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "選擇圖示"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "這個模組包不包含任何額外內容。"
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "找不到內容"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "模組包內容"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "正在載入內容..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "沒有專案符合你的搜尋字詞。"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "搜尋 {count, number} {count, plural, other {個專案}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "目前"

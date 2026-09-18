@@ -83,12 +83,6 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Page d'ouverture"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Désactive le nom au-dessus du joueur sur la page skins."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Cacher le pseudo"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimiser le lanceur quand Minecraft démarre."
   },
@@ -115,12 +109,6 @@
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Cacher les alertes non essentielles"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Permet d'ouvrir ou de fermer la barre latérale."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Tiroir latéral"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "Si vous essayez d'installer un fichier Modrinth Pack (.mrpack) qui n'est pas hébergé sur Modrinth, nous nous assurerons que vous comprenez les risques avant de l'installer."
@@ -353,42 +341,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Rechercher {count} mondes..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Contenu requis"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Installer pour jouer"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Installer"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {# mod} other {# mods}}"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Modpack requis"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ce serveur a besoin de mods pour jouer. Cliquez sur Installer pour mettre en place les fichiers requis depuis Modrinth, puis lancez directement dans le serveur."
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Instance partagée"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Instance serveur partagée"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "Voir le contenu"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Mettre à jour pour jouer"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Mise à jour requise"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Une mise à jour est requise pour jouer à {name}. Veuillez mettre à jour à la dernière version pour lancer le jeu."
-  },
   "app.project.install-button.already-installed": {
     "message": "Ce projet a déjà été installé"
   },
@@ -410,23 +362,8 @@
   "app.skins.add-button.drag-and-drop": {
     "message": "Glisser et déposer"
   },
-  "app.skins.apply-button": {
-    "message": "Appliquer"
-  },
   "app.skins.delete-button": {
     "message": "Supprimer le skin"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "Cela va supprimer de manière permanente ce skin. Cette action est irréversible."
-  },
-  "app.skins.delete-modal.title": {
-    "message": "Êtes-vous sûr de vouloir supprimer cette skin ?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "Impossible de lire le fichier déposé."
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "Erreur lors du traitement du fichier"
   },
   "app.skins.edit-button": {
     "message": "Modifier le skin"
@@ -479,71 +416,8 @@
   "app.skins.modal.upload-skin-first-tooltip": {
     "message": "Importez d'abord une skin !"
   },
-  "app.skins.preview.edit-button": {
-    "message": "Modifier le skin"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Aperçu"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "Vous changez de skin trop vite. Les serveurs de Mojang ont temporairement bloqué certaines requêtes. Veuillez patienter un moment puis réessayez."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Du calme !"
-  },
-  "app.skins.reorder-error.text": {
-    "message": "L'ordre des skins n'a pas pu être sauvegardé."
-  },
-  "app.skins.reorder-error.title": {
-    "message": "Impossible de réorganiser les skins"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "Builders & Biomes"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Chassez les cieux"
-  },
-  "app.skins.section.default-skins": {
-    "message": "Skins par défaut"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Montures en pagaille"
-  },
   "app.skins.section.saved-skins": {
     "message": "Skins sauvegardées"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "L'éveil du jardin"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Horde miniature"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Se connecter"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Veuillez vous connecter à votre compte Minecraft pour utiliser les fonctionnalités de gestion de skins de Axolotl Launcher."
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Veuillez vous connecter"
-  },
-  "app.skins.title": {
-    "message": "Sélecteur de skin"
   },
   "app.update-popup.body.download-complete": {
     "message": "Axolotl Launcher v{version} a finie d'être téléchargée. Rechargez pour mettre à jour maintenant, ou automatiquement quand vous fermez Axolotl Launcher."
@@ -905,9 +779,6 @@
   "instance.worlds.world_in_use": {
     "message": "Le monde en cours d'utilisation"
   },
-  "minecraft-account.label": {
-    "message": "Compte Minecraft"
-  },
   "minecraft-account.not-signed-in": {
     "message": "Pas connecté"
   },
@@ -916,9 +787,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Sélectionner un compte"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Se connecter à Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Procuré par l'instance"

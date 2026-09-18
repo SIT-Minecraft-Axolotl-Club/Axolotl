@@ -314,9 +314,6 @@
   "content.filter.updates": {
     "defaultMessage": "Оновлює"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Попереджає"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "Шукати вміст"
   },
@@ -1186,24 +1183,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Вибрати значок"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Збірка не включає додатковий уміст."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Умісту не знайдено"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Уміст збірки"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Завантаження вмісту…"
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "За вашим запитом не знайдено жодного проєкту."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Пошук {count, number} {count, plural, one {проєкту} other {проєктів}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Поточна"

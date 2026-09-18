@@ -68,12 +68,6 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Trang mặc định"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Tắt hiển thị thẻ tên phía trên người chơi ở trang skin."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Ẩn thẻ tên"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Thu nhỏ launcher khi game Minecraft bắt đầu chạy."
   },
@@ -94,12 +88,6 @@
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Hiện thời gian chơi"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Bật tính năng ẩn hiển thị thanh menu bên."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Ẩn/hiện thanh bên"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "Nếu bạn cố gắng cài đặt tệp Modrinth Pack (.mrpack) không được lưu trữ trên máy chủ Modrinth, chúng tôi sẽ đảm bảo bạn hiểu rõ các rủi ro trước khi cài đặt."
@@ -245,42 +233,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Tìm kiếm {count} world..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Nội dung bắt buộc"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Tải xuống để chơi"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Tải xuống"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, other {# mod}}"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Yêu cầu modpack"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Máy chủ này yêu cầu mod để có thể chơi. Vui lòng ấn vào tải xuống và tải các tệp bắt buộc từ Modrinth và khởi chạy trực tiếp để tham gia máy chủ."
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Chia sẻ hồ sơ"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Chia sẻ hồ sơ máy chủ"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "Xem nội dung"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Cập nhật và bắt đầu chơi"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Yêu cầu cập nhật"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Bạn cần cập nhật {name} để có thể chơi. Vui lòng cập nhật lên bản mới nhất để khởi chạy trò chơi."
-  },
   "app.project.install-button.already-installed": {
     "message": "Dự án này đã được cài đặt"
   },
@@ -302,23 +254,8 @@
   "app.skins.add-button.drag-and-drop": {
     "message": "Kéo và thả"
   },
-  "app.skins.apply-button": {
-    "message": "Áp dụng"
-  },
   "app.skins.delete-button": {
     "message": "Xóa skin"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "Hành động này sẽ xóa skin trên vĩnh viễn. Hành động này không thể khôi phục lại."
-  },
-  "app.skins.delete-modal.title": {
-    "message": "Bạn hoàn toàn muốn xóa skin này chứ?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "Không đọc được file thả."
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "Có lỗi khi đọc file"
   },
   "app.skins.edit-button": {
     "message": "Sửa skin"
@@ -371,71 +308,8 @@
   "app.skins.modal.upload-skin-first-tooltip": {
     "message": "Nhập skin vào trước đã!"
   },
-  "app.skins.preview.edit-button": {
-    "message": "Sửa skin"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Xem trước"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "Bạn đang chỉnh skin quá thường xuyên. Mãy chủ của Mojang đã tạm thời chặn lại các yêu cầu hiện thời. Đợi một lúc trước khi thử lại lần nữa."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Bình tĩnh lại!"
-  },
-  "app.skins.reorder-error.text": {
-    "message": "Không thể lưu thứ tự skin của bạn."
-  },
-  "app.skins.reorder-error.title": {
-    "message": "Sắp xếp lại skin thất bại"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "Builders & Biomes"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
-  },
-  "app.skins.section.default-skins": {
-    "message": "Skin mặc định"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
-  },
   "app.skins.section.saved-skins": {
     "message": "Skin đã lưu"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Đăng nhập"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Đặng nhập vào mội tài khoản Minecraft để đổi skin Skin trong ứng dụng này."
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Đăng nhập đã"
-  },
-  "app.skins.title": {
-    "message": "Đổi skin"
   },
   "app.update-popup.body.download-complete": {
     "message": "Phiên bản v{version} của Axolotl Launcherđã sẵn sàng để có thể cài đặt. Khởi động lại ứng dụng để cập nhật ngay bây giờ, hoặc tự động cập nhật sau khi bạn tắt Axolotl Launcher."
@@ -797,9 +671,6 @@
   "instance.worlds.world_in_use": {
     "message": "Thế giới đang mở"
   },
-  "minecraft-account.label": {
-    "message": "Tài khoản Minecraft"
-  },
   "minecraft-account.not-signed-in": {
     "message": "Chưa đăng nhập"
   },
@@ -808,9 +679,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Chọn tài khoản"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Đăng nhập vào Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Được cung cấp bởi phiên bản"

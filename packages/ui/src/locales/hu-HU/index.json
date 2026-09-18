@@ -311,9 +311,6 @@
   "content.filter.updates": {
     "defaultMessage": "Frissítések"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Figyelmeztetések"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "Tartalom böngészése"
   },
@@ -1117,24 +1114,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Ikon feltöltése"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Ez a modcsomag nem tartalmaz további tartalmakat."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nincsen tartalom"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Modcsomag tartalma"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Tartalmak betöltése..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Nincsen olyan projekt ami keresnél."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Keresés {count, number} projekt között"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Jelenlegi"

@@ -83,12 +83,6 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Página inicial padrão"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Desativa o nametag acima do seu jogador na página de Skins."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Ocultar nametag"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimize o launcher assim que algum processo do Minecraft iniciar."
   },
@@ -115,12 +109,6 @@
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Pular avisos desnecessários"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Permite alternar a barra lateral."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Alternar barra lateral"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "Se você tentar instalar um arquivo Modrinth Pack (.mrpack) não hospedado no Modrinth, garantiremos que você entenda os riscos antes de instalar."
@@ -353,42 +341,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Buscar {count} mundos..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Conteúdo necessário"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Instale para jogar"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Instalar"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, =0 {Nenhum mod} one {# mod} other {# mods}}"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Pacote de mods necessário"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Este servidor exige mods para jogar. Clique em instalar para configurar os arquivos necessários através do Modrinth, e então iniciar diretamente no servidor."
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Instância compartilhada"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Instância de servidor compartilhada"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "Ver conteúdo"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Atualize para jogar"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Atualização necessária"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Uma atualização é necessária para jogar {name}. Atualize para a versão mais recente para iniciar o jogo."
-  },
   "app.project.install-button.already-installed": {
     "message": "Este projeto já foi instalado"
   },
@@ -410,23 +362,8 @@
   "app.skins.add-button.drag-and-drop": {
     "message": "Arraste e solte"
   },
-  "app.skins.apply-button": {
-    "message": "Aplicar"
-  },
   "app.skins.delete-button": {
     "message": "Excluir skin"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "Isso excluirá permanentemente a skin. Esta ação não pode ser desfeita."
-  },
-  "app.skins.delete-modal.title": {
-    "message": "Deseja mesmo excluir esta skin?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "Falha ao ler o arquivo solto."
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "Erro ao processar arquivo"
   },
   "app.skins.edit-button": {
     "message": "Editar skin"
@@ -479,71 +416,8 @@
   "app.skins.modal.upload-skin-first-tooltip": {
     "message": "Primeiramente, envie uma skin!"
   },
-  "app.skins.preview.edit-button": {
-    "message": "Editar skin"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Prévia"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "Você está mudando de skin muitas vezes. Os servidores da Mojang bloquearam temporariamente novas solicitações. Aguarde um momento antes de tentar novamente."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Mais lento!"
-  },
-  "app.skins.reorder-error.text": {
-    "message": "Não foi possível salvar a ordem de skins."
-  },
-  "app.skins.reorder-error.title": {
-    "message": "Falhou ao reordenar skins"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "Construtores & Biomas"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
-  },
-  "app.skins.section.default-skins": {
-    "message": "Skins padrões"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
-  },
   "app.skins.section.saved-skins": {
     "message": "Skins salvas"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Iniciar sessão"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Inicie sessão na sua conta do Minecraft para usar os recursos de gerenciamento de skins no Axolotl Launcher."
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Por favor, inicie sessão"
-  },
-  "app.skins.title": {
-    "message": "Seletor de skins"
   },
   "app.update-popup.body.download-complete": {
     "message": "O Axolotl Launcher v{version} já foi instalado. Recarregue para atualizar agora ou ela será feita automaticamente ao fechar o Axolotl Launcher."
@@ -908,9 +782,6 @@
   "instance.worlds.world_in_use": {
     "message": "Mundo em uso"
   },
-  "minecraft-account.label": {
-    "message": "Conta de Minecraft"
-  },
   "minecraft-account.not-signed-in": {
     "message": "Não conectado"
   },
@@ -919,9 +790,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Selecionar conta"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Inicie sessão no Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Fornecido pela instância"

@@ -59,12 +59,6 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Laman pendaratan lalai"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Menyahdayakan tanda nama di atas pemain anda pada halaman kekulit."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Sembunyikan tanda nama"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Meminimumkan pelancar apabila proses Minecraft bermula."
   },
@@ -79,12 +73,6 @@
   },
   "app.appearance-settings.select-option": {
     "message": "Pilih satu pilihan"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Membolehkan keupayaan untuk menogol bar sisi."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Togol bar sisi"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "Jika anda cuba memasang fail Modrinth Pack (.mrpack) yang tidak dihoskan pada Modrinth, kami akan memastikan anda memahami risikonya sebelum memasangnya."
@@ -230,42 +218,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Cari {count} dunia..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Kandungan yang diperlukan"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Pasang untuk mainkan"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Pasang"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, other {# mod}}"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Pek mod yang diperlukan"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Pelayan ini memerlukan mod untuk dimainkan. Klik Pasang untuk menyediakan fail yang diperlukan daripada Modrinth, kemudian lancarkan permainan terus ke dalam pelayan."
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Pemasangan yang dikongsi"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Pemasangan pelayan yang dikongsi"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "Lihat kandungan"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Kemas kini untuk mainkan"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Kemas kini diperlukan"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Kemas kini diperlukan untuk memainkan {name}. Sila kemas kini kepada versi terkini untuk melancarkan permainan."
-  },
   "app.project.install-button.already-installed": {
     "message": "Projek ini sudah dipasang"
   },
@@ -284,14 +236,8 @@
   "app.skins.add-button": {
     "message": "Tambah kekulit"
   },
-  "app.skins.apply-button": {
-    "message": "Terapkan"
-  },
   "app.skins.delete-button": {
     "message": "Padam kekulit"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "Ini akan memadamkan kekulit yang dipilih selama-lamanya. Tindakan ini tidak boleh dibuat asal."
   },
   "app.skins.edit-button": {
     "message": "Sunting kekulit"
@@ -332,53 +278,8 @@
   "app.skins.modal.texture-section": {
     "message": "Tekstur"
   },
-  "app.skins.preview.edit-button": {
-    "message": "Sunting kekulit"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Sedang pralihat"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "Anda terlalu kerap menukar kekulit anda. Pelayan Mojang telah menyekat permintaan selanjutnya buat sementara waktu. Sila tunggu sebentar sebelum mencuba lagi."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Perlahanlah sikit!"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
-  },
   "app.skins.section.saved-skins": {
     "message": "Kekulit yang disimpan"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Daftar Masuk"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Sila daftar masuk ke akaun Minecraft anda untuk menggunakan ciri pengurusan kekulit milik Axolotl Launcher."
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Sila daftar masuk"
-  },
-  "app.skins.title": {
-    "message": "Pemilih kekulit"
   },
   "app.update-popup.body.download-complete": {
     "message": "Axolotl Launcher v{version} sudah selesai dimuat turun! Muat semula untuk kemas kini sekarang, atau kemas kini secara automatik apabila anda menutup Axolotl Launcher."
@@ -713,9 +614,6 @@
   "instance.worlds.world_in_use": {
     "message": "Dunia sedang digunakan"
   },
-  "minecraft-account.label": {
-    "message": "Akaun Minecraft"
-  },
   "minecraft-account.not-signed-in": {
     "message": "Tidak didaftar masuk"
   },
@@ -724,9 +622,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Pilih akaun"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Daftar masuk ke dalam Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Disediakan oleh pemasangan ini"

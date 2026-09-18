@@ -638,9 +638,6 @@
   "app.appearance-settings.default-landing-page.description": {
     "message": "更改启动器打开的页面。"
   },
-  "app.appearance-settings.default-landing-page.discover-content": {
-    "message": "发现内容"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "首页"
   },
@@ -649,12 +646,6 @@
   },
   "app.appearance-settings.default-landing-page.title": {
     "message": "默认起始页"
-  },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "在皮肤页面中禁用你玩家头顶上的名牌。"
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "隐藏名牌"
   },
   "app.appearance-settings.home-layout.description": {
     "message": "在信息主页和专注的实例启动页之间选择。"
@@ -718,12 +709,6 @@
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "跳过非必要的警告"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "启用切换侧边栏的功能。"
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "切换侧边栏"
   },
   "app.appearance-settings.transparent-background.blur-description": {
     "message": "将背景画面模糊处理。占用性能较高"
@@ -2092,21 +2077,6 @@
   },
   "app.home.calendar.title": {
     "message": "日历"
-  },
-  "app.home.challenge.easy": {
-    "message": "简单"
-  },
-  "app.home.challenge.hard": {
-    "message": "困难"
-  },
-  "app.home.challenge.medium": {
-    "message": "中等"
-  },
-  "app.home.challenge.shuffle": {
-    "message": "换一个"
-  },
-  "app.home.challenge.title": {
-    "message": "每日小挑战"
   },
   "app.home.greeting.afternoon": {
     "message": "午后休息，时机正好。\n短短一局也可能很精彩。\n世界已准备好接住你的下一步。\n该去看看那座半成品建筑了。\n一点探索就能走很远。\n下一个生物群系正在呼唤。\n你的背包耐心等候很久了。\n村庄市场还没关门。\n这一小时适合专心做个项目。\n红石今天大概会听话。\n你的镐子准备开工。\n出生点外还有新路线。\n午后天生适合支线任务。\n要不要快速回世界看看？\n下一章从这里开始。\n花一点时间，做点东西。"
@@ -5615,45 +5585,6 @@
   "app.minecraft-crash.view-mod-changes": {
     "message": "查看 Mod 变化"
   },
-  "app.minecraft.playing-as": {
-    "message": "当前游玩账号："
-  },
-  "app.modal.install-to-play.content-required": {
-    "message": "需求内容"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "安装以游玩"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "安装"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count} 个模组"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "需求整合包"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "此服务器需要安装模组才能游玩。点击安装，从 Modrinth 下载所需文件，然后直接进入服务器。"
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "共享实例"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "共享的服务端实例"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "查看内容"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "更新以游玩"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "需要更新"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "需要更新至最新版本才能运行 {name}。请更新后启动游戏。"
-  },
   "app.modpack-install.already-installed": {
     "message": "此版本已安装"
   },
@@ -5933,12 +5864,6 @@
   "app.multiplayer.switch-warning": {
     "message": "切换服务会断开当前联机会话，是否继续？"
   },
-  "app.multiplayer.tab.rooms": {
-    "message": "联机房间"
-  },
-  "app.multiplayer.tab.servers": {
-    "message": "服务器"
-  },
   "app.multiplayer.terracotta.public-node-invalid": {
     "message": "节点 URI 无效：{node}。请使用 http、https、tcp、tls、udp、ws 或 wss。"
   },
@@ -5962,9 +5887,6 @@
   },
   "app.multiplayer.terracotta.update-available": {
     "message": "陶瓦联机 {version} 已可安装。"
-  },
-  "app.multiplayer.title": {
-    "message": "多人游戏"
   },
   "app.multiplayer.unknown-player-role": {
     "message": "未知身份"
@@ -5992,12 +5914,6 @@
   },
   "app.navigation.library": {
     "message": "实例库"
-  },
-  "app.navigation.multiplayer": {
-    "message": "多人游戏"
-  },
-  "app.navigation.skin-selector": {
-    "message": "皮肤选择器"
   },
   "app.navigation.worlds": {
     "message": "世界"
@@ -6037,9 +5953,6 @@
   },
   "app.onboarding.action.click-settings": {
     "message": "点击设置，继续"
-  },
-  "app.onboarding.action.click-skins": {
-    "message": "点击皮肤选择器，继续"
   },
   "app.onboarding.action.click-tab": {
     "message": "点击这个标签，继续"
@@ -6124,12 +6037,6 @@
   },
   "app.onboarding.creation.title": {
     "message": "选条路"
-  },
-  "app.onboarding.defaults.description": {
-    "message": "新实例会继承这些选择，省得你每次重做作业。"
-  },
-  "app.onboarding.defaults.title": {
-    "message": "少做点重复劳动"
   },
   "app.onboarding.discover.description": {
     "message": "整合包、模组、插件、资源包、光影：这才是值得掉进去的坑。"
@@ -6265,18 +6172,6 @@
   },
   "app.onboarding.settings.title": {
     "message": "按你的方式使用"
-  },
-  "app.onboarding.skins-page.description": {
-    "message": "在这里添加、预览、排序和应用皮肤。现在不登录也完全没关系。"
-  },
-  "app.onboarding.skins-page.title": {
-    "message": "你的皮肤抽屉"
-  },
-  "app.onboarding.skins.description": {
-    "message": "把 Minecraft 皮肤放在一起管理。想登录的时候再登录。"
-  },
-  "app.onboarding.skins.title": {
-    "message": "换个造型吧"
   },
   "app.onboarding.translation.description": {
     "message": "浏览时直接翻译 Modrinth 项目的标题、摘要和介绍。保留原文、双语同屏，或者让译文站 C 位，都由你决定。"
@@ -7862,14 +7757,8 @@
   "app.settings.tabs.about": {
     "message": "关于"
   },
-  "app.settings.tabs.ai": {
-    "message": "AI 功能"
-  },
   "app.settings.tabs.content-downloads": {
     "message": "内容与下载"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "默认实例选项"
   },
   "app.settings.tabs.home-navigation": {
     "message": "首页与导航"
@@ -7885,9 +7774,6 @@
   },
   "app.settings.tabs.language": {
     "message": "语言"
-  },
-  "app.settings.tabs.language-translation": {
-    "message": "语言与翻译"
   },
   "app.settings.tabs.shortcut-settings": {
     "message": "键盘快捷键"
@@ -7943,38 +7829,14 @@
   "app.shortcut-settings.nav-lab-description": {
     "message": "前往实验室。"
   },
-  "app.shortcut-settings.nav-library": {
-    "message": "内容库"
-  },
-  "app.shortcut-settings.nav-library-description": {
-    "message": "前往内容库。"
-  },
-  "app.shortcut-settings.nav-multiplayer": {
-    "message": "多人游戏"
-  },
-  "app.shortcut-settings.nav-multiplayer-description": {
-    "message": "前往多人游戏。"
-  },
   "app.shortcut-settings.nav-settings": {
     "message": "设置"
   },
   "app.shortcut-settings.nav-settings-description": {
     "message": "前往设置。"
   },
-  "app.shortcut-settings.nav-skins": {
-    "message": "皮肤选择器"
-  },
-  "app.shortcut-settings.nav-skins-description": {
-    "message": "前往皮肤选择器。"
-  },
   "app.shortcut-settings.nav-title": {
     "message": "导航快捷键"
-  },
-  "app.shortcut-settings.nav-worlds": {
-    "message": "世界"
-  },
-  "app.shortcut-settings.nav-worlds-description": {
-    "message": "前往你的世界。"
   },
   "app.shortcut-settings.page-down-action": {
     "message": "向下滚动一屏"
@@ -7994,14 +7856,8 @@
   "app.shortcut-settings.scroll-title": {
     "message": "快速滚动"
   },
-  "app.settings.tabs.launch-defaults": {
-    "message": "启动默认值"
-  },
   "app.settings.tabs.logs": {
     "message": "日志与诊断"
-  },
-  "app.settings.tabs.network-multiplayer": {
-    "message": "网络与多人游戏"
   },
   "app.settings.tabs.privacy-data": {
     "message": "隐私与数据共享"
@@ -8192,38 +8048,14 @@
   "app.settings.updates.up-to-date": {
     "message": "Axolotl 已是最新版本。"
   },
-  "app.sidebar.collapse": {
-    "message": "收起边栏"
-  },
-  "app.sidebar.expand": {
-    "message": "展开边栏"
-  },
   "app.skins.add-button": {
     "message": "添加皮肤"
   },
   "app.skins.add-button.drag-and-drop": {
     "message": "拖放"
   },
-  "app.skins.apply-button": {
-    "message": "应用"
-  },
-  "app.skins.create-skin": {
-    "message": "创建皮肤"
-  },
   "app.skins.delete-button": {
     "message": "删除皮肤"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "这会永久删除所选皮肤。这操作无法撤销。"
-  },
-  "app.skins.delete-modal.title": {
-    "message": "你确定要删除这个皮肤吗？"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "无法读取拖放的文件。"
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "处理文件时出错"
   },
   "app.skins.edit-button": {
     "message": "编辑皮肤"
@@ -8276,92 +8108,8 @@
   "app.skins.modal.upload-skin-first-tooltip": {
     "message": "请先上传皮肤！"
   },
-  "app.skins.offline-account.compatibility": {
-    "message": "离线皮肤通过本地资源包应用。Minecraft 1.6–1.19.2 的兼容性最佳；较新版本为尽力兼容。皮肤不会上传到 Mojang，并可能在你的客户端中同时替换其他使用默认皮肤的玩家；部分皮肤模组或服务器插件也可能覆盖它。"
-  },
-  "app.skins.offline-account.compatibility-title": {
-    "message": "离线皮肤兼容性"
-  },
-  "app.skins.preview.edit-button": {
-    "message": "编辑皮肤"
-  },
-  "app.skins.previewing-badge": {
-    "message": "预览"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "你更改皮肤过于频繁。Mojang服务器已暂时阻止了后续请求。请稍等片刻后再试。"
-  },
-  "app.skins.rate-limit.title": {
-    "message": "慢点！"
-  },
-  "app.skins.reorder-error.text": {
-    "message": "未能保存皮肤顺序。"
-  },
-  "app.skins.reorder-error.title": {
-    "message": "皮肤排序失败"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "建造者与生物群系"
-  },
-  "app.skins.section.chaos-cubed": {
-    "message": "混沌立方"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "追逐天空"
-  },
-  "app.skins.section.default-skins": {
-    "message": "默认皮肤"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "群骑纷争"
-  },
   "app.skins.section.saved-skins": {
     "message": "已保存皮肤"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "铜器时代"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "苍园觉醒"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "小鬼当家"
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
-  },
-  "app.skins.sign-in.button": {
-    "message": "登录"
-  },
-  "app.skins.sign-in.description": {
-    "message": "请登录您的 Minecraft 账号，以便使用 Axolotl Launcher 的皮肤管理功能。"
-  },
-  "app.skins.sign-in.title": {
-    "message": "请登录"
-  },
-  "app.skins.tabs.default": {
-    "message": "官方皮肤"
-  },
-  "app.skins.tabs.saved": {
-    "message": "已保存皮肤"
-  },
-  "app.skins.third-party-account.description": {
-    "message": "此账号的皮肤由其 Yggdrasil 认证服务管理。请前往对应服务的网站更换皮肤或披风。"
-  },
-  "app.skins.third-party-account.title": {
-    "message": "第三方皮肤管理"
-  },
-  "app.skins.title": {
-    "message": "皮肤选择器"
   },
   "app.splash.checking-for-updates": {
     "message": "正在检查更新……"
@@ -10685,71 +10433,11 @@
   "instance.worlds.world_in_use": {
     "message": "世界正在使用中"
   },
-  "minecraft-account.add-microsoft-account": {
-    "message": "添加 Microsoft 账户"
-  },
-  "minecraft-account.add-offline-account": {
-    "message": "添加离线账户"
-  },
-  "minecraft-account.add-third-party-account": {
-    "message": "添加第三方账号"
-  },
   "minecraft-account.copy-uuid": {
     "message": "复制 UUID"
   },
-  "minecraft-account.label": {
-    "message": "Minecraft 账户"
-  },
   "minecraft-account.not-signed-in": {
     "message": "未登录"
-  },
-  "minecraft-account.official-badge": {
-    "message": "官方"
-  },
-  "minecraft-account.offline-account": {
-    "message": "Minecraft 离线账户"
-  },
-  "minecraft-account.offline-badge": {
-    "message": "离线"
-  },
-  "minecraft-account.offline-modal.chinese-username-warning": {
-    "message": "Minecraft 1.18 及以上版本可能会拒绝中文用户名，导致无法进入单人世界或服务器。请在旧版本中使用此账户，或为新版本改用英文用户名。"
-  },
-  "minecraft-account.offline-modal.create": {
-    "message": "创建账户"
-  },
-  "minecraft-account.offline-modal.custom-uuid": {
-    "message": "自定义 UUID"
-  },
-  "minecraft-account.offline-modal.custom-uuid-duplicate": {
-    "message": "已存在使用此 UUID 的账户，请更换一个 UUID。"
-  },
-  "minecraft-account.offline-modal.custom-uuid-input-label": {
-    "message": "UUID 值"
-  },
-  "minecraft-account.offline-modal.custom-uuid-placeholder": {
-    "message": "00000000-0000-0000-0000-000000000000"
-  },
-  "minecraft-account.offline-modal.custom-uuid-validation": {
-    "message": "请输入 32 位十六进制字符，可包含连字符。"
-  },
-  "minecraft-account.offline-modal.custom-uuid-warning": {
-    "message": "如果您不了解这是什么，请不要开启此功能"
-  },
-  "minecraft-account.offline-modal.description": {
-    "message": "选择离线游戏中使用的用户名。此账户只能加入允许离线玩家的服务器。"
-  },
-  "minecraft-account.offline-modal.title": {
-    "message": "添加离线账户"
-  },
-  "minecraft-account.offline-modal.username-label": {
-    "message": "Minecraft 用户名"
-  },
-  "minecraft-account.offline-modal.username-placeholder": {
-    "message": "输入用户名"
-  },
-  "minecraft-account.offline-modal.username-validation": {
-    "message": "请输入 1–16 个字母、数字或下划线，支持中文。"
   },
   "minecraft-account.offline-mode": {
     "message": "离线模式"
@@ -10766,77 +10454,11 @@
   "minecraft-account.select-account": {
     "message": "选择账户"
   },
-  "minecraft-account.sign-in": {
-    "message": "登录 Minecraft"
-  },
-  "minecraft-account.third-party-account": {
-    "message": "Minecraft 第三方账号"
-  },
-  "minecraft-account.third-party-badge": {
-    "message": "第三方"
-  },
-  "minecraft-account.third-party-modal.account": {
-    "message": "账号或邮箱"
-  },
-  "minecraft-account.third-party-modal.account-placeholder": {
-    "message": "请输入账号或邮箱"
-  },
-  "minecraft-account.third-party-modal.api-root": {
-    "message": "Yggdrasil API 地址"
-  },
-  "minecraft-account.third-party-modal.api-root-placeholder": {
-    "message": "https://example.com/api/yggdrasil"
-  },
-  "minecraft-account.third-party-modal.description": {
-    "message": "使用 LittleSkin 或其他兼容的 Yggdrasil 外置登录服务。"
-  },
-  "minecraft-account.third-party-modal.littleskin": {
-    "message": "使用 LittleSkin"
-  },
-  "minecraft-account.third-party-modal.password": {
-    "message": "密码"
-  },
-  "minecraft-account.third-party-modal.remember-password": {
-    "message": "在此设备上保存登录"
-  },
-  "minecraft-account.third-party-modal.remove-saved-login": {
-    "message": "删除已保存的登录"
-  },
-  "minecraft-account.third-party-modal.saved-logins": {
-    "message": "已保存的登录"
-  },
-  "minecraft-account.third-party-modal.sign-in": {
-    "message": "登录"
-  },
-  "minecraft-account.third-party-modal.title": {
-    "message": "登录第三方账号"
-  },
-  "minecraft-account.third-party-profile.description": {
-    "message": "请选择此账号要使用的 Minecraft 角色。"
-  },
-  "minecraft-account.third-party-profile.title": {
-    "message": "选择角色"
-  },
   "minecraft-login.browser": {
     "message": "使用浏览器登录"
   },
   "minecraft-login.device-code": {
     "message": "使用设备代码"
-  },
-  "minecraft-login.device-description": {
-    "message": "请在任意设备上打开下方页面，然后输入此代码。"
-  },
-  "minecraft-login.device-expired": {
-    "message": "此设备代码已过期。请重新开始以获取新代码。"
-  },
-  "minecraft-login.device-starting": {
-    "message": "正在请求设备代码……"
-  },
-  "minecraft-login.open-verification": {
-    "message": "打开验证页面"
-  },
-  "minecraft-login.title": {
-    "message": "登录 Minecraft"
   },
   "minecraft-login.trouble": {
     "message": "遇到问题？"
@@ -12476,9 +12098,6 @@
   "instance.settings.sync.creative-hotbars": {
     "message": "创造模式快捷栏"
   },
-  "instance.settings.sync.data-packs": {
-    "message": "数据包"
-  },
   "instance.settings.sync.description": {
     "message": "选择此实例要与其他实例共享的设置。"
   },
@@ -12490,9 +12109,6 @@
   },
   "instance.settings.sync.resource-packs": {
     "message": "资源包"
-  },
-  "instance.settings.sync.screenshots": {
-    "message": "截图"
   },
   "instance.settings.sync.title": {
     "message": "设置同步"
@@ -12527,15 +12143,13 @@
   "app.navigation.map": {
     "message": "地图"
   },
-  "app.map.host-failed": {
-    "message": "无法在启动器内显示此地图。"
-  },
   "app.action-bar.account.characters": {
     "message": "角色"
   },
   "app.action-bar.account.other-accounts": {
     "message": "其他账号"
-  },  "app.action-bar.account": {
+  },
+  "app.action-bar.account": {
     "message": "账号"
   },
   "app.action-bar.sign-in": {
@@ -12546,7 +12160,8 @@
   },
   "app.shortcut-settings.nav-map-description": {
     "message": "打开地图。"
-  },  "app.map.title": {
+  },
+  "app.map.title": {
     "message": "地图"
   },
   "app.map.tabs.pixelsit": {
@@ -12587,15 +12202,6 @@
   },
   "sitmc-login.device-expired": {
     "message": "授权码已过期，请重新开始登录。"
-  },
-  "sitmc-login.register-title": {
-    "message": "还没有账户？"
-  },
-  "sitmc-login.register": {
-    "message": "前往皮肤站注册"
-  },
-  "sitmc-login.visit-site": {
-    "message": "打开皮肤站"
   },
   "sitmc-login.password-fallback": {
     "message": "改用账号密码登录"
@@ -12648,7 +12254,6 @@
   "sitmc-account.add": {
     "message": "添加 SIT-Minecraft 账户"
   },
-
   "managed-instances.play-downloads": {
     "message": "开始游戏（需先下载）"
   },
@@ -12666,7 +12271,8 @@
   },
   "managed-instances.badge-optional": {
     "message": "按需下载"
-  },  "managed-instances.title": {
+  },
+  "managed-instances.title": {
     "message": "社团游戏实例"
   },
   "managed-instances.checking": {
@@ -12695,12 +12301,6 @@
   },
   "managed-instances.empty": {
     "message": "服务端当前没有下发可用的游戏实例。"
-  },
-  "managed-instances.retired-title": {
-    "message": "已下线的实例"
-  },
-  "managed-instances.retired-hint": {
-    "message": "这些实例已从服务端清单移除，不再能启动，数据仍保留在本地。"
   },
   "managed-instances.unconfigured": {
     "message": "未配置社团实例清单地址，无法获取游戏实例。"

@@ -362,9 +362,6 @@
   "content.filter.updates": {
     "defaultMessage": "Actualizaciones"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Advertencias"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "Explorar contenido"
   },
@@ -1276,24 +1273,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Seleccionar ícono"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Este modpack no incluye ningún contenido adicional."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "No se encontró contenido"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Contenido del modpack"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Cargando contenido..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Ningún proyecto coincide con tu búsqueda."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Buscar en {count, number} {count, plural, one {proyecto} other {proyectos}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Actual"

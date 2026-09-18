@@ -83,12 +83,6 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Varsayılan karşılama sayfası"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Kostümler sayfasındaki karakterinizin üzerindeki isim etiketini devre dışı bırakır."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "İsim etiketini gizle"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minecraft başlatıldığında launcher'i simge durumuna at."
   },
@@ -115,12 +109,6 @@
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Gerekli olmayan uyarıları atla"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Kenar çubuğunu ayarlama özelliğini aktifleştirir."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Kenar çubuğunu ayarla"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "Modrinth üzerinde barındırılmayan bir Modrinth Paket dosyasını (.mrpack) yüklemeye çalışırsanız, yükleme öncesinde riskleri anladığınızdan emin oluruz."
@@ -353,42 +341,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count} dünya ara..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "İçerik gerekli"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Oynamak için yükleyin"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Yükle"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {#mod} other {#mods}}"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Gerekli mod paketi"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Bu sunucuya girebilmek için modlar gereklidir. Gerekli dosyaları Modrinth üzerinden kurmak için Yükle butonuna tıkla, ardından doğrudan sunucuya başlat."
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Paylaşılan Kurulum"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Paylaşılan Sunucu Kurulumu"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "İçeriği görüntüle"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Oynamak için güncelle"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Güncelleme gerekli"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "{name} oyununu oynamak için güncelleme gereklidir. Oyunu başlatmak için lütfen en son sürüme güncelleyin."
-  },
   "app.project.install-button.already-installed": {
     "message": "Bu proje zaten kurulu"
   },
@@ -410,23 +362,8 @@
   "app.skins.add-button.drag-and-drop": {
     "message": "Sürükle ve bırak"
   },
-  "app.skins.apply-button": {
-    "message": "Uygula"
-  },
   "app.skins.delete-button": {
     "message": "Skin'i sil"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "Bu seçilmiş skin'i kalıcı olarak silecektir. Bu işlem geri alınamaz."
-  },
-  "app.skins.delete-modal.title": {
-    "message": "Bu skin'i silmek istediğinize gerçekten emin misiniz?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "Bıraktığınız dosya okunamadı."
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "Dosya işlenirken hata oluştu"
   },
   "app.skins.edit-button": {
     "message": "Skin'i düzenle"
@@ -479,71 +416,8 @@
   "app.skins.modal.upload-skin-first-tooltip": {
     "message": "İlk başta skin yükleyin!"
   },
-  "app.skins.preview.edit-button": {
-    "message": "Skin'i düzenle"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Önizleme"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "Skin'inizi çok hızlı değiştiriyorsunuz. Mojang'ın sunucuları geçici olarak diğer istekleri engelledi. Lütfen tekrar denemeden önce biraz bekleyin."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Yavaşla!"
-  },
-  "app.skins.reorder-error.text": {
-    "message": "Skinini kaydedemedik."
-  },
-  "app.skins.reorder-error.title": {
-    "message": "Skinler sıralanamadı"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "İnşaatçılar & Biyomlar"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Gökyüzünü kovala"
-  },
-  "app.skins.section.default-skins": {
-    "message": "Varsayılan skinler"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Kaos Dağları"
-  },
   "app.skins.section.saved-skins": {
     "message": "Kaydedilen Skinler"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Yürüyen Kahraman"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "Bakır Çağı"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "Bahçe Uyanıyor"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Küçük Devralma"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Giriş Yap"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Axolotl Launcher'daki skin yönetim özelliklerini kullanmak için lütfen Minecraft hesabınıza giriş yapın."
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Lütfen giriş yapın"
-  },
-  "app.skins.title": {
-    "message": "Skin seçici"
   },
   "app.update-popup.body.download-complete": {
     "message": "Axolotl Launcher v{version} indirildi. Güncellemek için yeniden başlatın veya Axolotl Launcher’i kapattığınızda otomatik olarak güncellenecektir."
@@ -908,9 +782,6 @@
   "instance.worlds.world_in_use": {
     "message": "Dünya şu anda kullanımda"
   },
-  "minecraft-account.label": {
-    "message": "Minecraft hesabı"
-  },
   "minecraft-account.not-signed-in": {
     "message": "Giriş yapılmadı"
   },
@@ -919,9 +790,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Hesap seçin"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Minecraft'a giriş yapın"
   },
   "search.filter.locked.instance": {
     "message": "Kurulum tarafından sağlanan"

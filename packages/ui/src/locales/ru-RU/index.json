@@ -338,9 +338,6 @@
   "content.filter.updates": {
     "defaultMessage": "Обновления"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Предупреждения"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "Найти проекты"
   },
@@ -1204,24 +1201,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Выбрать иконку"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "В сборке нет дополнительного контента."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Сборка пуста"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Содержимое сборки"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Загрузка содержимого..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Не найдены проекты, соответствующие запросу."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Поиск по {count, number} {count, plural, one {проекту} other {проектам}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Текущая"

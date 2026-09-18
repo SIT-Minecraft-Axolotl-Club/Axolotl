@@ -83,12 +83,6 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Стартовая страница"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Скрывать имя над игроком на странице скинов."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Без имени над скином"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Сворачивать окно лаунчера при запуске Minecraft."
   },
@@ -115,12 +109,6 @@
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Пропустить несущественные предупреждения"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Показывать кнопку скрытия боковой панели."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Переключатель боковой панели"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "Предупреждать о рисках перед установкой файлов .mrpack, не размещённых на Modrinth."
@@ -344,42 +332,6 @@
   "app.instance.worlds.remove-server-modal.warning-header": {
     "message": "Удаление {name}"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Требуется дополнительный контент"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Установка перед запуском"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Установить"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {# мод} few {# мода} other {# модов}}"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Необходимая сборка"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Для игры на сервере требуются моды. Установите необходимые файлы с Modrinth, чтобы подключиться."
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Сборка"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Общая сборка сервера"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "Посмотреть содержимое"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Обновление перед запуском"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Требуется обновление"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Обновите {name} до последней версии, чтобы запустить игру."
-  },
   "app.project.install-button.already-installed": {
     "message": "Этот проект уже установлен"
   },
@@ -401,23 +353,8 @@
   "app.skins.add-button.drag-and-drop": {
     "message": "Перетащите сюда"
   },
-  "app.skins.apply-button": {
-    "message": "Применить"
-  },
   "app.skins.delete-button": {
     "message": "Удалить скин"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "Выбранный скин будет удалён навсегда. Это действие необратимо."
-  },
-  "app.skins.delete-modal.title": {
-    "message": "Вы действительно хотите удалить этот скин?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "Не удалось прочитать перетащенный файл."
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "Ошибка обработки файла"
   },
   "app.skins.edit-button": {
     "message": "Изменить скин"
@@ -470,71 +407,8 @@
   "app.skins.modal.upload-skin-first-tooltip": {
     "message": "Сначала загрузите скин!"
   },
-  "app.skins.preview.edit-button": {
-    "message": "Изменить"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Предпросмотр"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "Вы слишком часто меняете скин. Серверы Mojang временно заблокировали дальнейшие запросы. Подождите немного, прежде чем попробовать снова."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Не так быстро!"
-  },
-  "app.skins.reorder-error.text": {
-    "message": "Ваш порядок скинов не удалось сохранить."
-  },
-  "app.skins.reorder-error.title": {
-    "message": "Не удалось изменить порядок скинов"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "Builders & Biomes"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
-  },
-  "app.skins.section.default-skins": {
-    "message": "Стандартные скины"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
-  },
   "app.skins.section.saved-skins": {
     "message": "Сохранённые скины"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Войти"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Пожалуйста, войдите в свой аккаунт Minecraft, чтобы воспользоваться функциями управления скинами в Axolotl Launcher."
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Войдите"
-  },
-  "app.skins.title": {
-    "message": "Выбор скина"
   },
   "app.update-popup.body.download-complete": {
     "message": "Скачивание версии Axolotl Launcher {version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
@@ -896,9 +770,6 @@
   "instance.worlds.world_in_use": {
     "message": "Мир используется"
   },
-  "minecraft-account.label": {
-    "message": "Учётная запись Minecraft"
-  },
   "minecraft-account.not-signed-in": {
     "message": "Вход не выполнен"
   },
@@ -907,9 +778,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Выберите профиль"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Войти в Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Управляется сборкой"

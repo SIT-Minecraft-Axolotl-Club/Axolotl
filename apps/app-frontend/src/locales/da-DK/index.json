@@ -68,12 +68,6 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Standard startside"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Slår nametagget over din spiller på skins siden fra."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Gem nametag"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimer launcheren når Minecraft starter."
   },
@@ -88,12 +82,6 @@
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Vis tid spillet"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Aktivere muligheden for at slå sidepanelet til og fra."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Slå sidepanel til og fra"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "Hvis du prøver at installere en Modrinth Pack fil (.mrpack) som ikke er hosted på Modrinth, så skal vi nok sikre os du forstår riskoen før du installere den."
@@ -239,42 +227,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Søg {count} verdener..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Indhold krævet"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Installer for at spille"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Installer"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {# mod} other {# mods}}"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Modpack krævet"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Denne server kræver mods for at spille. Tryk på installer for at sætte de krævet filler fra modrinth op, så lancer direkte til serveren."
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Delt instance"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Delt server instance"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "Vis indhold"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Opdater for at spille"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Opdatering krævet"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "En opdatering er krævet for at spille {name}. Venligst opdater til den seneste version for at køre spillet."
-  },
   "app.project.install-button.already-installed": {
     "message": "Dette projekt er allerede installeret"
   },
@@ -296,23 +248,8 @@
   "app.skins.add-button.drag-and-drop": {
     "message": "Træk og slip"
   },
-  "app.skins.apply-button": {
-    "message": "Brug"
-  },
   "app.skins.delete-button": {
     "message": "Slet skin"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "Dette vil permanent slette det valgte skin. Dette vil ikke kunne blive fortydes."
-  },
-  "app.skins.delete-modal.title": {
-    "message": "Er du sikker på, at du vil slette dette skin?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "Fejl ved læsning af den afleverede fil."
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "Fejl under behandling af fil"
   },
   "app.skins.edit-button": {
     "message": "Rediger skin"
@@ -356,65 +293,8 @@
   "app.skins.modal.upload-skin-first-tooltip": {
     "message": "Upload et skin først!"
   },
-  "app.skins.preview.edit-button": {
-    "message": "Rediger skin"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Forhåndsvisning"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "Du skifter dit skin for ofte. Mojang's servere har midlertidigt blokeret fremtidige anmodninger. Vent venligst et øjeblik for du prøver igen."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Ro på!"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "Builders & Biomes"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
-  },
-  "app.skins.section.default-skins": {
-    "message": "Standard skins"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
-  },
   "app.skins.section.saved-skins": {
     "message": "Gemte skins"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Log Ind"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Venligst log ind på din Minecraft-konto for at bruge funktionerne til administration af skins i Axolotl Launcher."
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Venligst log ind"
-  },
-  "app.skins.title": {
-    "message": "Skin vælger"
   },
   "app.update-popup.body.download-complete": {
     "message": "Axolotl Launcher v{version} er færdig med at download. Genindlæs for at opdatere nu, eller automatisk når du lukker Axolotl Launcher."
@@ -737,9 +617,6 @@
   "instance.worlds.world_in_use": {
     "message": "Verden er i brug"
   },
-  "minecraft-account.label": {
-    "message": "Minecraft konto"
-  },
   "minecraft-account.not-signed-in": {
     "message": "Ikke logged ind"
   },
@@ -748,9 +625,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Vælg konto"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Log ind på Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Givet af instanceen"

@@ -83,12 +83,6 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Výchozí stránka po spuštění"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Zakáže zobrazení jmenovky nad vaší postavou na stránce skinů."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Skrýt jmenovku"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimalizovat launcher při spuštění Minecraftu."
   },
@@ -115,12 +109,6 @@
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Přeskočit nedůležitá upozornění"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Umožňí přepínat zobrazení postranního panelu."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Přepnout postranní panel"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "Pokud se pokusíte nainstalovat soubor Modrinth Pack (.mrpack), který není hostován na Modrinth, zajistíme, abyste si před instalací uvědomili související rizika."
@@ -353,42 +341,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Hledat v {count} světech..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Požadovaný obsah"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Nainstaluj pro hraní"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Instalovat"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {# mód} few {# módy} other {# módů}}"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Požadovaný modpack"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Tento server k hraní vyžaduje módy. Klikni na instalovat pro získání potřebných módů z Modrinth a poté se rovnou připoj na server."
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Sdílená instance"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Sdílená serverová instance"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "Zobrazit obsah"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Aktualizuj pro hraní"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Je vyžadována aktualizace"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Pro hraní {name} je vyžadována aktualizace. Prosím aktualizuj na nejnovější verzi, abys mohl hru spustit."
-  },
   "app.project.install-button.already-installed": {
     "message": "Tento projekt je již nainstalován"
   },
@@ -410,23 +362,8 @@
   "app.skins.add-button.drag-and-drop": {
     "message": "Přetáhni a pusť"
   },
-  "app.skins.apply-button": {
-    "message": "Použít"
-  },
   "app.skins.delete-button": {
     "message": "Smazat skin"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "Tímto dojde k trvalému smazání vybreného skinu. Tuto akci nelze vrátit zpět."
-  },
-  "app.skins.delete-modal.title": {
-    "message": "Opravdu chceš smazat tenhle skin?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "Nepodařilo se načíst přetažený soubor."
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "Chyba při načítání souboru"
   },
   "app.skins.edit-button": {
     "message": "Upravit skin"
@@ -479,71 +416,8 @@
   "app.skins.modal.upload-skin-first-tooltip": {
     "message": "Nejdříve nahraj skin!"
   },
-  "app.skins.preview.edit-button": {
-    "message": "Upravit skin"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Náhled"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "Měníš svůj skin příliš často. Servery Mojangu dočasně zablokovaly další požadavky. Počkej chvíli, než to zkusíš znovu."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Zpomal!"
-  },
-  "app.skins.reorder-error.text": {
-    "message": "Tvé pořadí skinů se nepodařilo uložit."
-  },
-  "app.skins.reorder-error.title": {
-    "message": "Nepodařilo se změnit pořadí skinů"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "Builders & Biomes"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
-  },
-  "app.skins.section.default-skins": {
-    "message": "Výchozí skiny"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
-  },
   "app.skins.section.saved-skins": {
     "message": "Uložené skiny"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Přihlásit se"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Přihlas se prosím ke svému Minecraft účtu, abys mohl/a využívat funkce pro správu skinů v aplikaci Axolotl Launcher."
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Přihlaš se prosím"
-  },
-  "app.skins.title": {
-    "message": "Výběr skinu"
   },
   "app.update-popup.body.download-complete": {
     "message": "Stahování Axolotl Launcher v{version} bylo dokončeno. Aktualizujte ji znovunačtením nebo se automaticky aktualizuje po zavření."
@@ -908,9 +782,6 @@
   "instance.worlds.world_in_use": {
     "message": "Svět je používán"
   },
-  "minecraft-account.label": {
-    "message": "Minecraft účet"
-  },
   "minecraft-account.not-signed-in": {
     "message": "Nejste přihlášeni"
   },
@@ -919,9 +790,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Zvolte účet"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Přihlásit se do Minecraftu"
   },
   "search.filter.locked.instance": {
     "message": "Poskytováno instancí"

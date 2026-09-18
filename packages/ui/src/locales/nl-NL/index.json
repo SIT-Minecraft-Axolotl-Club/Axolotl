@@ -956,24 +956,6 @@
   "instances.content-install.select-icon": {
     "defaultMessage": "Selecteer pictogram"
   },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Deze modpack bevat geen extra inhoud."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Geen inhoud gevonden"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Modpack inhoud"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Inhoud aan het laden..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Geen projecten komen overeen met je zoekopdracht."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Zoek {count, number} {count, plural, one {project} other {projecten}}"
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Huidige"
   },

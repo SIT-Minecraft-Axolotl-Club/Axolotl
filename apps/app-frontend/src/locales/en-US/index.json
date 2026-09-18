@@ -2,6 +2,15 @@
   "app.account.signed-in-as": {
     "message": "Signed in as"
   },
+  "app.action-bar.account": {
+    "message": "Account"
+  },
+  "app.action-bar.account.characters": {
+    "message": "Characters"
+  },
+  "app.action-bar.account.other-accounts": {
+    "message": "Other accounts"
+  },
   "app.action-bar.downloading-java": {
     "message": "Downloading Java {version}"
   },
@@ -155,11 +164,17 @@
   "app.action-bar.show-more-running-instances": {
     "message": "Show more running instances"
   },
+  "app.action-bar.sign-in": {
+    "message": "Sign in"
+  },
   "app.action-bar.stop-instance": {
     "message": "Stop instance"
   },
   "app.action-bar.update": {
     "message": "Update"
+  },
+  "app.action-bar.update-required": {
+    "message": "Update required"
   },
   "app.action-bar.view-active-downloads": {
     "message": "View active downloads"
@@ -494,9 +509,6 @@
   "app.appearance-settings.default-landing-page.description": {
     "message": "Change the page to which the launcher opens on."
   },
-  "app.appearance-settings.default-landing-page.discover-content": {
-    "message": "Discover content"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Home"
   },
@@ -505,12 +517,6 @@
   },
   "app.appearance-settings.default-landing-page.title": {
     "message": "Default landing page"
-  },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Disables the nametag above your player on the skins page."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Hide nametag"
   },
   "app.appearance-settings.home-layout.description": {
     "message": "Choose between Information Home and a focused instance launcher."
@@ -574,12 +580,6 @@
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Skip non-essential warnings"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Enables the ability to toggle the sidebar."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Toggle sidebar"
   },
   "app.appearance-settings.transparent-background.blur-description": {
     "message": "Frost what shows through the window. Dragging or resizing may feel less smooth while this is on."
@@ -1628,6 +1628,12 @@
   "app.drop.error.unknown-title": {
     "message": "Unknown file type"
   },
+  "app.drop.error.unmanaged-text": {
+    "message": "This launcher installs the game instances published by the society server. Drop a world save instead, or start the game from the home page."
+  },
+  "app.drop.error.unmanaged-title": {
+    "message": "Only society instances can be installed"
+  },
   "app.drop.extract-failed": {
     "message": "Failed to extract archive"
   },
@@ -1948,21 +1954,6 @@
   },
   "app.home.calendar.title": {
     "message": "Calendar"
-  },
-  "app.home.challenge.easy": {
-    "message": "Easy"
-  },
-  "app.home.challenge.hard": {
-    "message": "Hard"
-  },
-  "app.home.challenge.medium": {
-    "message": "Medium"
-  },
-  "app.home.challenge.shuffle": {
-    "message": "Try another"
-  },
-  "app.home.challenge.title": {
-    "message": "Daily challenge"
   },
   "app.home.greeting.afternoon": {
     "message": "Afternoon break, excellent timing.\nA short session can become a great one.\nThe world is ready for your next move.\nTime to check on that half-finished build.\nA little exploration goes a long way.\nThe next biome is calling.\nYour inventory has been waiting patiently.\nThe village market is still open.\nA good hour for a focused project.\nThe redstone probably behaves today.\nYour pickaxe is ready to work.\nA new route is waiting beyond spawn.\nThe afternoon is made for side quests.\nOne quick visit to your world?\nThe next chapter starts here.\nTake a moment and make something."
@@ -3197,6 +3188,9 @@
   "app.instances.group.ungrouped": {
     "message": "No group"
   },
+  "app.instances.managed-delete-blocked": {
+    "message": "Instances published by the society server cannot be deleted."
+  },
   "app.instances.pin-to-home": {
     "message": "Pin to Home"
   },
@@ -3212,44 +3206,44 @@
   "app.instances.selected-count": {
     "message": "{count, plural, one {# selected} other {# selected}}"
   },
+  "app.instances.sort-by": {
+    "message": "Sort by"
+  },
   "app.instances.sort.date-created": {
     "message": "Date created"
   },
   "app.instances.sort.date-modified": {
     "message": "Date modified"
   },
+  "app.instances.sort.direction.asc-alphabetical": {
+    "message": "A–Z"
+  },
+  "app.instances.sort.direction.asc-date": {
+    "message": "Oldest first"
+  },
+  "app.instances.sort.direction.asc-recency": {
+    "message": "Least recent first"
+  },
+  "app.instances.sort.direction.asc-version": {
+    "message": "Oldest version first"
+  },
+  "app.instances.sort.direction.desc-alphabetical": {
+    "message": "Z–A"
+  },
+  "app.instances.sort.direction.desc-date": {
+    "message": "Newest first"
+  },
+  "app.instances.sort.direction.desc-recency": {
+    "message": "Most recent first"
+  },
+  "app.instances.sort.direction.desc-version": {
+    "message": "Newest version first"
+  },
   "app.instances.sort.last-played": {
     "message": "Last played"
   },
   "app.instances.sort.name": {
     "message": "Name"
-  },
-  "app.instances.sort-by": {
-    "message": "Sort by"
-  },
-  "app.instances.sort.direction.asc-alphabetical": {
-    "message": "A–Z"
-  },
-  "app.instances.sort.direction.desc-alphabetical": {
-    "message": "Z–A"
-  },
-  "app.instances.sort.direction.asc-version": {
-    "message": "Oldest version first"
-  },
-  "app.instances.sort.direction.desc-version": {
-    "message": "Newest version first"
-  },
-  "app.instances.sort.direction.asc-recency": {
-    "message": "Least recent first"
-  },
-  "app.instances.sort.direction.desc-recency": {
-    "message": "Most recent first"
-  },
-  "app.instances.sort.direction.asc-date": {
-    "message": "Oldest first"
-  },
-  "app.instances.sort.direction.desc-date": {
-    "message": "Newest first"
   },
   "app.instances.unpin-from-home": {
     "message": "Unpin from Home"
@@ -5180,6 +5174,21 @@
   "app.lab.tool-count-plural": {
     "message": "{count} tools"
   },
+  "app.launcher-update-required.action": {
+    "message": "Update and restart now"
+  },
+  "app.launcher-update-required.body": {
+    "message": "The society server requires launcher version {version} or newer. Update the launcher first; afterwards you can install and launch the game again."
+  },
+  "app.launcher-update-required.busy": {
+    "message": "Downloading the update..."
+  },
+  "app.launcher-update-required.title": {
+    "message": "Launcher update required"
+  },
+  "app.launcher-update-required.unavailable": {
+    "message": "No update is available right now. Try again later or contact a society administrator."
+  },
   "app.library.create-instance": {
     "message": "Create new instance"
   },
@@ -5320,6 +5329,15 @@
   },
   "app.log-share.summary.title": {
     "message": "LogShare analysis"
+  },
+  "app.map.tabs.pixelsit": {
+    "message": "PixelSIT"
+  },
+  "app.map.tabs.survival": {
+    "message": "Survival Satellite"
+  },
+  "app.map.title": {
+    "message": "Map"
   },
   "app.memory-display.available": {
     "message": "{memory} available"
@@ -5575,45 +5593,6 @@
   },
   "app.minecraft-crash.view-mod-changes": {
     "message": "View Mod changes"
-  },
-  "app.minecraft.playing-as": {
-    "message": "Playing as"
-  },
-  "app.modal.install-to-play.content-required": {
-    "message": "Content required"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Install to play"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Install"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {# mod} other {# mods}}"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Required modpack"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "This server requires mods to play. Click Install to set up the required files from Modrinth, then launch directly into the server."
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Shared instance"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Shared server instance"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "View contents"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Update to play"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Update required"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "An update is required to play {name}. Please update to the latest version to launch the game."
   },
   "app.modpack-install.already-installed": {
     "message": "This version is already installed"
@@ -5894,12 +5873,6 @@
   "app.multiplayer.switch-warning": {
     "message": "Switching services will disconnect the current multiplayer session. Continue?"
   },
-  "app.multiplayer.tab.rooms": {
-    "message": "Rooms"
-  },
-  "app.multiplayer.tab.servers": {
-    "message": "Servers"
-  },
   "app.multiplayer.terracotta.public-node-invalid": {
     "message": "Invalid node URI: {node}. Use http, https, tcp, tls, udp, ws, or wss."
   },
@@ -5923,9 +5896,6 @@
   },
   "app.multiplayer.terracotta.update-available": {
     "message": "Terracotta {version} is ready to install."
-  },
-  "app.multiplayer.title": {
-    "message": "Multiplayer"
   },
   "app.multiplayer.unknown-player-role": {
     "message": "Unknown role"
@@ -5954,14 +5924,11 @@
   "app.navigation.library": {
     "message": "Library"
   },
-  "app.navigation.multiplayer": {
-    "message": "Multiplayer"
+  "app.navigation.map": {
+    "message": "Map"
   },
   "app.navigation.screenshots": {
     "message": "Screenshots"
-  },
-  "app.navigation.skin-selector": {
-    "message": "Skin selector"
   },
   "app.navigation.worlds": {
     "message": "Worlds"
@@ -6001,9 +5968,6 @@
   },
   "app.onboarding.action.click-settings": {
     "message": "Click Settings to continue"
-  },
-  "app.onboarding.action.click-skins": {
-    "message": "Click Skin selector to continue"
   },
   "app.onboarding.action.click-tab": {
     "message": "Click this tab to continue"
@@ -6088,12 +6052,6 @@
   },
   "app.onboarding.creation.title": {
     "message": "Pick your route"
-  },
-  "app.onboarding.defaults.description": {
-    "message": "New instances inherit these choices, so you do not have to repeat the homework."
-  },
-  "app.onboarding.defaults.title": {
-    "message": "Start ahead"
   },
   "app.onboarding.discover.description": {
     "message": "Modpacks, mods, plugins, resource packs, shaders: the good kind of rabbit hole."
@@ -6229,18 +6187,6 @@
   },
   "app.onboarding.settings.title": {
     "message": "Make it yours"
-  },
-  "app.onboarding.skins-page.description": {
-    "message": "Add, preview, sort, and apply skins here. No pressure to sign in just yet."
-  },
-  "app.onboarding.skins-page.title": {
-    "message": "Your skin drawer"
-  },
-  "app.onboarding.skins.description": {
-    "message": "Keep your Minecraft skins together. Signing in can wait until you feel like it."
-  },
-  "app.onboarding.skins.title": {
-    "message": "A new look, maybe"
   },
   "app.onboarding.translation.description": {
     "message": "Translate Modrinth project titles, summaries, and descriptions while you browse. Keep the original, show both, or make the translation the main character."
@@ -6441,7 +6387,7 @@
     "message": "Visit website"
   },
   "app.remote-announcements.preview-content": {
-    "message": "## Announcement preview\n\nThis is **sample content**, not a published announcement.\n\n- Supports headings, lists, and links\n- Close buttons are always available\n\n> Previewing does not change real announcement read status.\n\n| Type | Display |\n| --- | --- |\n| Modal | Full Markdown content |\n| Popup | Summary, then full content |\n\n[Visit the website](https://axlmc.org)"
+    "message": "## Announcement preview\n\nThis is **sample content**, not a published announcement.\n\n- Supports headings, lists, and links\n- Close buttons are always available\n\n> Previewing does not change real announcement read status.\n\n| Type | Display |\n| --- | --- |\n| Modal | Full Markdown content |\n| Popup | Summary, then full content |\n\n[Visit the website](https://www.sitmc.club/)"
   },
   "app.remote-announcements.preview-summary": {
     "message": "This is a local preview. Select View announcement to preview the full Markdown content."
@@ -7079,9 +7025,6 @@
   "app.servers.settings.jvm-args-hint": {
     "message": "Space-separated arguments, e.g. -XX:+UseG1GC"
   },
-  "app.servers.settings.pre-launch-hook-hint": {
-    "message": "Runs in the server directory before the server starts. A non-zero exit code cancels the start."
-  },
   "app.servers.settings.memory": {
     "message": "Memory"
   },
@@ -7090,6 +7033,9 @@
   },
   "app.servers.settings.name": {
     "message": "Server name"
+  },
+  "app.servers.settings.pre-launch-hook-hint": {
+    "message": "Runs in the server directory before the server starts. A non-zero exit code cancels the start."
   },
   "app.servers.settings.running-hint": {
     "message": "Your changes will take effect the next time the server starts."
@@ -9413,9 +9359,6 @@
   "app.settings.tabs.about": {
     "message": "About"
   },
-  "app.settings.tabs.ai": {
-    "message": "AI features"
-  },
   "app.settings.tabs.content-downloads": {
     "message": "Content & downloads"
   },
@@ -9431,17 +9374,11 @@
   "app.settings.tabs.java-performance": {
     "message": "Java & performance"
   },
-  "app.settings.tabs.language-translation": {
-    "message": "Language & translation"
-  },
-  "app.settings.tabs.launch-defaults": {
-    "message": "Launch defaults"
+  "app.settings.tabs.language": {
+    "message": "Language"
   },
   "app.settings.tabs.logs": {
     "message": "Logs & diagnostics"
-  },
-  "app.settings.tabs.network-multiplayer": {
-    "message": "Network & multiplayer"
   },
   "app.settings.tabs.privacy-data": {
     "message": "Privacy & data sharing"
@@ -9680,17 +9617,11 @@
   "app.shortcut-settings.nav-lab-description": {
     "message": "Jump to the Lab."
   },
-  "app.shortcut-settings.nav-library": {
-    "message": "Library"
+  "app.shortcut-settings.nav-map": {
+    "message": "Map"
   },
-  "app.shortcut-settings.nav-library-description": {
-    "message": "Jump to your library."
-  },
-  "app.shortcut-settings.nav-multiplayer": {
-    "message": "Multiplayer"
-  },
-  "app.shortcut-settings.nav-multiplayer-description": {
-    "message": "Jump to multiplayer."
+  "app.shortcut-settings.nav-map-description": {
+    "message": "Open the map."
   },
   "app.shortcut-settings.nav-settings": {
     "message": "Settings"
@@ -9698,20 +9629,8 @@
   "app.shortcut-settings.nav-settings-description": {
     "message": "Jump to the settings."
   },
-  "app.shortcut-settings.nav-skins": {
-    "message": "Skin selector"
-  },
-  "app.shortcut-settings.nav-skins-description": {
-    "message": "Jump to the skin selector."
-  },
   "app.shortcut-settings.nav-title": {
     "message": "Navigation shortcuts"
-  },
-  "app.shortcut-settings.nav-worlds": {
-    "message": "Worlds"
-  },
-  "app.shortcut-settings.nav-worlds-description": {
-    "message": "Jump to your worlds."
   },
   "app.shortcut-settings.page-down-action": {
     "message": "Scroll down one screen"
@@ -9731,38 +9650,14 @@
   "app.shortcut-settings.scroll-title": {
     "message": "Quick scrolling"
   },
-  "app.sidebar.collapse": {
-    "message": "Collapse sidebar"
-  },
-  "app.sidebar.expand": {
-    "message": "Expand sidebar"
-  },
   "app.skins.add-button": {
     "message": "Add skin"
   },
   "app.skins.add-button.drag-and-drop": {
     "message": "Drag and drop"
   },
-  "app.skins.apply-button": {
-    "message": "Apply"
-  },
-  "app.skins.create-skin": {
-    "message": "Create skin"
-  },
   "app.skins.delete-button": {
     "message": "Delete skin"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "This will permanently delete the selected skin. This action cannot be undone."
-  },
-  "app.skins.delete-modal.title": {
-    "message": "Are you sure you want to delete this skin?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "Failed to read the dropped file."
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "Error processing file"
   },
   "app.skins.edit-button": {
     "message": "Edit skin"
@@ -9815,92 +9710,8 @@
   "app.skins.modal.upload-skin-first-tooltip": {
     "message": "Upload a skin first!"
   },
-  "app.skins.offline-account.compatibility": {
-    "message": "Offline skins are applied locally with a resource pack. Compatibility is best on Minecraft 1.6–1.19.2; newer versions are supported on a best-effort basis. The skin is not uploaded to Mojang, may also replace other default-skinned players on your client, and some skin mods or server plugins may override it."
-  },
-  "app.skins.offline-account.compatibility-title": {
-    "message": "Offline skin compatibility"
-  },
-  "app.skins.preview.edit-button": {
-    "message": "Edit skin"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Previewing"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "You're changing your skin too frequently. Mojang's servers have temporarily blocked further requests. Please wait a moment before trying again."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Slow down!"
-  },
-  "app.skins.reorder-error.text": {
-    "message": "Your skin order could not be saved."
-  },
-  "app.skins.reorder-error.title": {
-    "message": "Failed to reorder skins"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "Builders & Biomes"
-  },
-  "app.skins.section.chaos-cubed": {
-    "message": "Chaos Cubed"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
-  },
-  "app.skins.section.default-skins": {
-    "message": "Default skins"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
-  },
   "app.skins.section.saved-skins": {
     "message": "Saved skins"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Sign In"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Please sign into your Minecraft account to use the skin management features of Axolotl Launcher."
-  },
-  "app.skins.sign-in.title": {
-    "message": "Please sign in"
-  },
-  "app.skins.tabs.default": {
-    "message": "Official skins"
-  },
-  "app.skins.tabs.saved": {
-    "message": "Saved skins"
-  },
-  "app.skins.third-party-account.description": {
-    "message": "Skins for this account are managed by its Yggdrasil provider. Open the provider website to change skins or capes."
-  },
-  "app.skins.third-party-account.title": {
-    "message": "Third-party skin management"
-  },
-  "app.skins.title": {
-    "message": "Skin selector"
   },
   "app.splash.checking-for-updates": {
     "message": "Checking for updates..."
@@ -10532,6 +10343,9 @@
   "app.worlds.title": {
     "message": "Worlds"
   },
+  "button.open-in-browser": {
+    "message": "Open in browser"
+  },
   "create.add-minecraft-folder": {
     "message": "Add .minecraft folder"
   },
@@ -10883,9 +10697,6 @@
   "instance.settings.sync.creative-hotbars": {
     "message": "Creative hotbars"
   },
-  "instance.settings.sync.data-packs": {
-    "message": "Data packs"
-  },
   "instance.settings.sync.description": {
     "message": "Choose which settings this instance shares with other instances."
   },
@@ -10897,9 +10708,6 @@
   },
   "instance.settings.sync.resource-packs": {
     "message": "Resource packs"
-  },
-  "instance.settings.sync.screenshots": {
-    "message": "Screenshots"
   },
   "instance.settings.sync.title": {
     "message": "Settings synchronization"
@@ -12284,71 +12092,65 @@
   "instance.worlds.world_in_use": {
     "message": "World is in use"
   },
-  "minecraft-account.add-microsoft-account": {
-    "message": "Add Microsoft account"
+  "managed-instances.badge-optional": {
+    "message": "On demand"
   },
-  "minecraft-account.add-offline-account": {
-    "message": "Add offline account"
+  "managed-instances.badge-required": {
+    "message": "Required"
   },
-  "minecraft-account.add-third-party-account": {
-    "message": "Add third-party account"
+  "managed-instances.checking": {
+    "message": "Checking the server for versions..."
+  },
+  "managed-instances.downloading": {
+    "message": "Downloading..."
+  },
+  "managed-instances.empty": {
+    "message": "The server currently publishes no game instances."
+  },
+  "managed-instances.not-downloaded": {
+    "message": "Not downloaded yet"
+  },
+  "managed-instances.play": {
+    "message": "Play"
+  },
+  "managed-instances.play-downloads": {
+    "message": "Play (downloads first)"
+  },
+  "managed-instances.progress": {
+    "message": "{done} of {total} done"
+  },
+  "managed-instances.ready": {
+    "message": "Up to date"
+  },
+  "managed-instances.refresh": {
+    "message": "Check for updates"
+  },
+  "managed-instances.remove": {
+    "message": "Remove from this computer"
+  },
+  "managed-instances.remove-hint": {
+    "message": "Removing it frees the disk space; the instance stays listed so you can download it again."
+  },
+  "managed-instances.retry": {
+    "message": "Retry"
+  },
+  "managed-instances.starting": {
+    "message": "Starting..."
+  },
+  "managed-instances.title": {
+    "message": "Society game instances"
+  },
+  "managed-instances.unconfigured": {
+    "message": "No society instance manifest address is configured, so game instances cannot be fetched."
+  },
+  "managed-instances.updating": {
+    "message": "Updating {name}"
   },
   "minecraft-account.copy-uuid": {
     "message": "Copy UUID"
   },
-  "minecraft-account.label": {
-    "message": "Minecraft account"
-  },
   "minecraft-account.not-signed-in": {
     "message": "Not signed in"
-  },
-  "minecraft-account.official-badge": {
-    "message": "Official"
-  },
-  "minecraft-account.offline-account": {
-    "message": "Offline Minecraft account"
-  },
-  "minecraft-account.offline-badge": {
-    "message": "Offline"
-  },
-  "minecraft-account.offline-modal.chinese-username-warning": {
-    "message": "Minecraft 1.18 and newer may reject Chinese usernames when entering singleplayer worlds or servers. Use this account with an older version, or choose an English username for newer versions."
-  },
-  "minecraft-account.offline-modal.create": {
-    "message": "Create account"
-  },
-  "minecraft-account.offline-modal.custom-uuid": {
-    "message": "Custom UUID"
-  },
-  "minecraft-account.offline-modal.custom-uuid-duplicate": {
-    "message": "An account with this UUID already exists. Please use a different UUID."
-  },
-  "minecraft-account.offline-modal.custom-uuid-input-label": {
-    "message": "UUID"
-  },
-  "minecraft-account.offline-modal.custom-uuid-placeholder": {
-    "message": "00000000-0000-0000-0000-000000000000"
-  },
-  "minecraft-account.offline-modal.custom-uuid-validation": {
-    "message": "Use 32 hexadecimal characters. Hyphens are optional."
-  },
-  "minecraft-account.offline-modal.custom-uuid-warning": {
-    "message": "If you don't understand what this is, do not enable this feature."
-  },
-  "minecraft-account.offline-modal.description": {
-    "message": "Choose the username used in offline games. This account can only join servers that allow offline players."
-  },
-  "minecraft-account.offline-modal.title": {
-    "message": "Add offline account"
-  },
-  "minecraft-account.offline-modal.username-label": {
-    "message": "Minecraft username"
-  },
-  "minecraft-account.offline-modal.username-placeholder": {
-    "message": "Enter a username"
-  },
-  "minecraft-account.offline-modal.username-validation": {
-    "message": "Use 1–16 letters, numbers, or underscores, including Chinese characters."
   },
   "minecraft-account.offline-mode": {
     "message": "Offline mode"
@@ -12365,77 +12167,11 @@
   "minecraft-account.select-account": {
     "message": "Select account"
   },
-  "minecraft-account.sign-in": {
-    "message": "Sign in to Minecraft"
-  },
-  "minecraft-account.third-party-account": {
-    "message": "Third-party Minecraft account"
-  },
-  "minecraft-account.third-party-badge": {
-    "message": "Third-party"
-  },
-  "minecraft-account.third-party-modal.account": {
-    "message": "Account or email"
-  },
-  "minecraft-account.third-party-modal.account-placeholder": {
-    "message": "Enter your account or email"
-  },
-  "minecraft-account.third-party-modal.api-root": {
-    "message": "Yggdrasil API address"
-  },
-  "minecraft-account.third-party-modal.api-root-placeholder": {
-    "message": "https://example.com/api/yggdrasil"
-  },
-  "minecraft-account.third-party-modal.description": {
-    "message": "Use LittleSkin or another compatible Yggdrasil authentication service."
-  },
-  "minecraft-account.third-party-modal.littleskin": {
-    "message": "Use LittleSkin"
-  },
-  "minecraft-account.third-party-modal.password": {
-    "message": "Password"
-  },
-  "minecraft-account.third-party-modal.remember-password": {
-    "message": "Save this login on this device"
-  },
-  "minecraft-account.third-party-modal.remove-saved-login": {
-    "message": "Remove saved login"
-  },
-  "minecraft-account.third-party-modal.saved-logins": {
-    "message": "Saved logins"
-  },
-  "minecraft-account.third-party-modal.sign-in": {
-    "message": "Sign in"
-  },
-  "minecraft-account.third-party-modal.title": {
-    "message": "Sign in with a third-party service"
-  },
-  "minecraft-account.third-party-profile.description": {
-    "message": "Choose the Minecraft profile to use with this account."
-  },
-  "minecraft-account.third-party-profile.title": {
-    "message": "Select a profile"
-  },
   "minecraft-login.browser": {
     "message": "Use browser login"
   },
   "minecraft-login.device-code": {
     "message": "Use device code"
-  },
-  "minecraft-login.device-description": {
-    "message": "Open the page below on any device, then enter this code."
-  },
-  "minecraft-login.device-expired": {
-    "message": "This device code expired. Start again to receive a new code."
-  },
-  "minecraft-login.device-starting": {
-    "message": "Requesting a device code..."
-  },
-  "minecraft-login.open-verification": {
-    "message": "Open verification page"
-  },
-  "minecraft-login.title": {
-    "message": "Sign in to Minecraft"
   },
   "minecraft-login.trouble": {
     "message": "Having trouble?"
@@ -12484,6 +12220,93 @@
   },
   "settings.feature-flags.title": {
     "message": "Feature flags"
+  },
+  "sitmc-account.add": {
+    "message": "Add a SIT-Minecraft account"
+  },
+  "sitmc-account.open-site": {
+    "message": "Open the skin site"
+  },
+  "sitmc-account.register": {
+    "message": "Register a SIT-Minecraft account"
+  },
+  "sitmc-account.sign-in": {
+    "message": "Sign in to SIT-Minecraft"
+  },
+  "sitmc-login.account-label": {
+    "message": "Account (email or username)"
+  },
+  "sitmc-login.close": {
+    "message": "Not now"
+  },
+  "sitmc-login.code-copied": {
+    "message": "Copied"
+  },
+  "sitmc-login.copy-code": {
+    "message": "Copy the code"
+  },
+  "sitmc-login.device-description": {
+    "message": "If the browser did not open, visit the address below and enter this code:"
+  },
+  "sitmc-login.device-expired": {
+    "message": "The authorization code expired. Start the sign-in again."
+  },
+  "sitmc-login.device-fallback": {
+    "message": "Back to browser sign-in"
+  },
+  "sitmc-login.forget-account": {
+    "message": "Remove"
+  },
+  "sitmc-login.open-verification": {
+    "message": "Open the authorization page again"
+  },
+  "sitmc-login.password-fallback": {
+    "message": "Use username and password instead"
+  },
+  "sitmc-login.password-hint": {
+    "message": "When browser sign-in is unavailable, use your skin site account name and password directly."
+  },
+  "sitmc-login.password-label": {
+    "message": "Password"
+  },
+  "sitmc-login.play-guide": {
+    "message": "Play guide"
+  },
+  "sitmc-login.remember-password": {
+    "message": "Remember this password"
+  },
+  "sitmc-login.saved-accounts": {
+    "message": "Remembered accounts"
+  },
+  "sitmc-login.select-profile": {
+    "message": "Choose a character"
+  },
+  "sitmc-login.select-profile-hint": {
+    "message": "This account owns several characters. Choose the one to play as."
+  },
+  "sitmc-login.select-profile-on-site": {
+    "message": "The authorization page asks which character to play as, and the launcher starts the game with that character."
+  },
+  "sitmc-login.sign-in": {
+    "message": "Sign in"
+  },
+  "sitmc-login.sign-in-hint": {
+    "message": "Opens your browser to authorize"
+  },
+  "sitmc-login.sign-in-with-site": {
+    "message": "Sign in with a SIT-Minecraft account"
+  },
+  "sitmc-login.starting": {
+    "message": "Requesting an authorization code from the account site..."
+  },
+  "sitmc-login.subtitle": {
+    "message": "Sign in to begin your adventure"
+  },
+  "sitmc-login.title": {
+    "message": "Sign in to SIT-Minecraft"
+  },
+  "sitmc-login.waiting-approval": {
+    "message": "Waiting for you to finish authorizing in the browser..."
   },
   "unknown-pack-warning-modal.body": {
     "message": "A file is only reviewed if it’s uploaded to Modrinth, regardless of its file format (including .mrpack)."

@@ -329,9 +329,6 @@
   "content.filter.updates": {
     "defaultMessage": "Pembaruan"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Peringatan"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "Jelajahi konten"
   },
@@ -847,24 +844,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mode permainan tak dikenal"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Paket mod ini tidak termasuk konten tambahan."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Konten tidak ditemukan"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Konten paket mod"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Sedang memuat konten..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Tidak ada proyek yang cocok dengan pencarian Anda."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Cari {count, number} {count, plural, other {proyek}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Saat ini"

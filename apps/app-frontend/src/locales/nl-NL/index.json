@@ -68,12 +68,6 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Standaard openingspagina"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Schakelt het nametag boven jouw speler op de skins pagina uit."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Verberg nametag"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimaliseer de launcher als een Minecraft proces wordt gestart."
   },
@@ -94,12 +88,6 @@
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Speeltijd laten zien"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Schakelt de mogelijkheid om de zijbalk in- of uit te schakelen in."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Schakel zijbalk"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "Als je probeert een Modrinth Pack-bestand (.mrpack) te installeren dat niet op Modrinth zelf wordt gehost, zorgen we ervoor dat je de risico's begrijpt voordat je het installeert."
@@ -245,42 +233,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Zoek werelden"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Content vereist"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Installeer om te spelen"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Installeer"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural,one {# mod}other {# mods}}"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Vereist modpack"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Deze server vereist mods om te spelen. Klik op Installeer om de vereiste bestanden van Modrinth in te stellen, en start direct in de server."
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Gedeelde instantie"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Gedeelde server instantie"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "Toon content"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Update om te spelen"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Update vereist"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Een update is vereist om {name} te spelen. Update naar de laatste versie om het spel te starten."
-  },
   "app.project.install-button.already-installed": {
     "message": "Dit project is al geïnstalleerd"
   },
@@ -302,23 +254,8 @@
   "app.skins.add-button.drag-and-drop": {
     "message": "Slepen en neerzetten"
   },
-  "app.skins.apply-button": {
-    "message": "Toepassen"
-  },
   "app.skins.delete-button": {
     "message": "Skin verwijderen"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "De geselecteerde skin wordt permanent verwijderd. Deze actie kan niet ongedaan worden gemaakt."
-  },
-  "app.skins.delete-modal.title": {
-    "message": "Weet u zeker dat u deze skin wilt verwijderen?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "Kan het neergezette bestand niet lezen."
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "Fout bij het verwerken van het bestand"
   },
   "app.skins.edit-button": {
     "message": "Skin aanpassen"
@@ -371,71 +308,8 @@
   "app.skins.modal.upload-skin-first-tooltip": {
     "message": "Upload eerst een skin!"
   },
-  "app.skins.preview.edit-button": {
-    "message": "Skin aanpassen"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Voorvertonen"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "U verandert te snel van skin. Mojang's servers hebben nieuwe aanvragen tijdelijk geblokkeerd. Wacht een moment voordat u het opnieuw probeert."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Rustig aan!"
-  },
-  "app.skins.reorder-error.text": {
-    "message": "Je skinvolgorde kon niet worden opgeslagen."
-  },
-  "app.skins.reorder-error.title": {
-    "message": "Het herschikken van skins is mislukt."
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "Builders & Biomes"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
-  },
-  "app.skins.section.default-skins": {
-    "message": "Standaardskins"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
-  },
   "app.skins.section.saved-skins": {
     "message": "Opgeslagen skins"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Inloggen"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Log in op je Minecraft-account om de skinbeheerfuncties van Axolotl Launcher te gebruiken."
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Log in"
-  },
-  "app.skins.title": {
-    "message": "Skinkiezer"
   },
   "app.update-popup.body.download-complete": {
     "message": "Axolotl Launcher v{version} is klaar met downloaden. Herlaad om nu te updaten, of automatisch wanneer je de Axolotl Launcher afsluit."
@@ -797,9 +671,6 @@
   "instance.worlds.world_in_use": {
     "message": "Wereld wordt gebruikt"
   },
-  "minecraft-account.label": {
-    "message": "Minecraft account"
-  },
   "minecraft-account.not-signed-in": {
     "message": "Niet ingelogd"
   },
@@ -808,9 +679,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Selecteer account"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Log in bij Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Aangeboden door de instantie"

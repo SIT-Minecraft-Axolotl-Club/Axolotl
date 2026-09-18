@@ -83,12 +83,6 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Standardlandingssida"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Inaktiverar namnskylten ovanför din spelare på utseende-sidan."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Dölj namnskylt"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimerar launchern när Minecraft startas."
   },
@@ -115,12 +109,6 @@
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Hoppa över icke nödvändiga varningar"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Låter dig växla sidofältet."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Växla sidofält"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "Om du försöker installera en Modrinth Pack fil (.mrpack) som inte kommer från Modrinth ser vi till att du känner till riskerna innan du installerar den."
@@ -341,42 +329,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Sök {count} världar..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Innehåll krävs"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Installera för att spela"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Installera"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {# mod} other {# moddar}}"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Modpaket som krävs"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Servern kräver moddar för att du ska kunna spela. Klicka på Installera för att sätta upp dem nödvändiga filerna från Modrinth, och starta sedan på servern direkt."
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Delad instans"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Delad serverinstans"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "Visa innehåll"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Uppdatera för att spela"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Uppdatering krävs"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "En uppdatering krävs för att spela {name}. Vänligen uppdatera till senaste version för att starta spelet."
-  },
   "app.project.install-button.already-installed": {
     "message": "Detta projekt är redan installerat"
   },
@@ -398,23 +350,8 @@
   "app.skins.add-button.drag-and-drop": {
     "message": "Dra och släpp"
   },
-  "app.skins.apply-button": {
-    "message": "Tillämpa"
-  },
   "app.skins.delete-button": {
     "message": "Ta bort utseende"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "Du kommer permanent radera det valda utseendet. Detta kan inte ångras."
-  },
-  "app.skins.delete-modal.title": {
-    "message": "Är du säker på att du vill radera utseendet?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "Misslyckades att läsa den släppta filen."
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "Fel med behandlingen av filen"
   },
   "app.skins.edit-button": {
     "message": "Redigera utseende"
@@ -467,68 +404,8 @@
   "app.skins.modal.upload-skin-first-tooltip": {
     "message": "Ladda upp utseende först!"
   },
-  "app.skins.preview.edit-button": {
-    "message": "Redigera utseende"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Förhandsvisa"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "Du ändrar ditt utseende för ofta. Mojangs servrar har temporärt blockerat ytterligare förfrågningar. Vänligen vänta en stund innan du försöker igen."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Sakta ner!"
-  },
-  "app.skins.reorder-error.text": {
-    "message": "Ditt utseende kunde inte sparas."
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "Builders & Biomes"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
-  },
-  "app.skins.section.default-skins": {
-    "message": "Standard utseenden"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
-  },
   "app.skins.section.saved-skins": {
     "message": "Sparade utseenden"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Logga in"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Logga in på ditt Minecraft-konto för att använda hudhanteringsfunktionerna i Axolotl Launcher."
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Vänligen logga in"
-  },
-  "app.skins.title": {
-    "message": "Utseende väljare"
   },
   "app.update-popup.body.download-complete": {
     "message": "Axolotl Launcher v{version} har laddats ner. Ladda om för att uppdatera nu, eller automatiskt när du stänger Axolotl Launcher."
@@ -893,9 +770,6 @@
   "instance.worlds.world_in_use": {
     "message": "Värld används"
   },
-  "minecraft-account.label": {
-    "message": "Minecraft konto"
-  },
   "minecraft-account.not-signed-in": {
     "message": "Inte inloggad"
   },
@@ -904,9 +778,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Välj konto"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Logga in till Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Tillhandahållet av instansen"

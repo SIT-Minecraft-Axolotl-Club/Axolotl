@@ -356,9 +356,6 @@
   "content.filter.updates": {
     "defaultMessage": "Aktualizace"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Varování"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "Prozkoumat"
   },
@@ -1186,18 +1183,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Vybrat ikonu"
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nebyl nalezen obsah"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Obsah modpacku"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Načítání obsahu..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Žádné projekty neodpovídají tvému vyhledávání."
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Mometálně"

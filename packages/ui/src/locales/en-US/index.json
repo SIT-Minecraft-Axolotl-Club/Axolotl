@@ -887,9 +887,6 @@
   "content.filter.updates": {
     "defaultMessage": "Update available"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Warnings"
-  },
   "content.metadata-filter.author": {
     "defaultMessage": "Author"
   },
@@ -2407,24 +2404,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Select icon"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "This modpack does not include any additional content."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "No content found"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Modpack content"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Loading content..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "No projects match your search."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Search {count, number} {count, plural, one {project} other {projects}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Current"

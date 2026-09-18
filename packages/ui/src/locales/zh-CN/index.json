@@ -863,9 +863,6 @@
   "content.filter.updates": {
     "defaultMessage": "可更新"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "警告"
-  },
   "content.metadata-filter.author": {
     "defaultMessage": "作者"
   },
@@ -2005,24 +2002,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "选择图标"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "这个整合包不包含任何额外内容。"
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "未找到内容"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "整合包内容"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "加载内容……"
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "没有符合搜索条件的项目。"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "搜索 {count, number} {count, plural, other {个项目}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "当前"

@@ -83,12 +83,6 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Pagina di avvio"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Rimuove il nametag sopra la testa del giocatore nella pagina delle skin."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Nascondi il nome"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Riduci il launcher a icona quando si avvia Minecraft."
   },
@@ -115,12 +109,6 @@
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Salta le conferme poco importanti"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Mostra o nascondi la barra laterale."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Abilita la barra laterale"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "Mostrerà un avviso prima di installare un file Modrinth Pack (.mrpack) non proveniente da Modrinth, a causa dei possibili rischi."
@@ -350,42 +338,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Cerca tra {count} mondi..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Contenuto richiesto"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Installa per continuare"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Installa"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count} mod"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Pacchetto di mod richiesto"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Questo server richiede alcune mod. Clicca Installa per scaricarle direttamente da Modrinth, poi sarai pronto a giocare."
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Istanza condivisa"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Istanza del server condivisa"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "Mostra contenuti"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Aggiorna per continuare"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Aggiornamento richiesto"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "{name} richiede degli aggiornamenti. Installa l'ultima versione per poter giocare."
-  },
   "app.project.install-button.already-installed": {
     "message": "Questo progetto è già stato installato"
   },
@@ -407,23 +359,8 @@
   "app.skins.add-button.drag-and-drop": {
     "message": "Trascina qui"
   },
-  "app.skins.apply-button": {
-    "message": "Applica"
-  },
   "app.skins.delete-button": {
     "message": "Elimina"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "Questa skin sarà rimossa per sempre. Quest'azione non può essere annullata."
-  },
-  "app.skins.delete-modal.title": {
-    "message": "Vuoi davvero eliminare questa skin?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "Non è stato possibile leggere il file trascinato."
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "Impossibile processare il file"
   },
   "app.skins.edit-button": {
     "message": "Modifica"
@@ -476,71 +413,8 @@
   "app.skins.modal.upload-skin-first-tooltip": {
     "message": "Carica prima una skin!"
   },
-  "app.skins.preview.edit-button": {
-    "message": "Modifica"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Anteprima"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "Stai cambiando skin troppo spesso. I server di Mojang hanno limitato le nostre richieste. Aspetta un momento prima di riprovare."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Rallenta!"
-  },
-  "app.skins.reorder-error.text": {
-    "message": "L'ordine delle skin non è stato salvato."
-  },
-  "app.skins.reorder-error.title": {
-    "message": "Errore nel riordine delle skin"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "Builders & Biomes"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
-  },
-  "app.skins.section.default-skins": {
-    "message": "Skin predefinite"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
-  },
   "app.skins.section.saved-skins": {
     "message": "Skin salvate"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Accedi"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Accedi col tuo account Minecraft per poter gestire le skin qui."
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Effettua l'accesso"
-  },
-  "app.skins.title": {
-    "message": "Seleziona una skin"
   },
   "app.update-popup.body.download-complete": {
     "message": "Axolotl Launcher v{version} è stata scaricata. Ricarica per aggiornare ora, o avverrà in automatico alla chiusura dell'app."
@@ -905,9 +779,6 @@
   "instance.worlds.world_in_use": {
     "message": "Mondo già in uso"
   },
-  "minecraft-account.label": {
-    "message": "Account di Minecraft"
-  },
   "minecraft-account.not-signed-in": {
     "message": "Accesso non effettuato"
   },
@@ -916,9 +787,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Seleziona un account"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Accedi a Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Determinato dall'istanza"

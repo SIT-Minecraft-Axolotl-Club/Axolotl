@@ -578,21 +578,6 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Modo de jogo desconhecido"
   },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Este modpack não inclui nenhum conteúdo adicional."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nenhum conteúdo encontrado"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Conteúdo do modpack"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "A carregar conteúdo..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Nenhum projeto corresponde à tua pesquisa."
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Atual"
   },

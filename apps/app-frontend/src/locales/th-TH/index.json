@@ -68,12 +68,6 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "หน้าเริ่มต้น"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "ซ่อนป้ายชื่อบนศีรษะของผู้เล่นในหน้าแสดงสกิน"
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "ซ่อนป้ายชื่อ"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "ย่อลันเชอร์เมื่อกระบวนการการรัน Minecraft เริ่มต้นแล้ว"
   },
@@ -94,12 +88,6 @@
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "แสดงระยะเวลาที่เล่น"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "เปิดใช้งานตัวเลือกในการเลือกย่อหรือขยายแถบด้านข้าง"
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "ย่อแถบด้านข้าง"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "หากคุณกำลังติดตั้งไฟล์แพ็กของ Modrinth (.mrpack) ที่ไม่ได้โฮสต์โดยตรงบน Modrinth เราจะแจ้งให้คุณตรวจสอบให้มั่นใจก่อนที่จะติดตั้งไฟล์แพ็กดังกล่าว"
@@ -245,42 +233,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "ค้าหาโลกทั้งหมด {count} โลก"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "เนื้อหาที่จำเป็น"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "ติดตั้งเพื่อเล่น"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "ติดตั้ง"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, other {# ม็อด}}"
-  },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "มอดแพ็กที่จำเป็น"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "เซิร์ฟเวอร์ดังกล่าวจำเป็นต้องใช้ม็อดเพื่อเล่น โปรดติดตั้งและตั้งค่าไฟล์อื่นใดที่จำเป็นจาก Modrinth ก่อน จากนั้นถึงจะสามารถเข้าเล่นเซิร์ฟเวอร์ได้"
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "โปรแกรมที่มีร่วมกัน"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "เซิร์ฟเวอร์ของโปรแกรมที่มีร่วมกัน"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "ดูเนื้อหา"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "อัปเดตเพื่อเล่น"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "จำเป็นต้องอัปเดต"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "จำเป็นต้องอัปเดตเพื่อเล่น {name} กรุณาอัปเดตเป็นเวอร์ชันล่าสุดเพื่อเปิดเกม"
-  },
   "app.project.install-button.already-installed": {
     "message": "โปรเจคนี้ถูกติดตั้งแล้ว"
   },
@@ -302,23 +254,8 @@
   "app.skins.add-button.drag-and-drop": {
     "message": "ลากและวาง"
   },
-  "app.skins.apply-button": {
-    "message": "นำไปใช้"
-  },
   "app.skins.delete-button": {
     "message": "ลบสกิน"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "การดำเนินการนี้จะลบสกินที่เลือกอย่างถาวร การกระทำนี้ไม่สามารถย้อนกลับได้"
-  },
-  "app.skins.delete-modal.title": {
-    "message": "คุณแน่ใจหรือว่าต้องการที่จะลบสกินนี้?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "ไม่สามารถอ่านไฟล์ที่ถูกลากและวางได้"
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "ข้อผิดพลาดในการประมวลผลไฟล์"
   },
   "app.skins.edit-button": {
     "message": "แก้ไขสกิน"
@@ -371,68 +308,8 @@
   "app.skins.modal.upload-skin-first-tooltip": {
     "message": "อัพโหลดสกินก่อน!"
   },
-  "app.skins.preview.edit-button": {
-    "message": "แก้ไขสกิน"
-  },
-  "app.skins.previewing-badge": {
-    "message": "การแสดงตัวอย่าง"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "คุณได้เปลี่ยนสกินบ่อยเกินไป เซิร์ฟเวอร์ของ Mojang ได้บล็อกคำขอเพิ่มเติมชั่วคราว โปรดรอสักครู่ก่อนลองอีกครั้ง"
-  },
-  "app.skins.rate-limit.title": {
-    "message": "ลดความถี่ลง!"
-  },
-  "app.skins.reorder-error.text": {
-    "message": "ไม่สามารถบันทึกลำดับสกินของคุณได้"
-  },
-  "app.skins.reorder-error.title": {
-    "message": "ไม่สามารถจัดเรียงสกินได้"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "Builders & Biomes"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
-  },
-  "app.skins.section.default-skins": {
-    "message": "สกินเริ่มต้น"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
-  },
   "app.skins.section.saved-skins": {
     "message": "สกินที่บันทึกไว้"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.button": {
-    "message": "ลงชื่อเข้าใช้"
-  },
-  "app.skins.sign-in.description": {
-    "message": "โปรดลงชื่อเข้าใช้บัญชี Minecraft ของคุณเพื่อใช้งานฟีเจอร์จัดการสกินของ Axolotl Launcher"
-  },
-  "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl Launcher"
-  },
-  "app.skins.sign-in.title": {
-    "message": "โปรดลงชื่อเข้าใช้"
   },
   "app.update-popup.body.download-complete": {
     "message": "ดาวน์โหลด Axolotl Launcherv{version} สำเร็จแล้ว เปิดโปรแกรมใหม่อีกครั้งเพื่ออัปเดตตอนนี้ หรือจะรออัปเดตอัตโนมัติ ซึ่งจะเกิดขึ้นเมื่อคุณกดปิดโปรแกรม Axolotl Launcher"
@@ -749,9 +626,6 @@
   "instance.worlds.world_in_use": {
     "message": "โลกนี้กำลังถูกใช้งานอยู่"
   },
-  "minecraft-account.label": {
-    "message": "บัญชี Minecraft"
-  },
   "minecraft-account.not-signed-in": {
     "message": "ยังไม่ได้ลงชื่อเข้าใช้"
   },
@@ -760,9 +634,6 @@
   },
   "minecraft-account.select-account": {
     "message": "เลือกบัญชี"
-  },
-  "minecraft-account.sign-in": {
-    "message": "ลงชื่อเข้าใช้ Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "โปรแกรมเป็นผู้กำหนด"
