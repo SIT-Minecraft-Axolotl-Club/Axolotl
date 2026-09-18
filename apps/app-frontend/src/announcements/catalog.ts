@@ -28,6 +28,25 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-2.0.3',
+		version: '2.0.3',
+		publishedAt: '2026-09-18',
+		title: {
+			'en-US': 'Axolotl Launcher 2.0.3',
+			'zh-CN': 'Axolotl 启动器 2.0.3',
+		},
+		changes: {
+			changed: [
+				{
+					'en-US':
+						'Nothing is downloaded before you sign in: the instances the server requires, and the game files they need, stay untouched until the sign-in completes — which starts the download.',
+					'zh-CN':
+						'未登录前不再下载任何内容：服务端强制下发的实例及其所需的游戏文件都保持不动，登录完成后立即开始下载。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-2.0.2',
 		version: '2.0.2',
 		publishedAt: '2026-09-18',
@@ -52,8 +71,7 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 				{
 					'en-US':
 						'The full-screen launcher update notice no longer claims no update is available while the update is already downloading in the background.',
-					'zh-CN':
-						'全屏的启动器更新提示不再在更新已经开始后台下载时误报「暂时获取不到可用更新」。',
+					'zh-CN': '全屏的启动器更新提示不再在更新已经开始后台下载时误报「暂时获取不到可用更新」。',
 				},
 				{
 					'en-US':
