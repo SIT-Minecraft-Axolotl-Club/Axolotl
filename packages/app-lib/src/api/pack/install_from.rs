@@ -20,6 +20,7 @@ use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::future::Future;
+use std::io::Read;
 
 use std::path::{Component, Path, PathBuf};
 use std::pin::Pin;
@@ -156,6 +157,63 @@ impl Default for CreatePackInstance {
     }
 }
 
+/// Loaders a Modrinth pack may name as its primary one.
+const PRIMARY_LOADERS: [(PackDependency, ModLoader); 6] = [
+    (PackDependency::Forge, ModLoader::Forge),
+    (PackDependency::NeoForge, ModLoader::NeoForge),
+    (PackDependency::FabricLoader, ModLoader::Fabric),
+    (PackDependency::QuiltLoader, ModLoader::Quilt),
+    (PackDependency::Cleanroom, ModLoader::Cleanroom),
+    (PackDependency::LegacyFabric, ModLoader::LegacyFabric),
+];
+
+/// Identity a local Modrinth pack states about itself.
+struct LocalMrpackIdentity {
+    name: Option<String>,
+    game_version: String,
+    loader: ModLoader,
+    loader_version: Option<String>,
+}
+
+/// Reads the identity from a local `.mrpack`'s `modrinth.index.json`.
+///
+/// The index sits either at the archive root or one wrapping folder deep, which
+/// is also what the pack reader accepts. Returns `None` for a file that is not a
+/// Modrinth pack, or that does not name a Minecraft version: those keep the
+/// placeholder identity, and the install pipeline reports them as malformed.
+fn read_local_mrpack_identity(path: &Path) -> Option<LocalMrpackIdentity> {
+    let file = std::fs::File::open(path).ok()?;
+    let mut archive = ZipArchive::new(file).ok()?;
+    let index = (0..archive.len()).find_map(|index| {
+        let entry = archive.by_index(index).ok()?;
+        let name = entry.name().to_string();
+        let relative =
+            name.split_once('/').map_or(name.as_str(), |(_, rest)| rest);
+        (relative == "modrinth.index.json").then_some(index)
+    })?;
+
+    let mut contents = String::new();
+    archive.by_index(index).ok()?.read_to_string(&mut contents).ok()?;
+    let pack: PackFormat = serde_json::from_str(&contents).ok()?;
+
+    let game_version = pack.dependencies.get(&PackDependency::Minecraft)?.clone();
+    let (loader, loader_version) = PRIMARY_LOADERS
+        .iter()
+        .find_map(|(dependency, loader)| {
+            pack.dependencies
+                .get(dependency)
+                .map(|version| (*loader, Some(version.clone())))
+        })
+        .unwrap_or((ModLoader::Vanilla, None));
+
+    Some(LocalMrpackIdentity {
+        name: Some(pack.name).filter(|name| !name.trim().is_empty()),
+        game_version,
+        loader,
+        loader_version,
+    })
+}
+
 #[derive(Clone)]
 pub enum CreatePackFile {
     Bytes(bytes::Bytes),
@@ -265,6 +323,22 @@ pub async fn get_instance_from_pack(
             } else {
                 false
             };
+
+            // A local Modrinth pack states its own name, game version and loader.
+            // Reading them here is what keeps the instance created next from
+            // starting life as the placeholder default: an install that fails, or
+            // a launch that races it, would otherwise leave the player with a
+            // vanilla instance of an unrelated version.
+            if let Some(identity) = read_local_mrpack_identity(&path) {
+                return Ok(CreatePackInstance {
+                    name: identity.name.unwrap_or(file_name),
+                    game_version: identity.game_version,
+                    modloader: identity.loader,
+                    loader_version: identity.loader_version,
+                    unknown_file: !is_known_file,
+                    ..Default::default()
+                });
+            }
 
             Ok(CreatePackInstance {
                 name: file_name,
@@ -599,17 +673,10 @@ pub async fn set_instance_information(
         .into());
     };
 
-    let primary_dependencies = [
-        (PackDependency::Forge, ModLoader::Forge),
-        (PackDependency::NeoForge, ModLoader::NeoForge),
-        (PackDependency::FabricLoader, ModLoader::Fabric),
-        (PackDependency::QuiltLoader, ModLoader::Quilt),
-        (PackDependency::Cleanroom, ModLoader::Cleanroom),
-        (PackDependency::LegacyFabric, ModLoader::LegacyFabric),
-    ]
-    .into_iter()
-    .filter(|(dependency, _)| dependencies.contains_key(dependency))
-    .collect::<Vec<_>>();
+    let primary_dependencies = PRIMARY_LOADERS
+        .into_iter()
+        .filter(|(dependency, _)| dependencies.contains_key(dependency))
+        .collect::<Vec<_>>();
     if primary_dependencies.len() > 1 {
         return Err(crate::ErrorKind::InputError(format!(
             "Pack declares incompatible primary loaders: {}",
