@@ -113,6 +113,10 @@ apps/app/resources/blockbench-skin/
 # Club user-center source: a sibling project, never part of the launcher repo
 /SITUserCenter/
 
+# Artwork handed over for the launcher UI; the copy under apps/app-frontend is
+# the one that ships.
+/minecraft_title-2.png
+
 # Local run/build logs and third-party spec material kept out of the repo
 .dev*.log
 .tauri-build.log
