@@ -80,7 +80,7 @@ const messages = defineMessages({
 	editGroups: { id: 'app.instances.edit-groups', defaultMessage: 'Edit groups' },
 	managedDeleteBlocked: {
 		id: 'app.instances.managed-delete-blocked',
-		defaultMessage: 'Instances published by the club server cannot be deleted.',
+		defaultMessage: 'Instances published by the society server cannot be deleted.',
 	},
 	selectAll: { id: 'app.instances.select-all', defaultMessage: 'Select all' },
 	deselectAll: { id: 'app.instances.deselect-all', defaultMessage: 'Deselect all' },
@@ -229,7 +229,7 @@ const handleRightClick = (event, instanceId) => {
 		{ name: item.instance.pinned_at ? 'unpin' : 'pin' },
 		{ name: 'open' },
 		{ name: 'copy' },
-		// A managed instance belongs to the club server catalog; offering to
+		// A managed instance belongs to the society server catalog; offering to
 		// delete it would only produce a failure the player cannot act on.
 		...(isManagedInstance(item.instance.id)
 			? []

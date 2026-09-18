@@ -28,10 +28,10 @@ function describeError(error: unknown): string {
 }
 
 const messages = defineMessages({
-	title: { id: 'managed-instances.title', defaultMessage: 'Club game instances' },
+	title: { id: 'managed-instances.title', defaultMessage: 'Society game instances' },
 	subtitle: {
 		id: 'managed-instances.subtitle',
-		defaultMessage: 'Instances are published by the club server. Required ones are kept up to date automatically; optional ones are downloaded when you start them.',
+		defaultMessage: 'Instances are published by the society server. Required ones are kept up to date automatically; optional ones are downloaded when you start them.',
 	},
 	checking: { id: 'managed-instances.checking', defaultMessage: 'Checking the server for versions...' },
 	updating: { id: 'managed-instances.updating', defaultMessage: 'Updating {name}' },
@@ -60,7 +60,7 @@ const messages = defineMessages({
 	},
 	unconfigured: {
 		id: 'managed-instances.unconfigured',
-		defaultMessage: 'No club instance manifest address is configured, so game instances cannot be fetched.',
+		defaultMessage: 'No society instance manifest address is configured, so game instances cannot be fetched.',
 	},
 })
 

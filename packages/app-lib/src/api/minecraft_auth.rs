@@ -19,7 +19,7 @@ use crate::util::fetch::INSECURE_REQWEST_CLIENT;
 /// Checks whether the launcher's own services are reachable.
 ///
 /// This decides whether the launcher considers itself online, so it probes the
-/// club's account site instead of Mojang: the account site is the service this
+/// society's account site instead of Mojang: the account site is the service this
 /// launcher actually depends on, and it stays reachable in networks where
 /// Mojang does not.
 #[tracing::instrument]
@@ -125,7 +125,7 @@ pub async fn finish_login(
     crate::state::login_finish(code, state, flow, &app_state.pool).await
 }
 
-/// Starts a sign-in with the club's account site.
+/// Starts a sign-in with the society's account site.
 ///
 /// The player approves a short code in a browser and picks a character there, so
 /// the launcher never sees the account password.
@@ -142,11 +142,11 @@ pub async fn poll_sitmc_device_login(
     crate::state::poll_device_login(flow_id, &state.pool).await
 }
 
-/// Signs in with the account name and password of the club's account site.
+/// Signs in with the account name and password of the society's account site.
 ///
 /// This is the fallback for when the OpenID Connect exchange is unavailable.
-/// Only the club's own site is accepted, because an account anywhere else cannot
-/// play on the club's servers.
+/// Only the society's own site is accepted, because an account anywhere else cannot
+/// play on the society's servers.
 #[tracing::instrument(skip(password))]
 pub async fn begin_yggdrasil_login(
     login: &str,

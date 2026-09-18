@@ -1,6 +1,6 @@
 //! Server-managed game instances.
 //!
-//! The club backend publishes a manifest that declares which instances a player
+//! The society backend publishes a manifest that declares which instances a player
 //! may launch, at which `revision`, and from which pack file. This module keeps
 //! the local record of those instances, downloads their packs, and gates
 //! launching on the recorded revision. The manifest service is optional at
@@ -36,7 +36,7 @@ const MAX_INSTANCE_ID_LEN: usize = 64;
 /// Port used when the manifest provides a `server` object without a port.
 const DEFAULT_SERVER_PORT: u16 = 25565;
 
-/// One manifest document as served by the club backend.
+/// One manifest document as served by the society backend.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ManagedManifest {
     #[serde(default)]
@@ -361,7 +361,7 @@ pub async fn list_managed_instances()
         .collect())
 }
 
-/// The club instance that owns a local instance, and whether the server requires
+/// The society instance that owns a local instance, and whether the server requires
 /// it.
 ///
 /// The flag decides two things on the client: a required instance is installed
@@ -372,7 +372,7 @@ pub struct ManagedOwner {
     pub required: bool,
 }
 
-/// Looks up the club instance owning a local instance, if any.
+/// Looks up the society instance owning a local instance, if any.
 #[tracing::instrument]
 pub async fn managed_owner(
     instance_id: &str,
@@ -754,7 +754,7 @@ async fn store_spec(
     Ok(())
 }
 
-/// Forgets a club instance the server no longer publishes.
+/// Forgets a society instance the server no longer publishes.
 async fn delete_row(
     state: &State,
     server_instance_id: &str,

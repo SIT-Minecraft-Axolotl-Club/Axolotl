@@ -923,7 +923,7 @@ watch(accountMenuShown, (shown) => {
 	if (shown && hasMissingAccountHeads()) void renderAccountHeads(accounts.value)
 })
 
-/** Opens the club sign-in gate the account card used to own. */
+/** Opens the society sign-in gate the account card used to own. */
 function openSignInGate() {
 	if (offline.value) return
 	signInGateShown.value = true

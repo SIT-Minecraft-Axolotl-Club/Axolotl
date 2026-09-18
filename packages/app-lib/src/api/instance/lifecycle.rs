@@ -176,14 +176,14 @@ pub async fn edit_icon(
 pub async fn remove(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
 
-    // A club instance belongs to the server catalog. A required one may not be
+    // A society instance belongs to the server catalog. A required one may not be
     // deleted at all; an optional one may, and the launcher keeps listing it so
     // the player can download it again.
     if let Some(owner) = crate::api::managed::managed_owner(instance_id).await?
     {
         if owner.required {
             return Err(crate::ErrorKind::LauncherError(format!(
-                "Instance {instance_id} is required by the club server as \"{}\" and cannot be deleted",
+                "Instance {instance_id} is required by the society server as \"{}\" and cannot be deleted",
                 owner.server_instance_id
             ))
             .as_error());

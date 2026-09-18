@@ -12,7 +12,7 @@ import {
 /**
  * Mirror of the server manifest documented in `docs/launcher-protocol.md`.
  *
- * The club backend decides which instances exist, at which `revision` and from
+ * The society backend decides which instances exist, at which `revision` and from
  * which pack file; the launcher only reconciles and installs.
  */
 export interface ManagedLauncherPolicy {
@@ -94,7 +94,7 @@ export interface ManagedInstanceRecord {
 export const MANAGED_PACK_KIND = 'mrpack'
 
 /**
- * Local instance ids the club server owns, from the last successful sync.
+ * Local instance ids the society server owns, from the last successful sync.
  *
  * The launcher refuses to delete a managed instance in its own instance layer as
  * well, so this is only what keeps the action out of the menus; a stale set can
@@ -116,7 +116,7 @@ export async function refreshManagedInstanceIds(): Promise<Set<string>> {
 	return managedInstanceIds.value
 }
 
-/** Whether a local instance is owned by the club server, per the last sync. */
+/** Whether a local instance is owned by the society server, per the last sync. */
 export function isManagedInstance(instanceId: string | null | undefined): boolean {
 	if (!instanceId) return false
 	return managedInstanceIds.value.has(instanceId)
@@ -181,7 +181,7 @@ export function managedPendingActions(report: ManagedSyncReport): ManagedInstanc
 /**
  * Pending actions the launcher performs on its own.
  *
- * A required instance is what the club server insists every player has, so it is
+ * A required instance is what the society server insists every player has, so it is
  * downloaded without asking.
  */
 export function managedRequiredActions(report: ManagedSyncReport): ManagedInstanceAction[] {

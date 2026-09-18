@@ -2364,7 +2364,7 @@
     "message": "最新公告"
   },
   "app.home.widgets.announcement-description": {
-    "message": "显示俱乐部发布的最新一条公告。"
+    "message": "显示社团发布的最新一条公告。"
   },
   "app.home.widgets.back": {
     "message": "返回"

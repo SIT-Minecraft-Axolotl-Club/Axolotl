@@ -1,4 +1,4 @@
-//! Sign-in through the club account site using Yggdrasil Connect.
+//! Sign-in through the society account site using Yggdrasil Connect.
 //!
 //! The site runs Blessing Skin with the Yggdrasil Connect extension, which
 //! replaces the password-based part of the Yggdrasil API with OpenID Connect.

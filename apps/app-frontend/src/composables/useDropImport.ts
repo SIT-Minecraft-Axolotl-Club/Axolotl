@@ -298,12 +298,12 @@ export function useDropImport(options: DropImportOptions) {
 		},
 		unmanagedDropTitle: {
 			id: 'app.drop.error.unmanaged-title',
-			defaultMessage: 'Only club instances can be installed',
+			defaultMessage: 'Only society instances can be installed',
 		},
 		unmanagedDropText: {
 			id: 'app.drop.error.unmanaged-text',
 			defaultMessage:
-				'This launcher installs the game instances published by the club server. Drop a world save instead, or start the game from the home page.',
+				'This launcher installs the game instances published by the society server. Drop a world save instead, or start the game from the home page.',
 		},
 		dropUnknownText: {
 			id: 'app.drop.error.unknown-text',
@@ -705,7 +705,7 @@ export function useDropImport(options: DropImportOptions) {
 	async function handleDropConfirm(type: string, innerBase?: string) {
 		// The confirmation dialog lets the player correct the detected type, so the
 		// refusal is repeated here: choosing a modpack or an instance import must
-		// not create an instance the club server did not publish.
+		// not create an instance the society server did not publish.
 		if (isUnmanagedDrop(type)) {
 			dropClassification.value = null
 			confirmDropModal.value?.hide()
@@ -1205,7 +1205,7 @@ export function useDropImport(options: DropImportOptions) {
 	}
 
 	/**
-	 * Whether a classification describes something the club server did not
+	 * Whether a classification describes something the society server did not
 	 * publish: a modpack archive or another launcher's instance folder. Both
 	 * would add a local instance, which this launcher must not offer.
 	 */
@@ -1353,7 +1353,7 @@ export function useDropImport(options: DropImportOptions) {
 			genericInstallModal.value?.hide()
 			void cancelBatch('target-instance-navigate-create')
 		}
-		// Instances are published by the club server, so there is no creation form
+		// Instances are published by the society server, so there is no creation form
 		// to send the player to: the home page owns the instance catalog.
 		router.push('/')
 	}

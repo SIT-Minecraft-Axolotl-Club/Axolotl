@@ -11,11 +11,11 @@ use url::form_urlencoded;
 use urlencoding::decode;
 
 /// Entry points that would create an instance or install content outside
-/// the instances published by the club server are refused with this text.
+/// the instances published by the society server are refused with this text.
 const MANAGED_INSTANCES_ONLY: &str =
-    "This launcher only installs the instances published by the club server";
+    "This launcher only installs the instances published by the society server";
 
-/// Refuses an external entry point that manages an instance the club
+/// Refuses an external entry point that manages an instance the society
 /// server did not publish.
 async fn reject_unmanaged_entry() -> crate::Result<CommandPayload> {
     let _ = emit_warning(MANAGED_INSTANCES_ONLY).await;
@@ -144,7 +144,7 @@ pub async fn parse_command(
     } else {
         // We assume anything else is a filepath to a modpack file; zip
         // archives are format-sniffed by the pack installer. Opening one
-        // would create an instance outside the club server, so it is
+        // would create an instance outside the society server, so it is
         // refused here.
         let path = PathBuf::from(command_string);
         let path = io::canonicalize(path)?;

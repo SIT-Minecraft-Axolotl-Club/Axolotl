@@ -13,15 +13,15 @@ const messages = defineMessages({
 	openInBrowser: { id: 'button.open-in-browser', defaultMessage: 'Open in browser' },
 })
 
-type ClubMapId = 'pixelsit' | 'survival'
+type SocietyMapId = 'pixelsit' | 'survival'
 
-type ClubMap = {
-	id: ClubMapId
+type SocietyMap = {
+	id: SocietyMapId
 	label: string
 	url: string
 }
 
-const MAPS: ClubMap[] = [
+const MAPS: SocietyMap[] = [
 	{
 		id: 'pixelsit',
 		label: messages.pixelsit.id,
@@ -36,7 +36,7 @@ const MAPS: ClubMap[] = [
 
 const STORAGE_KEY = 'axolotl-map-selected-map'
 
-function storedMapId(): ClubMapId {
+function storedMapId(): SocietyMapId {
 	try {
 		const stored = localStorage.getItem(STORAGE_KEY)
 		if (stored === 'pixelsit' || stored === 'survival') return stored
@@ -46,7 +46,7 @@ function storedMapId(): ClubMapId {
 	return 'pixelsit'
 }
 
-const selectedId = ref<ClubMapId>(storedMapId())
+const selectedId = ref<SocietyMapId>(storedMapId())
 const selectedMap = computed(() => MAPS.find((map) => map.id === selectedId.value) ?? MAPS[0])
 
 watch(selectedId, (id) => {
@@ -97,7 +97,7 @@ watch(selectedId, (id) => {
 		</header>
 
 		<!--
-			The club removed the X-Frame-Options header from these map paths, so the
+			The society removed the X-Frame-Options header from these map paths, so the
 			pages can be embedded directly and the switcher stays usable above them.
 			The sandbox keeps an embedded map from capturing the pointer or opening
 			itself fullscreen, which used to leave the rest of the launcher dead.

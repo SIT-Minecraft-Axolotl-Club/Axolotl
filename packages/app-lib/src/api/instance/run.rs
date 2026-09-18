@@ -434,9 +434,9 @@ pub async fn try_update_playtime_by_instance_id(
         })?;
     let updated_recent_playtime = context.instance.recent_time_played;
 
-    // Club builds do not report playtime to Modrinth. This launcher has no
+    // Society builds do not report playtime to Modrinth. This launcher has no
     // Modrinth account, so the request could only ever answer 401, and every
-    // instance comes from the club catalog instead of a Modrinth project. Local
+    // instance comes from the society catalog instead of a Modrinth project. Local
     // playtime is still accumulated and shown in the launcher; it is simply not
     // uploaded anywhere.
     if updated_recent_playtime > 0 {

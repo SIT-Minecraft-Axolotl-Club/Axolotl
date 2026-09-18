@@ -16,7 +16,7 @@ import {
 	set_yggdrasil_password,
 } from '@/helpers/auth'
 
-/** The club's player guide, opened in the system browser from the sign-in card. */
+/** The society's player guide, opened in the system browser from the sign-in card. */
 const PLAY_GUIDE_URL = 'https://www.sitmc.club/guide'
 
 /** How long the "copied" confirmation stays visible after the code is copied. */

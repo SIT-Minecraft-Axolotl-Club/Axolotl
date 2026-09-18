@@ -100,7 +100,7 @@ const handleInstanceRightClick = async (event, passedInstance) => {
 		{ name: 'duplicate' },
 		{ name: 'open_folder' },
 		{ name: 'copy_path' },
-		// Managed instances belong to the club server catalog and cannot be
+		// Managed instances belong to the society server catalog and cannot be
 		// deleted locally, so the action is not offered for them.
 		...(isManagedInstance(passedInstance.id)
 			? []

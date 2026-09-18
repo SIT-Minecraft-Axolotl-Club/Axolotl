@@ -1,6 +1,6 @@
 //! Endpoints of the SIT-Minecraft services this launcher build talks to.
 //!
-//! This launcher is distributed for the SIT-Minecraft club, which means there is exactly
+//! This launcher is distributed for the SIT-Minecraft society, which means there is exactly
 //! one account provider and one server-provided instance catalog. Both are pinned
 //! here rather than being user-configurable, so a player cannot point the launcher
 //! at a different account system and every client agrees on where content comes
@@ -8,7 +8,7 @@
 //!
 //! See `docs/launcher-protocol.md` for the contracts these endpoints implement.
 
-/// Public site of the club's Blessing Skin deployment.
+/// Public site of the society's Blessing Skin deployment.
 pub const SITE_URL: &str = "https://skin.sitmc.club";
 
 /// Where a player creates the account the launcher accepts.
@@ -44,7 +44,7 @@ pub const OIDC_SCOPE: &str = "openid offline_access Yggdrasil.PlayerProfiles.Sel
 pub const OIDC_DEVICE_CODE_GRANT_TYPE: &str =
     "urn:ietf:params:oauth:grant-type:device_code";
 
-/// Whether an API root addresses the club's skin site.
+/// Whether an API root addresses the society's skin site.
 ///
 /// Compared after normalizing away a trailing slash so stored accounts created
 /// by earlier builds keep working.

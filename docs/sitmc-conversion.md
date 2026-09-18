@@ -92,7 +92,7 @@
 
 实测中暴露过两个问题,已在实例层与同步层修掉(不是靠界面藏按钮):
 
-- **受管实例不能被删除**:`theseus::instance::remove` 会先查 `managed_instances`,命中就直接报错 `Instance … is managed by the club server as "…" and cannot be deleted`。界面同步收敛:实例右键菜单、批量删除、实例设置里的「删除实例」入口对受管实例一律隐藏(`isManagedInstance()`,数据来自 `managed_list`),批量删除只删可删的那些;即使集合过期,删除请求也会被上面的实例层拒绝,不会真的删掉。要让玩家看不到某个实例,应把它从后端清单里移除(客户端会标记为 `retired`,数据保留但不可启动)。
+- **受管实例不能被删除**:`theseus::instance::remove` 会先查 `managed_instances`,命中就直接报错 `Instance … is managed by the society server as "…" and cannot be deleted`。界面同步收敛:实例右键菜单、批量删除、实例设置里的「删除实例」入口对受管实例一律隐藏(`isManagedInstance()`,数据来自 `managed_list`),批量删除只删可删的那些;即使集合过期,删除请求也会被上面的实例层拒绝,不会真的删掉。要让玩家看不到某个实例,应把它从后端清单里移除(客户端会标记为 `retired`,数据保留但不可启动)。
 - **删掉实例后点启动"没反应"**:清单同步过去只比较 `revision`,于是本地实例已被删除时它仍判定为「已是最新」,闸门随后抛 `InstanceNotReady`。现在同步会同时检查本地实例是否存在且 `install_stage == Installed`:**实例不存在 → 动作退化为 `create`(重装一个新实例)**;存在但安装未完成 → `update`(装进原实例);只有"存在 + 已安装 + revision 一致"才算 `current`。因此即使玩家此前已经把受管实例删掉,下次同步或点「检查更新」就会自动装回来。
 
 ### 2.7 按需下发(强制 / 非强制实例)

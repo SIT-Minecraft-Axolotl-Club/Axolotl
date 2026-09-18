@@ -199,7 +199,7 @@ async function selectMinimalInstance(instance: GameInstance) {
 }
 
 function createInstance() {
-	// Instances are published by the club server, so there is nothing to create by
+	// Instances are published by the society server, so there is nothing to create by
 	// hand: asking for one means asking the server for its current catalog.
 	void ensureInstancesSynced()
 }

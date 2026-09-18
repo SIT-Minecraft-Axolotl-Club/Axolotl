@@ -234,7 +234,7 @@ async function refresh(): Promise<void> {
  *
  * The panel keeps listing an instance that is not on disk yet, so this is what
  * its button calls. The records are re-read afterwards because installing binds
- * a new local instance to the club instance.
+ * a new local instance to the society instance.
  */
 async function installOptional(action: ManagedInstanceAction): Promise<void> {
 	state.value = 'updating'

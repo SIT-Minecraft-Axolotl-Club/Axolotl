@@ -862,7 +862,7 @@ const messages = defineMessages({
 	launcherUpdateRequiredBody: {
 		id: 'app.launcher-update-required.body',
 		defaultMessage:
-			'The club server requires launcher version {version} or newer. Update the launcher first; afterwards you can install and launch the game again.',
+			'The society server requires launcher version {version} or newer. Update the launcher first; afterwards you can install and launch the game again.',
 	},
 	launcherUpdateAction: {
 		id: 'app.launcher-update-required.action',
@@ -874,7 +874,7 @@ const messages = defineMessages({
 	},
 	launcherUpdateUnavailable: {
 		id: 'app.launcher-update-required.unavailable',
-		defaultMessage: 'No update is available right now. Try again later or contact a club administrator.',
+		defaultMessage: 'No update is available right now. Try again later or contact a society administrator.',
 	},
 	updateInstalledToastTitle: {
 		id: 'app.update.complete-toast.title',
@@ -2063,14 +2063,14 @@ provide('accountsCard', accounts)
 /**
  * Accounts the launcher can start the game with.
  *
- * An empty list means the player has not signed in to the club's account site
+ * An empty list means the player has not signed in to the society's account site
  * yet, which blocks the whole launcher behind `SitmcLoginGate`.
  */
 const minecraftAccounts = ref<unknown[]>([])
 
 /**
  * The login gate comes before everything else: the launcher is useless without a
- * club account, and the onboarding tour walks through pages that need one.
+ * society account, and the onboarding tour walks through pages that need one.
  */
 const loginGateVisible = computed(
 	() =>
@@ -2080,7 +2080,7 @@ const loginGateVisible = computed(
 )
 
 /**
- * The club launcher shows no guided tours.
+ * The society launcher shows no guided tours.
  *
  * The sign-in gate already explains what the launcher is for, and the upstream
  * tours walked through pages this build no longer contains (they appeared as an
@@ -2092,7 +2092,7 @@ const onboardingVisible = computed(() => false)
 async function refreshMinecraftAccounts() {
 	try {
 		// Always read the full list: offline mode only decides which account may
-		// start the game, and the club's accounts are all online ones.
+		// start the game, and the society's accounts are all online ones.
 		const loaded = await getUsers(false)
 		minecraftAccounts.value = Array.isArray(loaded) ? loaded : []
 	} catch (error) {
@@ -2120,7 +2120,7 @@ const updateGateBusy = ref(false)
 const updateGateMessage = ref<string | null>(null)
 
 /**
- * Updates the launcher from the blocking notice the club manifest can raise.
+ * Updates the launcher from the blocking notice the society manifest can raise.
  *
  * This path deliberately ignores the paused-updates preference: the server has
  * declared this build unusable, so installing the newer one is the only way

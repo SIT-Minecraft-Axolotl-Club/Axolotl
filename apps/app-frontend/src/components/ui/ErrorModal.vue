@@ -270,7 +270,7 @@ defineExpose({
 
 const loadingMinecraft = ref(false)
 async function loginMinecraft() {
-	// Accounts live on the club account site now, and the account card owns the
+	// Accounts live on the society account site now, and the account card owns the
 	// sign-in gate, so hand the player over to it instead of signing in here.
 	loadingMinecraft.value = true
 	try {

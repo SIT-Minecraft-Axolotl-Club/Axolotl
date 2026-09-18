@@ -508,10 +508,10 @@ impl Credentials {
         self.account_type == MinecraftAccountType::Yggdrasil
     }
 
-    /// Whether this account belongs to the club's own account site.
+    /// Whether this account belongs to the society's own account site.
     ///
     /// The launcher is built for exactly one account provider: an account from
-    /// anywhere else cannot sign in to the club's servers, so it must never be
+    /// anywhere else cannot sign in to the society's servers, so it must never be
     /// offered as a choice or used to launch the game. Accounts stored by
     /// earlier builds therefore stop being usable the moment this build runs,
     /// without deleting their rows.

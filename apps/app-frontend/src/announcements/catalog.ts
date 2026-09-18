@@ -54,12 +54,12 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 					'zh-CN': '新增地图页，可查看像素生存与生存卫星地图。',
 				},
 				{
-					'en-US': 'New "Latest announcement" card on Home showing the newest club announcement.',
-					'zh-CN': '首页新增「最新公告」卡片，显示俱乐部发布的最新公告。',
+					'en-US': 'New "Latest announcement" card on Home showing the newest society announcement.',
+					'zh-CN': '首页新增「最新公告」卡片，显示社团发布的最新公告。',
 				},
 				{
-					'en-US': 'Added a play guide entry that opens the club guide.',
-					'zh-CN': '新增游玩指南入口，直达俱乐部指南。',
+					'en-US': 'Added a play guide entry that opens the society guide.',
+					'zh-CN': '新增游玩指南入口，直达社团指南。',
 				},
 			],
 			changed: [
@@ -82,9 +82,9 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 			removed: [
 				{
 					'en-US':
-						'Removed features unrelated to the club, including AI features, crash-log sharing with AI analysis, Modrinth accounts and online content, and the hidden name tag option.',
+						'Removed features unrelated to the society, including AI features, crash-log sharing with AI analysis, Modrinth accounts and online content, and the hidden name tag option.',
 					'zh-CN':
-						'移除与俱乐部无关的功能，包括 AI 功能、日志分享与 AI 分析、Modrinth 账户与在线内容、隐藏名牌等。',
+						'移除与社团无关的功能，包括 AI 功能、日志分享与 AI 分析、Modrinth 账户与在线内容、隐藏名牌等。',
 				},
 				{
 					'en-US': 'Instances are no longer created inside the launcher, because the server publishes them.',
