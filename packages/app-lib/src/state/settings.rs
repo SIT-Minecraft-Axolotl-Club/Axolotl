@@ -1411,6 +1411,55 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn bmclapi_default_migration_keeps_explicit_download_choices() {
+        let pool = sqlx::sqlite::SqlitePoolOptions::new()
+            .max_connections(1)
+            .connect("sqlite::memory:")
+            .await
+            .unwrap();
+        sqlx::migrate!().run(&pool).await.unwrap();
+
+        let settings = Settings::get(&pool).await.unwrap();
+        assert_eq!(
+            settings.minecraft_metadata_source,
+            DownloadSourceMode::MirrorPreferred
+        );
+        assert_eq!(
+            settings.minecraft_file_source,
+            DownloadSourceMode::MirrorPreferred
+        );
+
+        sqlx::query(
+            "
+            UPDATE settings
+            SET
+                minecraft_metadata_source = 'official_only',
+                minecraft_file_source = 'official_preferred'
+            ",
+        )
+        .execute(&pool)
+        .await
+        .unwrap();
+        sqlx::query(include_str!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/migrations/20260918000000_default-download-sources-to-bmclapi.sql"
+        )))
+        .execute(&pool)
+        .await
+        .unwrap();
+
+        let settings = Settings::get(&pool).await.unwrap();
+        assert_eq!(
+            settings.minecraft_metadata_source,
+            DownloadSourceMode::OfficialOnly
+        );
+        assert_eq!(
+            settings.minecraft_file_source,
+            DownloadSourceMode::OfficialPreferred
+        );
+    }
+
+    #[tokio::test]
     async fn telemetry_schema_migrates_fresh_and_existing_settings_databases() {
         let fresh = sqlx::sqlite::SqlitePoolOptions::new()
             .max_connections(1)

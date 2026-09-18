@@ -29,10 +29,6 @@ function describeError(error: unknown): string {
 
 const messages = defineMessages({
 	title: { id: 'managed-instances.title', defaultMessage: 'Society game instances' },
-	subtitle: {
-		id: 'managed-instances.subtitle',
-		defaultMessage: 'Instances are published by the society server. Required ones are kept up to date automatically; optional ones are downloaded when you start them.',
-	},
 	checking: { id: 'managed-instances.checking', defaultMessage: 'Checking the server for versions...' },
 	updating: { id: 'managed-instances.updating', defaultMessage: 'Updating {name}' },
 	progress: { id: 'managed-instances.progress', defaultMessage: '{done} of {total} done' },
@@ -209,13 +205,10 @@ onMounted(() => {
 		data-onboarding-id="managed-instances"
 		class="mb-6 rounded-xl border border-divider bg-surface-2 p-5"
 	>
-		<header class="mb-4 flex flex-wrap items-start justify-between gap-3">
-			<div class="flex flex-col gap-1">
-				<h2 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.title) }}
-				</h2>
-				<p class="m-0 text-sm text-secondary">{{ formatMessage(messages.subtitle) }}</p>
-			</div>
+		<header class="mb-4 flex flex-wrap items-center justify-between gap-3">
+			<h2 class="m-0 text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.title) }}
+			</h2>
 			<div class="flex items-center gap-3">
 				<span v-if="statusText" class="text-xs text-secondary">{{ statusText }}</span>
 				<ButtonStyled>

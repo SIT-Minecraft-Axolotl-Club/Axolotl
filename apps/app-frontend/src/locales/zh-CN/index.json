@@ -12648,9 +12648,6 @@
   },  "managed-instances.title": {
     "message": "社团游戏实例"
   },
-  "managed-instances.subtitle": {
-    "message": "实例由社团服务端统一下发，启动前会强制更新到最新版本。"
-  },
   "managed-instances.checking": {
     "message": "正在检查服务端版本…"
   },

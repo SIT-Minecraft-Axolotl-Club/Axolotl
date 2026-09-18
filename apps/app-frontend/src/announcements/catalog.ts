@@ -28,6 +28,38 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-2.0.1',
+		version: '2.0.1',
+		publishedAt: '2026-09-18',
+		title: {
+			'en-US': 'Axolotl Launcher 2.0.1',
+			'zh-CN': 'Axolotl 启动器 2.0.1',
+		},
+		changes: {
+			added: [
+				{
+					'en-US':
+						'The launcher now updates itself: it checks the society update service, verifies the signature, installs the new version in the background and restarts.',
+					'zh-CN':
+						'启动器现在会自动更新：向社团更新服务检查新版本、校验签名后在后台自动安装并重启，玩家不再需要手动下载安装包。',
+				},
+			],
+			changed: [
+				{
+					'en-US':
+						'Minecraft metadata, game files, mod loaders and Java now default to the mainland mirror, with the official hosts kept as a fallback.',
+					'zh-CN':
+						'Minecraft 元数据、游戏文件、模组加载器与 Java 的默认下载来源改为「优先 OpenBMCLAPI」，官方源保留为后备。',
+				},
+				{
+					'en-US':
+						'The instance panel on Home dropped its explanatory line, so the list starts higher up.',
+					'zh-CN': '首页实例面板去掉了一行说明文字，列表位置更靠上。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-2.0.0',
 		version: '2.0.0',
 		publishedAt: '2026-09-18',
