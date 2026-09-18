@@ -295,7 +295,8 @@ pub async fn sync_manifest(
             }
             (Some(_), Some(applied))
                 if applied == target
-                    && linked_stage == Some(InstanceInstallStage::Installed) =>
+                    && linked_stage
+                        == Some(InstanceInstallStage::Installed) =>
             {
                 ManagedInstanceActionKind::Current
             }

@@ -1,4 +1,3 @@
-use super::content::get_projects;
 use crate::server_address::ServerAddress;
 use crate::state::{
     Credentials, InstanceInstallStage, InstanceLink, ProcessMetadata, Settings,
@@ -8,7 +7,6 @@ use crate::util::fetch;
 use crate::util::io::IOError;
 use crate::util::mojang::mojang_service_url;
 use serde_json::json;
-use std::collections::HashMap;
 use std::time::Duration;
 use tokio::process::Command;
 use tracing::{info, warn};
@@ -406,25 +404,6 @@ fn server_play_project_id(link: &InstanceLink) -> Option<&String> {
     }
 }
 
-fn modrinth_pack_version_id(link: &InstanceLink) -> Option<&str> {
-    match link {
-        InstanceLink::ModrinthModpack { version_id, .. }
-        | InstanceLink::ServerProjectModpack {
-            content_version_id: version_id,
-            ..
-        } => Some(version_id),
-        InstanceLink::Unmanaged
-        | InstanceLink::ServerProject { .. }
-        | InstanceLink::CurseForgeModpack { .. }
-        | InstanceLink::ImportedModpack { .. }
-        | InstanceLink::SharedInstance { .. } => None,
-    }
-}
-
-fn playtime_api_url(base_url: &str) -> String {
-    format!("{}/analytics/playtime", base_url.trim_end_matches('/'))
-}
-
 pub async fn kill(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
     let processes =
@@ -454,38 +433,13 @@ pub async fn try_update_playtime_by_instance_id(
             ))
         })?;
     let updated_recent_playtime = context.instance.recent_time_played;
-    let res = if updated_recent_playtime > 0 {
-        let modrinth_pack_version_id = modrinth_pack_version_id(&context.link);
-        let playtime_update_json = json!({
-            "seconds": updated_recent_playtime,
-            "loader": context.applied_content_set.loader.as_str(),
-            "game_version": &context.applied_content_set.game_version,
-            "parent": modrinth_pack_version_id,
-        });
-        let mut hashmap: HashMap<String, serde_json::Value> = HashMap::new();
 
-        for (_, project) in get_projects(instance_id, None).await? {
-            if let Some(metadata) = project.modrinth {
-                hashmap.insert(
-                    metadata.version_id.to_string(),
-                    playtime_update_json.clone(),
-                );
-            }
-        }
-
-        let playtime_url = playtime_api_url(env!("MODRINTH_API_BASE_URL"));
-        fetch::post_json(
-            &playtime_url,
-            serde_json::to_value(hashmap)?,
-            &state.api_semaphore,
-            &state.pool,
-        )
-        .await
-    } else {
-        Ok(())
-    };
-
-    if res.is_ok() {
+    // Club builds do not report playtime to Modrinth. This launcher has no
+    // Modrinth account, so the request could only ever answer 401, and every
+    // instance comes from the club catalog instead of a Modrinth project. Local
+    // playtime is still accumulated and shown in the launcher; it is simply not
+    // uploaded anywhere.
+    if updated_recent_playtime > 0 {
         crate::state::instances::commands::mark_instance_playtime_submitted(
             &context.instance.id,
             updated_recent_playtime,
@@ -494,46 +448,5 @@ pub async fn try_update_playtime_by_instance_id(
         .await?;
     }
 
-    res
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{modrinth_pack_version_id, playtime_api_url};
-    use crate::state::InstanceLink;
-
-    #[test]
-    fn playtime_parent_requires_an_explicit_modrinth_link() {
-        let modrinth = InstanceLink::ModrinthModpack {
-            project_id: "project".to_string(),
-            version_id: "version".to_string(),
-        };
-        let curseforge = InstanceLink::CurseForgeModpack {
-            project_id: "123".to_string(),
-            version_id: "456".to_string(),
-        };
-        let imported = InstanceLink::ImportedModpack {
-            project_id: Some("legacy-project".to_string()),
-            version_id: Some("legacy-version".to_string()),
-            name: None,
-            version_number: None,
-            filename: None,
-        };
-
-        assert_eq!(modrinth_pack_version_id(&modrinth), Some("version"));
-        assert_eq!(modrinth_pack_version_id(&curseforge), None);
-        assert_eq!(modrinth_pack_version_id(&imported), None);
-    }
-
-    #[test]
-    fn playtime_url_has_a_single_path_separator() {
-        assert_eq!(
-            playtime_api_url("https://api.modrinth.com"),
-            "https://api.modrinth.com/analytics/playtime"
-        );
-        assert_eq!(
-            playtime_api_url("https://api.modrinth.com/"),
-            "https://api.modrinth.com/analytics/playtime"
-        );
-    }
+    Ok(())
 }

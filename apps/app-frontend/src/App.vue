@@ -1833,20 +1833,6 @@ watch(
 	{ flush: 'post' },
 )
 
-watch(
-	() => route.path,
-	(path) => {
-		if (
-			path.startsWith('/instance/') &&
-			onboardingSettings.value?.onboarded &&
-			!onboardingSettings.value?.onboarding_instance_tour_completed &&
-			!showOnboarding.value
-		) {
-			startOnboarding('instance')
-		}
-	},
-)
-
 const error = useError()
 error.setMinecraftLaunchErrorHandler((launchError, context) => {
 	if (!minecraftCrashModal.value?.isLaunchFailure(launchError) || !context?.instanceId) return false
@@ -2121,10 +2107,15 @@ const loginGateVisible = computed(
 		minecraftAccounts.value.length === 0,
 )
 
-/** The tour waits for a signed-in account so it never tours an unusable launcher. */
-const onboardingVisible = computed(
-	() => showOnboarding.value && minecraftAccounts.value.length > 0,
-)
+/**
+ * The club launcher shows no guided tours.
+ *
+ * The sign-in gate already explains what the launcher is for, and the upstream
+ * tours walked through pages this build no longer contains (they appeared as an
+ * empty spotlight on instance pages). The machinery is left in place but never
+ * becomes visible.
+ */
+const onboardingVisible = computed(() => false)
 
 async function refreshMinecraftAccounts() {
 	try {

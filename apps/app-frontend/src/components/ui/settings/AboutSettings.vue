@@ -12,9 +12,9 @@ import {
 	ScaleIcon,
 	UsersIcon,
 } from '@modrinth/assets'
-import { Avatar, defineMessages, NewButton as Button, useVIntl } from '@modrinth/ui'
+import { Avatar, defineMessages, useVIntl } from '@modrinth/ui'
 import { getVersion } from '@tauri-apps/api/app'
-import { inject, nextTick, onScopeDispose, ref, shallowRef } from 'vue'
+import { nextTick, onScopeDispose, ref, shallowRef } from 'vue'
 
 import AfdianIcon from '@/assets/external/afdian.png'
 import QqIcon from '@/assets/external/qq.svg?component'
@@ -36,7 +36,6 @@ const pressingMemberName = ref<string>()
 let longPressTimer: ReturnType<typeof window.setTimeout> | undefined
 let pressStart = { x: 0, y: 0 }
 let suppressNextMemberClick = false
-const replayOnboarding = inject<(mode: 'main' | 'instance') => Promise<void>>('replayOnboarding')
 
 const licenseUrl = `${AxolotlBrandConfig.repositoryUrl}/blob/main/LICENSE`
 const copyingUrl = `${AxolotlBrandConfig.repositoryUrl}/blob/main/COPYING.md`
@@ -542,12 +541,6 @@ const projectLinks = [
 				</a>
 			</div>
 		</details>
-
-		<div id="settings-target-about-replay-tour" tabindex="-1" class="flex flex-wrap gap-2">
-			<Button type="base" @click="replayOnboarding?.('main')">
-				{{ formatMessage(messages.replayOnboarding) }}
-			</Button>
-		</div>
 	</div>
 
 	<EasterEggGameModal ref="gameModal" />
