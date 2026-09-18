@@ -1,3 +1,36 @@
+import { isTauri } from '@tauri-apps/api/core'
+import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
+
+export const MAX_ANNOUNCEMENT_PAYLOAD_LENGTH = 4_500_000
+
+/**
+ * Fetches an announcement payload from the society API.
+ *
+ * The society API answers without CORS headers, so inside the desktop shell the
+ * request is made by the HTTP plugin, which performs it in Rust where neither
+ * CORS nor the webview CSP applies. A plain browser (the standalone Vite dev
+ * server) has no such bridge and uses `fetch` instead.
+ */
+export async function fetchAnnouncementPayload(
+	href: string,
+	signal?: AbortSignal,
+): Promise<unknown | null> {
+	const response = isTauri()
+		? await tauriFetch(href, { signal, credentials: 'omit' })
+		: await fetch(href, { signal, credentials: 'omit' })
+	if (!response.ok) return null
+
+	const text = await response.text()
+	if (text.length > MAX_ANNOUNCEMENT_PAYLOAD_LENGTH) return null
+	return JSON.parse(text) as unknown
+}
+
+export function announcementItems(payload: unknown): unknown {
+	return Array.isArray(payload)
+		? payload
+		: (payload as { announcements?: unknown } | null)?.announcements
+}
+
 export type RemoteAnnouncement = {
 	id: string
 	title: string

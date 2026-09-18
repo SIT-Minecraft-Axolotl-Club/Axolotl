@@ -3,6 +3,8 @@ import { ref } from 'vue'
 
 import { SitmcConfig } from '@/config'
 import {
+	announcementItems,
+	fetchAnnouncementPayload,
 	isAnnouncementActive,
 	parseAnnouncements,
 	type RemoteAnnouncement,
@@ -12,7 +14,6 @@ import { getUpdateChannel } from '@/helpers/settings'
 const CACHE_TTL_MS = 30 * 60 * 1000
 const MEMO_TTL_MS = 60 * 1000
 const REQUEST_TIMEOUT_MS = 10 * 1000
-const MAX_PAYLOAD_LENGTH = 4_500_000
 
 let endpoint: string | null = null
 let memo: { at: number; items: RemoteAnnouncement[] } | null = null
@@ -74,16 +75,9 @@ async function load(): Promise<RemoteAnnouncement[] | null> {
 		const abort = new AbortController()
 		const timeout = setTimeout(() => abort.abort(), REQUEST_TIMEOUT_MS)
 		try {
-			const response = await fetch(href, { signal: abort.signal, credentials: 'omit' })
-			if (!response.ok) return cached
-			const text = await response.text()
-			if (text.length > MAX_PAYLOAD_LENGTH) return cached
-			const body: unknown = JSON.parse(text)
-			// The club backend serves the list as a bare array; the upstream service
-			// wrapped it in an object. Both shapes are accepted.
-			const parsed = parseAnnouncements(
-				Array.isArray(body) ? body : (body as { announcements?: unknown })?.announcements,
-			)
+			const payload = await fetchAnnouncementPayload(href, abort.signal)
+			if (payload === null) return cached
+			const parsed = parseAnnouncements(announcementItems(payload))
 			if (!parsed) return cached
 			memo = { at: Date.now(), items: parsed }
 			writeCache(href, parsed)

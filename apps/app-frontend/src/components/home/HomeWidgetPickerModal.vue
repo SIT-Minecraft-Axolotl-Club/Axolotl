@@ -74,7 +74,7 @@ const messages = defineMessages({
 	announcement: { id: 'app.home.widgets.announcement', defaultMessage: 'Latest announcement' },
 	announcementDescription: {
 		id: 'app.home.widgets.announcement-description',
-		defaultMessage: 'Show the newest announcement published by the club.',
+		defaultMessage: 'Show the newest announcement published by the society.',
 	},
 	calendar: { id: 'app.home.widgets.calendar', defaultMessage: 'Calendar' },
 	calendarDescription: {

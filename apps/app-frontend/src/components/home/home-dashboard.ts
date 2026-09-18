@@ -79,7 +79,7 @@ export type HomeDashboardSaveQueue = {
 
 export const HOME_WIDGET_SIZE_OPTIONS: Record<HomeWidgetKind, readonly HomeWidgetSize[]> = {
 	greeting: ['2x1'],
-	announcement: HOME_WIDGET_STANDARD_SIZES,
+	announcement: ['1x2', '2x2'],
 	recent: ['2x1', '2x2', '3x1', '3x2'],
 	calendar: ['1x2'],
 	'pinned-instances': HOME_WIDGET_STANDARD_SIZES,
@@ -90,7 +90,7 @@ export const HOME_WIDGET_SIZE_OPTIONS: Record<HomeWidgetKind, readonly HomeWidge
 
 export const HOME_WIDGET_DEFAULT_SIZE: Record<HomeWidgetKind, HomeWidgetSize> = {
 	greeting: '2x1',
-	announcement: '1x1',
+	announcement: '1x2',
 	recent: '2x2',
 	calendar: '1x2',
 	'pinned-instances': '2x2',

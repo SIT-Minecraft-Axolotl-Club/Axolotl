@@ -25,7 +25,9 @@ const messages = defineMessages({
 	urgent: { id: 'app.home.announcement.priority-critical', defaultMessage: 'Urgent' },
 })
 
-const compact = computed(() => props.dashboardSize === '1x1')
+const summaryClass = computed(() =>
+	props.dashboardSize === '2x2' ? 'line-clamp-8' : 'line-clamp-4',
+)
 const html = computed(() => renderString(announcement.value?.content ?? ''))
 const actionUrl = computed(() => safeAnnouncementUrl(announcement.value?.action_url))
 const summary = computed(() => announcement.value?.summary?.trim() ?? '')
@@ -84,9 +86,15 @@ onMounted(() => {
 			</span>
 		</header>
 
-		<p v-if="!announcement" class="m-0 text-sm text-secondary">
-			{{ formatMessage(loading ? messages.loading : messages.empty) }}
-		</p>
+		<div
+			v-if="!announcement"
+			class="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 text-center"
+		>
+			<BellRingIcon class="size-8 text-secondary opacity-60" aria-hidden="true" />
+			<p class="m-0 text-sm text-secondary">
+				{{ formatMessage(loading ? messages.loading : messages.empty) }}
+			</p>
+		</div>
 
 		<template v-else>
 			<button
@@ -94,10 +102,10 @@ onMounted(() => {
 				class="min-w-0 cursor-pointer border-0 bg-transparent p-0 text-left text-sm font-semibold text-contrast hover:underline"
 				@click="show"
 			>
-				<span class="line-clamp-2">{{ announcement.title }}</span>
+				<span class="line-clamp-3">{{ announcement.title }}</span>
 			</button>
 
-			<p v-if="!compact && summary" class="m-0 line-clamp-3 text-xs leading-5 text-secondary">
+			<p v-if="summary" class="m-0 text-xs leading-5 text-secondary" :class="summaryClass">
 				{{ summary }}
 			</p>
 

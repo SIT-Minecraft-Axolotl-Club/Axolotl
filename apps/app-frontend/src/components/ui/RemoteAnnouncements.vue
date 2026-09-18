@@ -16,7 +16,9 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { SitmcConfig } from '@/config'
 import {
+	announcementItems,
 	announcementKey,
+	fetchAnnouncementPayload,
 	isAnnouncementActive,
 	parseAnnouncements,
 	type RemoteAnnouncement,
@@ -220,17 +222,12 @@ async function refresh() {
 		}
 		if (disposed || abort.signal.aborted) return
 		loadCache()
-		const response = await fetch(endpoint, { signal: abort.signal, credentials: 'omit' })
-		if (!response.ok) return
-		const text = await response.text()
-		if (text.length > 4500000) return
-		const result = JSON.parse(text)
-		// The club backend serves the list as a bare array; the upstream service
+		const result = await fetchAnnouncementPayload(endpoint.href, abort.signal)
+		if (result === null || disposed) return
+		// The society backend serves the list as a bare array; the upstream service
 		// wrapped it in an object. Both shapes are accepted so either backend can
 		// be pointed at without a client change.
-		const parsed = parseAnnouncements(
-			Array.isArray(result) ? result : (result as { announcements?: unknown })?.announcements,
-		)
+		const parsed = parseAnnouncements(announcementItems(result))
 		if (!parsed || disposed) return
 		sync(parsed, true)
 		try {
