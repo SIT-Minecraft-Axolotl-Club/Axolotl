@@ -179,6 +179,26 @@ export function managedPendingActions(report: ManagedSyncReport): ManagedInstanc
 }
 
 /**
+ * Pending actions the launcher performs on its own.
+ *
+ * A required instance is what the club server insists every player has, so it is
+ * downloaded without asking.
+ */
+export function managedRequiredActions(report: ManagedSyncReport): ManagedInstanceAction[] {
+	return managedPendingActions(report).filter((action) => action.spec.required)
+}
+
+/**
+ * Pending actions the player starts themselves.
+ *
+ * An instance the server does not require is only downloaded once the player
+ * asks for it, which keeps optional packs off the disk until they are wanted.
+ */
+export function managedOptionalActions(report: ManagedSyncReport): ManagedInstanceAction[] {
+	return managedPendingActions(report).filter((action) => !action.spec.required)
+}
+
+/**
  * Installs or updates one managed instance.
  *
  * The pack is downloaded and integrity-checked by the Rust side first; the actual

@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 
 import { SitmcConfig } from '@/config'
 import type {
+	ManagedInstanceAction,
 	ManagedInstanceRecord,
 	ManagedInstanceSpec,
 	ManagedLauncherPolicy,
@@ -12,7 +13,8 @@ import {
 	applyManagedInstanceAction,
 	managed_list,
 	managed_sync,
-	managedPendingActions,
+	managedOptionalActions,
+	managedRequiredActions,
 	refreshManagedInstanceIds,
 } from '@/helpers/managed'
 import { compareSemanticVersions } from '@/helpers/version-compatibility'
@@ -59,6 +61,21 @@ const activeRecords = computed(() =>
 
 /** Instances the server took out of service. Kept on disk, but not launchable. */
 const retiredRecords = computed(() => records.value.filter((record) => record.retired))
+
+/**
+ * Instances the player can still download.
+ *
+ * The server publishes them, but they are not required, so nothing is fetched
+ * until the player asks for them. They are keyed by the server's instance id so
+ * the panel can look one up while rendering a record.
+ */
+const optionalActions = computed(() =>
+	report.value ? managedOptionalActions(report.value) : [],
+)
+
+const optionalActionsByServerId = computed(
+	() => new Map(optionalActions.value.map((action) => [action.spec.id, action])),
+)
 
 /** Manifest details by server instance id, for display alongside a record. */
 const specsById = computed(() => {
@@ -150,7 +167,7 @@ async function runSync(): Promise<void> {
 	report.value = result
 	await applyLauncherPolicy(result.launcher ?? null)
 
-	const pendingActions = managedPendingActions(result)
+	const pendingActions = managedRequiredActions(result)
 	totalUpdates.value = pendingActions.length
 	completedUpdates.value = 0
 
@@ -212,6 +229,30 @@ async function refresh(): Promise<void> {
 	await refreshRecords().catch(() => {})
 }
 
+/**
+ * Downloads and installs one instance the player asked for.
+ *
+ * The panel keeps listing an instance that is not on disk yet, so this is what
+ * its button calls. The records are re-read afterwards because installing binds
+ * a new local instance to the club instance.
+ */
+async function installOptional(action: ManagedInstanceAction): Promise<void> {
+	state.value = 'updating'
+	updatingName.value = action.spec.name
+	error.value = null
+
+	try {
+		await applyManagedInstanceAction(action)
+		await refreshRecords()
+		state.value = 'ready'
+	} catch (installError) {
+		error.value = installError instanceof Error ? installError.message : String(installError)
+		state.value = 'error'
+	} finally {
+		updatingName.value = null
+	}
+}
+
 export function useManagedInstances() {
 	return {
 		state,
@@ -222,6 +263,8 @@ export function useManagedInstances() {
 		records,
 		activeRecords,
 		retiredRecords,
+		optionalActions,
+		optionalActionsByServerId,
 		specsById,
 		isBusy,
 		isConfigured,
@@ -231,6 +274,7 @@ export function useManagedInstances() {
 		syncNow,
 		ensureSynced,
 		refresh,
+		installOptional,
 		stopPeriodicSync,
 	}
 }

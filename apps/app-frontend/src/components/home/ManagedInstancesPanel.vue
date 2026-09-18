@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { DownloadIcon, RefreshCwIcon } from '@modrinth/assets'
+import { DownloadIcon, RefreshCwIcon, TrashIcon } from '@modrinth/assets'
 import { ButtonStyled, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
 import { useManagedInstances } from '@/composables/useManagedInstances'
 import { SitmcConfig } from '@/config'
-import { run } from '@/helpers/instance'
+import { remove as removeInstance, run } from '@/helpers/instance'
+import type { ManagedInstanceRecord } from '@/helpers/managed'
 import { managed_ensure_runnable } from '@/helpers/managed'
 
 const { formatMessage } = useVIntl()
@@ -14,7 +15,7 @@ const messages = defineMessages({
 	title: { id: 'managed-instances.title', defaultMessage: 'Club game instances' },
 	subtitle: {
 		id: 'managed-instances.subtitle',
-		defaultMessage: 'Instances are published by the club server and are updated to the newest version before every launch.',
+		defaultMessage: 'Instances are published by the club server. Required ones are kept up to date automatically; optional ones are downloaded when you start them.',
 	},
 	checking: { id: 'managed-instances.checking', defaultMessage: 'Checking the server for versions...' },
 	updating: { id: 'managed-instances.updating', defaultMessage: 'Updating {name}' },
@@ -23,15 +24,23 @@ const messages = defineMessages({
 	retry: { id: 'managed-instances.retry', defaultMessage: 'Retry' },
 	refresh: { id: 'managed-instances.refresh', defaultMessage: 'Check for updates' },
 	play: { id: 'managed-instances.play', defaultMessage: 'Play' },
+	playDownloads: {
+		id: 'managed-instances.play-downloads',
+		defaultMessage: 'Play (downloads first)',
+	},
 	starting: { id: 'managed-instances.starting', defaultMessage: 'Starting...' },
+	downloading: { id: 'managed-instances.downloading', defaultMessage: 'Downloading...' },
+	notDownloaded: { id: 'managed-instances.not-downloaded', defaultMessage: 'Not downloaded yet' },
+	remove: { id: 'managed-instances.remove', defaultMessage: 'Remove from this computer' },
+	removeHint: {
+		id: 'managed-instances.remove-hint',
+		defaultMessage: 'Removing it frees the disk space; the instance stays listed so you can download it again.',
+	},
+	badgeRequired: { id: 'managed-instances.badge-required', defaultMessage: 'Required' },
+	badgeOptional: { id: 'managed-instances.badge-optional', defaultMessage: 'On demand' },
 	noInstances: {
 		id: 'managed-instances.empty',
 		defaultMessage: 'The server currently publishes no game instances.',
-	},
-	retiredTitle: { id: 'managed-instances.retired-title', defaultMessage: 'Retired instances' },
-	retiredHint: {
-		id: 'managed-instances.retired-hint',
-		defaultMessage: 'These instances were removed from the server manifest. They can no longer be launched, but their data stays on disk.',
 	},
 	unconfigured: {
 		id: 'managed-instances.unconfigured',
@@ -42,8 +51,9 @@ const messages = defineMessages({
 const {
 	state,
 	error,
+	records,
 	activeRecords,
-	retiredRecords,
+	optionalActionsByServerId,
 	specsById,
 	isBusy,
 	isConfigured,
@@ -53,9 +63,11 @@ const {
 	syncNow,
 	ensureSynced,
 	refresh,
+	installOptional,
 } = useManagedInstances()
 
 const launchingId = ref<string | null>(null)
+const removingId = ref<string | null>(null)
 const launchError = ref<string | null>(null)
 
 const statusText = computed(() => {
@@ -69,6 +81,11 @@ const statusText = computed(() => {
 
 function specFor(serverInstanceId: string) {
 	return specsById.value.get(serverInstanceId) ?? null
+}
+
+/** An instance waiting for the player to download it, if this is one. */
+function pendingAction(serverInstanceId: string) {
+	return optionalActionsByServerId.value.get(serverInstanceId) ?? null
 }
 
 function versionLabel(serverInstanceId: string) {
@@ -118,6 +135,50 @@ async function launch(instanceId: string, serverInstanceId: string) {
 			launchFailure instanceof Error ? launchFailure.message : String(launchFailure)
 	} finally {
 		launchingId.value = null
+	}
+}
+
+/**
+ * Starts an instance, downloading it first when it is not on this computer.
+ *
+ * Optional instances are deliberately not fetched in the background, so the
+ * player's press is what installs them; the launch follows once the install
+ * settled and the record points at the new local instance.
+ */
+async function play(record: ManagedInstanceRecord) {
+	const action = pendingAction(record.server_instance_id)
+
+	if (!action) {
+		await launch(record.instance_id, record.server_instance_id)
+		return
+	}
+
+	await installOptional(action)
+	await refresh()
+
+	const updated = records.value.find(
+		(candidate) => candidate.server_instance_id === record.server_instance_id,
+	)
+	if (!updated?.instance_id) return
+
+	await launch(updated.instance_id, record.server_instance_id)
+}
+
+/** Frees an optional instance. The record stays, so it can be downloaded again. */
+async function removeOptional(record: ManagedInstanceRecord) {
+	if (!record.instance_id || removingId.value) return
+	removingId.value = record.instance_id
+	launchError.value = null
+	try {
+		await removeInstance(record.instance_id)
+		await refresh()
+		// Re-reads the manifest so the instance is offered for download again.
+		await syncNow()
+	} catch (removalFailure) {
+		launchError.value =
+			removalFailure instanceof Error ? removalFailure.message : String(removalFailure)
+	} finally {
+		removingId.value = null
 	}
 }
 
@@ -178,7 +239,7 @@ onMounted(() => {
 			<article
 				v-for="record in activeRecords"
 				:key="record.server_instance_id"
-				class="flex items-center gap-4 rounded-lg border border-divider bg-surface-3 p-4"
+				class="flex flex-wrap items-center gap-4 rounded-lg border border-divider bg-surface-3 p-4"
 			>
 				<img
 					v-if="record.icon_url"
@@ -194,7 +255,23 @@ onMounted(() => {
 				</div>
 
 				<div class="flex min-w-0 flex-1 flex-col gap-1">
-					<span class="truncate font-medium text-contrast">{{ record.name }}</span>
+					<span class="flex items-center gap-2">
+						<span class="truncate font-medium text-contrast">{{ record.name }}</span>
+						<span
+							class="shrink-0 rounded-full px-2 py-0.5 text-[11px]"
+							:class="
+								record.required
+									? 'bg-surface-2 text-secondary'
+									: 'bg-surface-1 text-secondary'
+							"
+						>
+							{{
+								record.required
+									? formatMessage(messages.badgeRequired)
+									: formatMessage(messages.badgeOptional)
+							}}
+						</span>
+					</span>
 					<span v-if="record.description" class="truncate text-xs text-secondary">
 						{{ record.description }}
 					</span>
@@ -205,35 +282,41 @@ onMounted(() => {
 						<span v-if="serverLabel(record.server_instance_id)">
 							{{ serverLabel(record.server_instance_id) }}
 						</span>
+						<span v-if="pendingAction(record.server_instance_id)" class="text-brand">
+							{{ formatMessage(messages.notDownloaded) }}
+						</span>
 					</span>
 				</div>
 
-				<ButtonStyled color="brand" class="shrink-0">
-					<button
-						:disabled="isBusy || launchingId !== null"
-						@click="launch(record.instance_id, record.server_instance_id)"
-					>
-						{{
-							launchingId === record.instance_id
-								? formatMessage(messages.starting)
-								: formatMessage(messages.play)
-						}}
-					</button>
-				</ButtonStyled>
+				<div class="flex shrink-0 items-center gap-2">
+					<ButtonStyled v-if="!record.required && record.instance_id">
+						<button
+							v-tooltip="formatMessage(messages.removeHint)"
+							:disabled="isBusy || removingId !== null"
+							@click="removeOptional(record)"
+						>
+							<TrashIcon />
+							{{ formatMessage(messages.remove) }}
+						</button>
+					</ButtonStyled>
+
+					<ButtonStyled color="brand" class="shrink-0">
+						<button
+							:disabled="isBusy || launchingId !== null || removingId !== null"
+							@click="play(record)"
+						>
+							{{
+								launchingId === record.instance_id
+									? formatMessage(messages.starting)
+									: pendingAction(record.server_instance_id)
+										? formatMessage(messages.playDownloads)
+										: formatMessage(messages.play)
+							}}
+						</button>
+					</ButtonStyled>
+				</div>
 			</article>
 		</div>
-
-		<details v-if="retiredRecords.length > 0" class="mt-4">
-			<summary class="cursor-pointer text-xs text-secondary">
-				{{ formatMessage(messages.retiredTitle) }} ({{ retiredRecords.length }})
-			</summary>
-			<p class="m-0 mt-2 text-xs text-secondary">{{ formatMessage(messages.retiredHint) }}</p>
-			<ul class="m-0 mt-2 flex list-none flex-col gap-1 p-0">
-				<li v-for="record in retiredRecords" :key="record.server_instance_id" class="text-xs">
-					{{ record.name }}
-				</li>
-			</ul>
-		</details>
 	</section>
 
 	<section

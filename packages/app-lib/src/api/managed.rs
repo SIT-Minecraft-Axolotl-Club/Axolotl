@@ -9,6 +9,8 @@
 //! See `docs/launcher-protocol.md` for the contract these types mirror.
 
 use crate::State;
+use crate::event::InstancePayloadType;
+use crate::event::emit::emit_instance;
 use crate::state::InstanceInstallStage;
 use crate::util::fetch::{INSECURE_REQWEST_CLIENT, sha1_file_async};
 use chrono::Utc;
@@ -316,20 +318,21 @@ pub async fn sync_manifest(
         if declared.contains(row.server_instance_id.as_str()) {
             continue;
         }
-        if row.retired == 0 {
-            mark_retired(&state, &row.server_instance_id, updated).await?;
+
+        // The server stopped publishing this instance, so the launcher follows:
+        // the local instance, its files and the record all go. Keeping the entry
+        // would only leave something the player cannot launch and cannot remove.
+        if !row.instance_id.is_empty()
+            && crate::state::get_instance(&row.instance_id, &state.pool)
+                .await?
+                .is_some()
+        {
+            crate::state::remove_instance(&row.instance_id, &state).await?;
+            emit_instance(&row.instance_id, InstancePayloadType::Removed)
+                .await?;
         }
-        let spec = previous
-            .get(&row.server_instance_id)
-            .cloned()
-            .unwrap_or_else(|| spec_from_row(&row));
-        actions.push(ManagedInstanceAction {
-            spec,
-            instance_id: Some(row.instance_id.clone())
-                .filter(|value| !value.is_empty()),
-            applied_revision: Some(row.revision),
-            action: ManagedInstanceActionKind::Retired,
-        });
+
+        delete_row(&state, &row.server_instance_id).await?;
     }
 
     actions.sort_by(|left, right| {
@@ -358,23 +361,36 @@ pub async fn list_managed_instances()
         .collect())
 }
 
-/// The server-side id of the managed instance owning a local instance, if any.
+/// The club instance that owns a local instance, and whether the server requires
+/// it.
 ///
-/// Callers use this to refuse actions that would break the server's ownership of
-/// an instance, such as deleting it.
+/// The flag decides two things on the client: a required instance is installed
+/// without asking and may not be deleted, while an optional one is only
+/// downloaded once the player starts it and can be deleted again.
+pub struct ManagedOwner {
+    pub server_instance_id: String,
+    pub required: bool,
+}
+
+/// Looks up the club instance owning a local instance, if any.
 #[tracing::instrument]
-pub async fn server_instance_id_for(
+pub async fn managed_owner(
     instance_id: &str,
-) -> crate::Result<Option<String>> {
+) -> crate::Result<Option<ManagedOwner>> {
     let state = State::get().await?;
 
-    Ok(sqlx::query_scalar::<_, String>(
-        "SELECT server_instance_id FROM managed_instances
+    let row = sqlx::query_as::<_, (String, i64)>(
+        "SELECT server_instance_id, required FROM managed_instances
          WHERE instance_id = ? LIMIT 1",
     )
     .bind(instance_id)
     .fetch_optional(&state.pool)
-    .await?)
+    .await?;
+
+    Ok(row.map(|(server_instance_id, required)| ManagedOwner {
+        server_instance_id,
+        required: required != 0,
+    }))
 }
 
 /// Downloads and verifies the pack of a managed instance and returns the local
@@ -738,20 +754,15 @@ async fn store_spec(
     Ok(())
 }
 
-async fn mark_retired(
+/// Forgets a club instance the server no longer publishes.
+async fn delete_row(
     state: &State,
     server_instance_id: &str,
-    updated: i64,
 ) -> crate::Result<()> {
-    sqlx::query(
-        "UPDATE managed_instances
-         SET retired = TRUE, updated = ?
-         WHERE server_instance_id = ?",
-    )
-    .bind(updated)
-    .bind(server_instance_id)
-    .execute(&state.pool)
-    .await?;
+    sqlx::query("DELETE FROM managed_instances WHERE server_instance_id = ?")
+        .bind(server_instance_id)
+        .execute(&state.pool)
+        .await?;
     Ok(())
 }
 
@@ -841,37 +852,6 @@ async fn cached_spec(
     }
 
     Ok(spec)
-}
-
-/// Best-effort spec for a managed instance the current manifest no longer
-/// declares, built from the record so the frontend can still show it.
-fn spec_from_row(row: &ManagedInstanceRow) -> ManagedInstanceSpec {
-    ManagedInstanceSpec {
-        id: row.server_instance_id.clone(),
-        name: row.name.clone(),
-        description: Some(row.description.clone())
-            .filter(|value| !value.is_empty()),
-        icon_url: Some(row.icon_url.clone()).filter(|value| !value.is_empty()),
-        sort: clamp_i32(row.sort),
-        revision: row.target_revision,
-        minecraft: ManagedMinecraftSpec {
-            game_version: String::new(),
-            loader: None,
-            loader_version: None,
-        },
-        pack: ManagedPackSpec {
-            kind: String::new(),
-            url: String::new(),
-            sha1: None,
-            size: None,
-        },
-        server: Some(ManagedServerSpec {
-            address: row.server_address.clone(),
-            port: Some(clamp_u16(row.server_port)),
-        })
-        .filter(|server| !server.address.is_empty()),
-        required: row.required != 0,
-    }
 }
 
 async fn download_pack(
