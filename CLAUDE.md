@@ -46,6 +46,21 @@ The website and app `prepr` commands
 - **Website:** `pnpm website:dev`
 - **App:** `pnpm app:dev` (copy `.env` template in `packages/app-lib/` first)
 
+## Society Build and Release
+
+The society service addresses are **baked into `apps/app-frontend/src/config.ts`** (`VITE_SITMC_MANIFEST_URL`, `VITE_SITMC_ANNOUNCEMENTS_URL`, `VITE_SITMC_UPDATE_URL` all default to `https://skin.sitmc.club/api/launcher/*`), so a plain `pnpm app:build` produces a working society build. Do not re-add an empty default or an upstream fallback; the same-named environment variables remain overrides for local development only, and an explicitly empty value disables that feature.
+
+A release build must be signed, otherwise no client can accept it as an update:
+
+```powershell
+$env:TAURI_SIGNING_PRIVATE_KEY          = Get-Content "$env:USERPROFILE\.tauri\sitmc-updater.key" -Raw
+$env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD = Get-Content "$env:USERPROFILE\.tauri\sitmc-updater.key.password" -Raw
+pnpm --filter @modrinth/app build
+```
+
+- `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` **must stay in `turbo.jsonc` `passThroughEnv`** — turbo drops undeclared variables, and without them the build still succeeds but silently produces no `.sig`.
+- The private key never enters the repository; see `docs/launcher-update-guide.md` for the full publish flow and `docs/launcher-protocol.md` §6.3 for the service-address contract.
+
 ## Codex Development Workflow
 
 ### Local App Verification

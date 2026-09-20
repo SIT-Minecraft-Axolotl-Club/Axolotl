@@ -53,21 +53,27 @@ export const config = {
  *
  * Accounts live on the society's Blessing Skin site and nowhere else, and the game
  * instances come from the server-side catalog described in
- * `docs/launcher-protocol.md`. Every address the society has to publish itself is a
- * build-time variable that defaults to empty, which disables the feature instead
- * of falling back to another community's server.
+ * `docs/launcher-protocol.md`. The service addresses are baked in here so a plain
+ * `pnpm app:build` produces a working society build; each `VITE_SITMC_*` variable
+ * still overrides its default, and setting one to an empty string disables that
+ * feature instead of reaching for another community's server.
  */
-const manifestUrl = (import.meta.env.VITE_SITMC_MANIFEST_URL ?? '').trim()
+const DEFAULT_MANIFEST_URL = 'https://skin.sitmc.club/api/launcher/manifest'
+const DEFAULT_ANNOUNCEMENTS_URL = 'https://skin.sitmc.club/api/launcher/announcements'
+const DEFAULT_UPDATE_URL = 'https://skin.sitmc.club/api/launcher/update'
+
+const manifestUrl = (import.meta.env.VITE_SITMC_MANIFEST_URL ?? DEFAULT_MANIFEST_URL).trim()
 const announcementsUrl = (
 	import.meta.env.VITE_SITMC_ANNOUNCEMENTS_URL ??
 	import.meta.env.VITE_AXO_ANNOUNCEMENTS_URL ??
-	''
+	DEFAULT_ANNOUNCEMENTS_URL
 ).trim()
-const updateUrl = (import.meta.env.VITE_SITMC_UPDATE_URL ?? '').trim()
+const updateUrl = (import.meta.env.VITE_SITMC_UPDATE_URL ?? DEFAULT_UPDATE_URL).trim()
 
 export const SitmcConfig = Object.freeze({
 	serverLabel: 'SIT-Minecraft',
 	site: 'https://skin.sitmc.club',
+	skinLibraryUrl: 'https://skin.sitmc.club/skinlib',
 	registerUrl: 'https://skin.sitmc.club/auth/register',
 	loginUrl: 'https://skin.sitmc.club/auth/login',
 	apiRoot: 'https://skin.sitmc.club/api/yggdrasil',

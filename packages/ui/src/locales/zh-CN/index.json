@@ -4993,5 +4993,14 @@
   },
   "image-viewer.previous": {
     "message": "上一张图片"
+  },
+  "input.confirm-here.placeholder": {
+    "defaultMessage": "在此输入……"
+  },
+  "label.confirm-to-proceed": {
+    "defaultMessage": "要确认继续，请在下方输入 {confirmation}："
+  },
+  "button.proceed": {
+    "defaultMessage": "继续"
   }
 }

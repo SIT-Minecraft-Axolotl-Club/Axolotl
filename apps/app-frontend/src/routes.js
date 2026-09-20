@@ -20,6 +20,14 @@ export default new createRouter({
 			},
 		},
 		{
+			path: '/skins',
+			name: 'Skins',
+			component: () => import('@/pages/Skins.vue'),
+			meta: {
+				breadcrumb: [{ name: 'Skins' }],
+			},
+		},
+		{
 			path: '/worlds',
 			name: 'Worlds',
 			component: () => import('@/pages/Worlds.vue'),

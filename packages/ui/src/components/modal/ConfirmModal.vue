@@ -25,28 +25,31 @@
 			<slot />
 			<label v-if="hasToType" for="confirmation">
 				<span>
-					To confirm you want to proceed, type
-					<span class="italic font-bold">{{ confirmationText }}</span> below:
+					{{
+						formatMessage(messages.confirmHint, {
+							confirmation: confirmationText,
+						})
+					}}
 				</span>
 			</label>
 			<StyledInput
 				v-if="hasToType"
 				id="confirmation"
 				v-model="confirmation_typed"
-				placeholder="Type here..."
+				:placeholder="formatMessage(messages.confirmHintPlaceholder)"
 				wrapper-class="max-w-[20rem]"
 			/>
 			<div class="flex gap-2 justify-end">
 				<ButtonStyled>
 					<button class="!shadow-none" @click="hide()">
 						<XIcon />
-						Cancel
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled :color="danger ? 'red' : 'brand'">
 					<button :disabled="action_disabled" @click="proceed">
 						<component :is="proceedIcon" />
-						{{ proceedLabel }}
+						{{ proceedText }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -59,9 +62,28 @@ import { TrashIcon, XIcon } from '@modrinth/assets'
 import { renderString } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
+import { defineMessages, useVIntl } from '../../composables/i18n'
+import { commonMessages } from '../../utils/common-messages'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import StyledInput from '../base/StyledInput.vue'
 import NewModal from './NewModal.vue'
+
+const messages = defineMessages({
+	confirmHintPlaceholder: {
+		id: 'input.confirm-here',
+		defaultMessage: 'Type here...',
+	},
+	confirmHint: {
+		id: 'label.confirm-to-proceed',
+		defaultMessage: 'To confirm you want to proceed, type {confirmation} below:',
+	},
+	proceedButton: {
+		id: 'button.proceed',
+		defaultMessage: 'Proceed',
+	},
+})
+
+const { formatMessage } = useVIntl()
 
 const props = defineProps({
 	confirmationText: {
@@ -88,7 +110,7 @@ const props = defineProps({
 	},
 	proceedLabel: {
 		type: String,
-		default: 'Proceed',
+		default: undefined,
 	},
 	noblur: {
 		type: Boolean,
@@ -109,6 +131,10 @@ const props = defineProps({
 		default: true,
 	},
 })
+
+const proceedText = computed(
+	() => props.proceedLabel ?? formatMessage(messages.proceedButton),
+)
 
 const emit = defineEmits(['proceed'])
 const modal = ref(null)

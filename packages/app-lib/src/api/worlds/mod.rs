@@ -971,9 +971,10 @@ pub async fn remove_server_from_instance(
     Ok(())
 }
 
-mod servers_data {
+pub(crate) mod servers_data {
     use crate::Result;
     use crate::util::io;
+    use quartz_nbt::{NbtCompound, NbtList, NbtTag};
     use serde::{Deserialize, Serialize};
     use std::path::Path;
 
@@ -992,39 +993,217 @@ mod servers_data {
         pub accept_textures: Option<bool>,
     }
 
-    pub async fn read(instance_dir: &Path) -> Result<Vec<ServerData>> {
-        #[derive(Deserialize, Debug)]
-        struct ServersData {
-            #[serde(default)]
-            servers: Vec<ServerData>,
+    impl ServerData {
+        /// The `servers.dat` entry key the game itself uses: the address with
+        /// its port normalised (`example.com` and `example.com:25565` are the
+        /// same server). Quick play looks a server up by the argument it was
+        /// launched with, so matching on this key is what decides whether an
+        /// existing entry can be reused instead of appended.
+        pub fn key(&self) -> (String, u16) {
+            crate::server_address::parse_server_address(&self.ip)
+                .map(|(host, port)| (host.to_ascii_lowercase(), port))
+                .unwrap_or_else(|_| (self.ip.to_ascii_lowercase(), 25565))
         }
+    }
 
-        let servers_dat_path = instance_dir.join("servers.dat");
-        if !servers_dat_path.exists() {
-            return Ok(vec![]);
-        }
-        let servers_data = io::read(servers_dat_path).await?;
-        let servers_data: ServersData = quartz_nbt::serde::deserialize(
-            &servers_data,
-            quartz_nbt::io::Flavor::Uncompressed,
-        )?
-        .0;
-        Ok(servers_data.servers)
+    pub async fn read(instance_dir: &Path) -> Result<Vec<ServerData>> {
+        Ok(read_entries(instance_dir)
+            .await?
+            .into_iter()
+            .map(|entry| entry.data)
+            .collect())
     }
 
     pub async fn write(
         instance_dir: &Path,
         servers: &[ServerData],
     ) -> Result<()> {
-        #[derive(Serialize, Debug)]
-        struct ServersData<'a> {
-            servers: &'a [ServerData],
+        let mut entries = read_entries(instance_dir).await?;
+        entries.truncate(servers.len());
+        for (index, server) in servers.iter().enumerate() {
+            match entries.get_mut(index) {
+                Some(entry) => {
+                    entry.data = server.clone();
+                }
+                None => entries.push(ServerEntry::new(server.clone())),
+            }
+        }
+        write_entries(instance_dir, &entries).await
+    }
+
+    /// Inserts or updates one server entry without disturbing anything else in
+    /// `servers.dat`.
+    ///
+    /// The game refuses to launch into a quick play server that is not present
+    /// in this file, so the launcher must add it before handing over the
+    /// address. An existing entry for the same address keeps its own name,
+    /// icon, pack decision, hidden flag, and any tag this launcher does not
+    /// model (notably `acceptedCodeOfConduct`, which the game writes from
+    /// 1.21.9 on).
+    pub async fn upsert(
+        instance_dir: &Path,
+        address: &str,
+        name: &str,
+        pack_status: bool,
+    ) -> Result<bool> {
+        let key = ServerData {
+            ip: address.to_string(),
+            ..ServerData::default()
+        }
+        .key();
+        let mut entries = read_entries(instance_dir).await?;
+        if let Some(entry) = entries.iter_mut().find(|entry| entry.data.key() == key) {
+            entry.data.ip = address.to_string();
+            if entry.data.name.trim().is_empty() {
+                entry.data.name = name.to_string();
+            }
+            if entry.data.accept_textures.is_none() {
+                entry.data.accept_textures = Some(pack_status);
+            }
+            write_entries(instance_dir, &entries).await?;
+            return Ok(false);
         }
 
+        let mut server = ServerData {
+            hidden: true,
+            icon: None,
+            ip: address.to_string(),
+            name: name.to_string(),
+            accept_textures: Some(pack_status),
+        };
+        if server.name.trim().is_empty() {
+            server.name = address.to_string();
+        }
+        entries.push(ServerEntry::new(server));
+        write_entries(instance_dir, &entries).await?;
+        Ok(true)
+    }
+
+    impl Default for ServerData {
+        fn default() -> Self {
+            Self {
+                hidden: false,
+                icon: None,
+                ip: String::new(),
+                name: String::new(),
+                accept_textures: None,
+            }
+        }
+    }
+
+    /// One `servers.dat` list element: the modelled fields plus the original
+    /// compound, so fields this launcher does not understand survive a write.
+    struct ServerEntry {
+        data: ServerData,
+        raw: NbtCompound,
+    }
+
+    impl ServerEntry {
+        fn new(data: ServerData) -> Self {
+            Self {
+                data,
+                raw: NbtCompound::new(),
+            }
+        }
+
+        /// Rewrites the modeled fields on top of the stored compound, keeping
+        /// every tag this launcher does not understand.
+        fn synced_raw(&self) -> NbtCompound {
+            const KNOWN: [&str; 5] =
+                ["hidden", "icon", "ip", "name", "acceptTextures"];
+            let mut raw = NbtCompound::new();
+            // The element type of `iter_map` here is infallible, so unwrapping
+            // cannot panic; the loop only preserves tags this launcher does not
+            // model so the game keeps them (for example
+            // `acceptedCodeOfConduct`).
+            for (key, tag) in self.raw.iter_map::<&NbtTag>() {
+                if KNOWN.contains(&key) {
+                    continue;
+                }
+                raw.insert(key, tag.expect("infallible tag").clone());
+            }
+            raw.insert("hidden", NbtTag::Byte(i8::from(self.data.hidden)));
+            raw.insert("ip", NbtTag::String(self.data.ip.clone()));
+            raw.insert("name", NbtTag::String(self.data.name.clone()));
+            if let Some(accept_textures) = self.data.accept_textures {
+                raw.insert(
+                    "acceptTextures",
+                    NbtTag::Byte(i8::from(accept_textures)),
+                );
+            }
+            if let Some(icon) = &self.data.icon {
+                raw.insert("icon", NbtTag::String(icon.clone()));
+            }
+            raw
+        }
+    }
+
+    async fn read_entries(instance_dir: &Path) -> Result<Vec<ServerEntry>> {
         let servers_dat_path = instance_dir.join("servers.dat");
-        let data = quartz_nbt::serde::serialize(
-            &ServersData { servers },
+        if !servers_dat_path.exists() {
+            return Ok(vec![]);
+        }
+        let servers_data = io::read(servers_dat_path).await?;
+        let (root, _) = quartz_nbt::io::read_nbt(
+            &mut std::io::Cursor::new(servers_data),
+            quartz_nbt::io::Flavor::Uncompressed,
+        )?;
+        let Ok(list) = root.get::<_, &NbtList>("servers") else {
+            return Ok(vec![]);
+        };
+
+        let mut entries = Vec::with_capacity(list.len());
+        for tag in list.iter() {
+            let NbtTag::Compound(compound) = tag else {
+                continue;
+            };
+            entries.push(ServerEntry {
+                data: ServerData {
+                    hidden: matches!(
+                        compound.get::<_, &NbtTag>("hidden"),
+                        Ok(NbtTag::Byte(value)) if *value != 0
+                    ),
+                    icon: compound
+                        .get::<_, &str>("icon")
+                        .ok()
+                        .map(str::to_string),
+                    ip: compound
+                        .get::<_, &str>("ip")
+                        .unwrap_or_default()
+                        .to_string(),
+                    name: compound
+                        .get::<_, &str>("name")
+                        .unwrap_or_default()
+                        .to_string(),
+                    accept_textures: match compound.get::<_, &NbtTag>("acceptTextures")
+                    {
+                        Ok(NbtTag::Byte(value)) => Some(*value != 0),
+                        _ => None,
+                    },
+                },
+                raw: compound.clone(),
+            });
+        }
+        Ok(entries)
+    }
+
+    async fn write_entries(
+        instance_dir: &Path,
+        entries: &[ServerEntry],
+    ) -> Result<()> {
+        let mut root = NbtCompound::new();
+        let mut list = NbtList::new();
+        for entry in entries {
+            list.push(entry.synced_raw());
+        }
+        root.insert("servers", list);
+
+        let servers_dat_path = instance_dir.join("servers.dat");
+        let mut data = Vec::new();
+        quartz_nbt::io::write_nbt(
+            &mut data,
             None,
+            &root,
             quartz_nbt::io::Flavor::Uncompressed,
         )?;
         io::write(servers_dat_path, data).await?;
@@ -1223,7 +1402,10 @@ async fn _get_server_status_new(
 #[cfg(test)]
 mod tests {
     use super::read_hardcore;
+    use super::servers_data;
     use quartz_nbt::{NbtCompound, NbtTag};
+    use std::io::Cursor;
+    use std::path::Path;
 
     #[test]
     fn reads_hardcore_from_legacy_and_26_1_layouts() {
@@ -1241,5 +1423,115 @@ mod tests {
         assert!(read_hardcore(&modern));
 
         assert!(!read_hardcore(&NbtCompound::new()));
+    }
+
+    fn read_raw_servers(path: &Path) -> NbtCompound {
+        let bytes = std::fs::read(path).unwrap();
+        let (root, _) = quartz_nbt::io::read_nbt(
+            &mut Cursor::new(bytes),
+            quartz_nbt::io::Flavor::Uncompressed,
+        )
+        .unwrap();
+        root
+    }
+
+    fn servers_of(root: &NbtCompound) -> Vec<NbtCompound> {
+        root.get::<_, &quartz_nbt::NbtList>("servers")
+            .unwrap()
+            .iter()
+            .map(|tag| match tag {
+                NbtTag::Compound(compound) => compound.clone(),
+                other => panic!("unexpected server tag: {other:?}"),
+            })
+            .collect()
+    }
+
+    #[tokio::test]
+    async fn server_writes_keep_tags_the_launcher_does_not_model() {
+        let directory = tempfile::tempdir().unwrap();
+        let instance = directory.path();
+        let servers_dat = instance.join("servers.dat");
+
+        let mut server = NbtCompound::new();
+        server.insert("name", NbtTag::String("Club Server".to_string()));
+        server.insert("ip", NbtTag::String("mc.example.com".to_string()));
+        server.insert("hidden", NbtTag::Byte(0));
+        server.insert("acceptedCodeOfConduct", NbtTag::Int(12345));
+        server.insert("icon", NbtTag::String("AAAA".to_string()));
+        let mut servers = quartz_nbt::NbtList::new();
+        servers.push(server);
+        let mut root = NbtCompound::new();
+        root.insert("servers", servers);
+        let mut bytes = Vec::new();
+        quartz_nbt::io::write_nbt(
+            &mut bytes,
+            None,
+            &root,
+            quartz_nbt::io::Flavor::Uncompressed,
+        )
+        .unwrap();
+        std::fs::write(&servers_dat, bytes).unwrap();
+
+        let parsed = servers_data::read(instance).await.unwrap();
+        assert_eq!(parsed.len(), 1);
+        assert_eq!(parsed[0].name, "Club Server");
+        assert_eq!(parsed[0].icon.as_deref(), Some("AAAA"));
+
+        // A quick play upsert for a different server must not disturb the
+        // existing entry or its newer tags.
+        let inserted = servers_data::upsert(
+            instance,
+            "play.example.com:25566",
+            "Club Server",
+            true,
+        )
+        .await
+        .unwrap();
+        assert!(inserted);
+
+        let root = read_raw_servers(&servers_dat);
+        let servers = servers_of(&root);
+        assert_eq!(servers.len(), 2);
+        assert_eq!(
+            servers[0].get::<_, i32>("acceptedCodeOfConduct").unwrap(),
+            12345
+        );
+        assert_eq!(servers[0].get::<_, &str>("icon").unwrap(), "AAAA");
+        assert!(!servers[0].get::<_, bool>("hidden").unwrap_or(true));
+        assert!(servers[1].get::<_, bool>("hidden").unwrap_or(false));
+        assert_eq!(servers[1].get::<_, &str>("ip").unwrap(), "play.example.com:25566");
+
+        // A second upsert of the same address updates in place instead of
+        // appending a duplicate, which is what would otherwise accumulate a
+        // new hidden entry on every launch.
+        let inserted = servers_data::upsert(
+            instance,
+            "play.example.com:25566",
+            "Club Server",
+            true,
+        )
+        .await
+        .unwrap();
+        assert!(!inserted);
+        assert_eq!(servers_of(&read_raw_servers(&servers_dat)).len(), 2);
+    }
+
+    #[tokio::test]
+    async fn server_upsert_matches_the_same_host_with_a_default_port() {
+        let directory = tempfile::tempdir().unwrap();
+        let instance = directory.path();
+
+        servers_data::upsert(instance, "mc.example.com", "Club", true)
+            .await
+            .unwrap();
+        let inserted =
+            servers_data::upsert(instance, "mc.example.com:25565", "Club", true)
+                .await
+                .unwrap();
+
+        assert!(!inserted);
+        let servers = servers_of(&read_raw_servers(&instance.join("servers.dat")));
+        assert_eq!(servers.len(), 1);
+        assert_eq!(servers[0].get::<_, &str>("ip").unwrap(), "mc.example.com:25565");
     }
 }

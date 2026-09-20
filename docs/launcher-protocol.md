@@ -18,6 +18,7 @@
 4. [客户端行为规范](#4-客户端行为规范)
 5. [版本与兼容](#5-版本与兼容)
 6. [附录](#6-附录)
+7. [皮肤契约](#7-皮肤契约)
 
 ---
 
@@ -31,7 +32,7 @@ SIT-Minecraft 专用版启动器的运行流程被收敛为四个阶段：
 登录 → 拉取实例清单 → 强制更新 / 安装 → 启动
 ```
 
-- 启动器**不再提供**账号注册、皮肤编辑、实例自由创建与编辑等开放能力。
+- 启动器**不再提供**账号注册、实例自由创建与编辑等开放能力；皮肤由启动器直接管理**皮肤站**上的贴图（见 [7](#7-皮肤契约)），不做本地皮肤编辑。
 - 玩家打开启动器后必须先完成 SIT-Minecraft 账户登录，随后由社团后端下发的实例清单决定「能玩什么、装哪个版本、是否必须先更新」。
 - 社团需要提供的能力被拆分为两个**互相独立**的服务端契约，任何一个不可用都不应导致另一个被误判为故障。
 
@@ -395,7 +396,7 @@ GET https://skin.sitmc.club/api/yggdrasil/sessionserver/session/minecraft/profil
 Accept: application/json
 ```
 
-用于展示角色名与皮肤信息。皮肤与披风由皮肤站管理，**启动器不提供皮肤编辑功能**。
+用于展示角色名与皮肤信息。皮肤与披风由皮肤站管理，启动器通过 [7](#7-皮肤契约) 的端点直接读写这些贴图。
 
 ### 2.4 站点侧必须确认/开启的事项（检查清单）
 
@@ -431,7 +432,7 @@ Accept: application/json
 | 4 | `client_id=11`（公用应用）是否被允许使用设备授权授予，是否有额外限制 | 规范允许认证服务器对公共客户端限流或缩短令牌有效期 | 步骤 1 直接失败（如 `invalid_client`），OIDC 流程不可用。**实测设备授权端点返回 200，未观察到额外限制；更细的策略未验证** |
 | 5 | 访问令牌是否确实绑定玩家选定的角色（`Select` 与 `Server.Join` 同时生效） | 规范规定 `Yggdrasil.Server.Join` 必须与 `Yggdrasil.PlayerProfiles.Select` 同时申请，且访问令牌必须绑定角色，否则会话服务器必须拒绝该令牌进服 | 授权成功但进不了服务器（表现由会话服务器/服务端决定） |
 | 6 | 游戏服务端是否已配置 authlib-injector 外置登录 | 账户闭环的前提：访问令牌必须在游戏与服务端两侧被同一 Yggdrasil 源验证 | 客户端能登录、能启动，但进不了服务器。**未验证** |
-| 7 | 皮肤与披风是否全部由皮肤站管理 | 启动器本期不提供皮肤编辑入口 | 玩家找不到换肤入口（预期行为，但需在玩家侧说明） |
+| 7 | 皮肤与披风是否全部由皮肤站管理 | 启动器直接读写皮肤站衣柜（[7](#7-皮肤契约)），不写 Mojang，也不提供本地皮肤编辑器 | 玩家在启动器里看到的是皮肤站上的贴图 |
 | 8 | 站点错误响应体格式是否统一为 `error` / `error_description` | 客户端按此结构解析并本地化提示 | 客户端只能显示通用错误，排障困难。**实测 device/token/userinfo 三处均符合** |
 | 9 | 站点是否允许启动器与 authlib-injector 使用同一 `{yggdrasil_root}` | 客户端与游戏共用同一 API 根，避免出现两套令牌域；用户信息端点实测已回带 `X-Authlib-Injector-API-Location: {yggdrasil_root}` | 访问令牌无法在游戏侧复用 |
 
@@ -742,26 +743,136 @@ Accept: application/json
 
 ### 6.3 客户端如何指向后端
 
-社团必须对外发布的地址都是**构建期常量**，不提供运行时入口：
+社团对外发布的地址是**构建期常量**，不提供运行时入口。三个地址**已硬编码在 `apps/app-frontend/src/config.ts`**，因此直接 `pnpm app:build` 产出的就是可用的社团版；同名 `VITE_SITMC_*` 环境变量仍可覆盖（本地联调时把地址指向 `http://127.0.0.1:8000/...`，或置为空串以关闭该功能）：
 
-| 变量 | 用途 | 未设置时 |
-| --- | --- | --- |
-| `VITE_SITMC_MANIFEST_URL` | 受管实例清单（§2） | 不请求任何清单，首页显示"未配置社团实例清单地址" |
-| `VITE_SITMC_ANNOUNCEMENTS_URL` | 远程公告接口（可选，`?version=&channel=` 由客户端追加） | 不请求任何公告；旧变量 `VITE_AXO_ANNOUNCEMENTS_URL` 仍被兼容 |
-| `VITE_SITMC_UPDATE_URL` | 自更新服务基址，客户端请求 `{基址}/latest?channel=` | 设置页不查询最新版本 |
+| 变量 | 当前默认值 | 用途 | 置为空串时 |
+| --- | --- | --- | --- |
+| `VITE_SITMC_MANIFEST_URL` | `https://skin.sitmc.club/api/launcher/manifest` | 受管实例清单（§2） | 不请求任何清单，首页显示"未配置社团实例清单地址" |
+| `VITE_SITMC_ANNOUNCEMENTS_URL` | `https://skin.sitmc.club/api/launcher/announcements` | 远程公告接口（可选，`?version=&channel=` 由客户端追加） | 不请求任何公告；旧变量 `VITE_AXO_ANNOUNCEMENTS_URL` 仍被兼容 |
+| `VITE_SITMC_UPDATE_URL` | `https://skin.sitmc.club/api/launcher/update` | 自更新服务基址，客户端请求 `{基址}/latest?channel=` | 设置页不查询最新版本 |
 
 ```bash
-VITE_SITMC_MANIFEST_URL=https://content.sitmc.club/v1/launcher/manifest \
-VITE_SITMC_ANNOUNCEMENTS_URL=https://content.sitmc.club/v1/announcements \
-VITE_SITMC_UPDATE_URL=https://update.sitmc.club \
+# 通常什么都不用设，直接构建即可：
+pnpm app:build
+
+# 仅本地联调需要覆盖时：
+VITE_SITMC_MANIFEST_URL=http://127.0.0.1:8000/manifest.json \
+VITE_SITMC_ANNOUNCEMENTS_URL= \
+VITE_SITMC_UPDATE_URL= \
 pnpm app:build
 ```
 
-- 三个变量都**默认为空并关闭对应功能**：客户端绝不会回退到 Axolotl 上游的服务器。指向后端失败时也不会阻断登录与启动。
-- 未设置清单变量时，客户端不会请求任何清单，首页会显示"未配置社团实例清单地址"的提示，其余功能（登录、设置、下载、世界、截图）不受影响。
-- 之所以不做成设置项：客户端一旦可被随意指向其他服务端，"实例由社团下发"就不再成立。变更后端地址请重新发版。
+- 客户端**绝不会回退到 Axolotl 上游的服务器**：默认值只有社团自己的域名。指向后端失败时也不会阻断登录与启动。
+- 把变量置为空串（而非留空不设）可以关闭对应功能；未设置则使用上面的社团默认地址。
+- 之所以不做成设置项：客户端一旦可被随意指向其他服务端，"实例由社团下发"就不再成立。变更后端地址请重新发版（改 `config.ts` 里的默认值）。
 - 客户端不直接 fetch 清单（请求由 Rust 侧发出，见 `packages/app-lib/src/api/managed.rs`），因此**清单域名不需要加入前端 CSP**；但整合包与图标的下载域名必须在 CSP 的 `connect-src`（下载）与 `img-src`（图标）中可达。
 
 ---
 
+## 7. 皮肤契约
+
+> 本章由社团后端（`SITUserCenter/plugins/sitmc-launcher`）实现，**已实现**。
+
+启动器用社团账户登录后，玩家的皮肤归**皮肤站**所有；启动器不写 Mojang。Blessing Skin 自带的 JSON API（`/api/players/*`）由 Laravel Passport 守卫，而启动器持有的是 Yggdrasil Connect（Janus）令牌——**两者是不同的凭据**，所以启动器不能直接调那些接口，改由 `sitmc-launcher` 插件提供下面这组端点。
+
+### 7.1 认证
+
+三个端点都要求与登录同一枚访问令牌：
+
+```http
+Authorization: Bearer <access_token>
+```
+
+服务端**不解析令牌**，而是把它转发给站点自己的 `GET /api/janus/userinfo` 校验（该端点对无效令牌返回 `401`）。校验成功后，以响应中的 `selectedProfile.name` 作为**角色名**定位角色——插件因此不需要知道本站如何由角色推导 UUID。角色必须属于令牌所属账户，否则返回 `403`。
+
+| 错误码 | 状态码 | 含义 |
+| --- | --- | --- |
+| `missing_token` | 401 | 没有 `Authorization: Bearer` 头 |
+| `invalid_token` | 401 | userinfo 拒绝了该令牌（玩家需要重新登录） |
+| `unknown_player` | 400 | 角色名在本站不存在，或不属于该账户 |
+| `validate_failed` | 400 | 贴图尺寸/类型/名称不符合站点规则 |
+| `file_too_large` | 400 | 超过站点 `max_upload_file_size` |
+
+### 7.2 列出皮肤
+
+```http
+GET {site}/api/launcher/skins?player=<角色名>
+```
+
+```json
+{
+  "player": {
+    "name": "Steve",
+    "skin": { "tid": 12, "name": "my skin", "type": "steve", "model": "default", "public": true, "url": "https://skin.sitmc.club/textures/<sha256>" },
+    "cape": null
+  },
+  "textures": [
+    { "tid": 12, "name": "my skin", "type": "steve", "model": "default", "public": true, "url": "https://skin.sitmc.club/textures/<sha256>" }
+  ]
+}
+```
+
+- `textures` 是该账户**衣柜**里的全部贴图（`user_closet`），启动器把它当作"我的皮肤"列表。
+- `type` 取 `steve` / `alex` / `cape`；`model` 为 `default`（宽）或 `slim`（细），与启动器的 Classic / Slim 变体一一对应。
+- `url` 指向站点自己的静态贴图路由（`/textures/{hash}`），因此贴图的可见性与站点既有行为一致。
+
+### 7.3 上传并装备皮肤
+
+```http
+POST {site}/api/launcher/skins?player=<角色名>&type=<steve|alex>&name=<贴图名>
+Content-Type: image/png
+
+<PNG 字节流>
+```
+
+- 请求体是**裸 PNG**（不是 multipart），最大 `max_upload_file_size` KB。
+- 尺寸规则与站点上传页一致：必须是 64x32 的整数倍；`steve` 为 2:1、`alex` 为 1:1、披风为 2:1。
+- 同一 SHA-256 已存在（且公开或就是本人上传）时**不重复入库**，直接复用并挂进衣柜。
+
+```json
+{ "texture": { "tid": 13, "...": "同上" }, "created": true }
+```
+
+拿到 `tid` 后由启动器调用 7.4 装备。
+
+### 7.4 装备 / 卸下
+
+```http
+PUT {site}/api/launcher/skins/equip
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{ "player": "Steve", "skin": 13, "cape": 7 }
+```
+
+- `skin` / `cape` 都是可选的；`0` 表示卸下该槽位，缺省表示**不改动**该槽位。
+- 贴图必须存在于该账户衣柜中，否则 `not_in_closet`。
+- 服务端会派发站点原有的 `player.texture.updating` / `player.texture.updated` / `player.texture.reset` 事件，因此其他插件（审核、日志等）看到的与网页端操作完全一致。
+
+### 7.5 从衣柜移除
+
+```http
+DELETE {site}/api/launcher/skins
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{ "player": "Steve", "tid": 13 }
+```
+
+- `tid` 必须在该账户衣柜中，否则 `not_in_closet`（错误码 `missing_texture` 表示请求没带 `tid`）。
+- 若角色正穿着该贴图（皮肤或披风槽位），服务端会先置空该槽位并派发 `player.texture.reset`，再从衣柜分离。
+- 贴图行与文件本身留在站点，与网页端"从衣柜移除"的行为一致；删除的是该账户对它的使用。
+
+### 7.6 客户端行为
+
+- 皮肤页分两个标签页:**皮肤**列出衣柜里的贴图(可直接切换、改模型 Classic/Slim、替换贴图、移除),**官方皮肤**列出游戏自带的皮肤。对**本站账户**之外来源的 Yggdrasil 账户仍然拒绝写操作(只有本站皮肤站托管皮肤)。
+- **启动器不提供披风管理**。披风仍然从站点读出来,只用于 3D 预览里把角色当前披风渲染出来;更换披风请在站点网页上操作。因此装备皮肤时**不发送 `cape` 槽位**,站点保留角色原有的披风(发送 `cape: 0` 会把它清掉)。
+- 应用皮肤后写操作进入 **5 秒冷却**(站点是 `throttle:30,1`),避免连点把配额打满;`GET /api/launcher/skins` 的结果在**启动器内复用 20 秒**,上传/装备/移除后立即失效,因此自己的改动立刻可见,而读列表不会反复消耗配额。
+- 本站账户的衣柜就是启动器里的皮肤列表:不写本地镜像行。列表按贴图内容哈希去重(站点以 `/textures/{sha256}` 提供贴图,与本地镜像行的 `local-{sha256}` 同名同源),因此同一张贴图不会既作为站点条目又作为旧镜像行出现两次。
+- 编辑一张本站皮肤等于向站点上传一张新贴图,随后沿用原装备状态。
+- Launcher 侧不再有常驻右栏:皮肤页的说明与操作都在页面内完成。
+
+---
+
 *文档结束。*
+

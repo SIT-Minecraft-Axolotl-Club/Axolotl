@@ -230,6 +230,9 @@
   "button.play": {
     "defaultMessage": "Play"
   },
+  "button.proceed": {
+    "defaultMessage": "Proceed"
+  },
   "button.refresh": {
     "defaultMessage": "Refresh"
   },
@@ -2171,6 +2174,9 @@
   "image-viewer.previous": {
     "defaultMessage": "Previous image"
   },
+  "input.confirm-here.placeholder": {
+    "defaultMessage": "Type here..."
+  },
   "input.search-version.placeholder": {
     "defaultMessage": "Search version..."
   },
@@ -2506,6 +2512,9 @@
   },
   "label.confirm-password": {
     "defaultMessage": "Confirm password"
+  },
+  "label.confirm-to-proceed": {
+    "defaultMessage": "To confirm you want to proceed, type {confirmation} below:"
   },
   "label.content": {
     "defaultMessage": "Content"

@@ -83,10 +83,11 @@
 
 ### 2.5 界面收敛与社团化(按你的确认执行)
 
-- **删除「皮肤」与「多人游戏」**:`routes.js` 去掉 `/skins`、`/multiplayer`(含 servers/rooms/studio 子路由);`App.vue` 去掉两个导航按钮与 `onSkinsPage` 判断;`shortcut-actions.ts` 去掉 `Ctrl+4`/`Ctrl+5` 动作与文案;`settings-search-index.ts`、`onboardingConfig.ts`、`Breadcrumbs.vue` 同步清理;删除 `pages/Skins.vue`、`pages/Multiplayer.vue`。服务器管理组件(`components/multiplayer/**`)保留在磁盘但不可达,日后加回路由即可恢复。
+- **删除「多人游戏」**:`routes.js` 去掉 `/multiplayer`(含 servers/rooms/studio 子路由);`App.vue` 去掉对应导航按钮;`shortcut-actions.ts` 去掉 `Ctrl+5` 动作与文案;`settings-search-index.ts`、`onboardingConfig.ts`、`Breadcrumbs.vue` 同步清理;删除 `pages/Multiplayer.vue`。服务器管理组件(`components/multiplayer/**`)保留在磁盘但不可达,日后加回路由即可恢复。
+- **皮肤改为「本站托管」**:原先跟随上游删除的 `pages/Skins.vue` 需要恢复,但皮肤不再写 Mojang——社团账户的皮肤由皮肤站托管,启动器通过 `sitmc-launcher` 插件新增的 `/api/launcher/skins*` 端点读写(契约见 `docs/launcher-protocol.md` §7)。Rust 侧 `ensure_skin_management_supported` 只放行**本站** `api_root`,其它来源的 Yggdrasil 账户仍然拒绝写操作;离线账户仍走本地皮肤 + 实例资源包。
 - **删除首页「每日挑战」**:`pages/Index.vue` 侧栏不再渲染,并删除 `components/home/HomeDailyChallenge.vue` 与 `data/daily-challenges.ts`。
 - **社团化**:官网指向 `https://www.sitmc.club/`,隐私政策指向 `https://www.sitmc.club/privacy`(已实测为真实页面);QQ 群/频道、爱发电赞助、飞书问卷这些上游社群入口**置空并在界面上隐藏**(有值就自动显示,无需改代码)。唯一保留的上游链接是 `repositoryUrl`:About 页的 LICENSE / COPYING / 第三方许可证都从它拼接,是 AGPL 合规所需的源码与许可出处。
-- **公告与自更新改为构建期配置**:远程公告、自更新版本查询分别由 `VITE_SITMC_ANNOUNCEMENTS_URL` / `VITE_SITMC_UPDATE_URL` 控制,**默认空 = 关闭**,不再有指向 `admin.axlmc.org` / `update.axlmc.org` 的默认回退(见 `docs/launcher-protocol.md` §6.3)。
+- **公告与自更新改为构建期配置**:远程公告、自更新版本查询分别由 `VITE_SITMC_ANNOUNCEMENTS_URL` / `VITE_SITMC_UPDATE_URL` 控制,**不再有指向 `admin.axlmc.org` / `update.axlmc.org` 的默认回退**;两者的社团默认值硬编码在 `apps/app-frontend/src/config.ts`(见 `docs/launcher-protocol.md` §6.3),环境变量可覆盖、置空串即关闭。
 
 ### 2.6 受管实例不可删除 + 同步自愈
 
@@ -196,7 +197,7 @@ cargo check --package theseus_gui --features updater
 - `pages/instance/Index.vue`:标签裁到 **Overview + Logs**。
 - `onboardingConfig.ts`:删除目标已不存在的步骤(仅剩 7 步)。
 - `packages/app-lib/src/api/handler.rs`:深链 `discovery` / `seed-map` / `mod/{id}` / `version/{id}` / `modpack/{id}` / `server/{id}` 与 `.mrpack` / `.zip` 文件打开一律拒绝,`launch?instance_id=` 保留;并**同步更新了该文件的单元测试**。
-- `pages/Skins.vue`:改为跳转皮肤站的小页面(保留 `data-onboarding-id="skins-page"` 与角色名/UUID 展示)。
+- `pages/Skins.vue`:改为跳转皮肤站的小页面(保留 `data-onboarding-id="skins-page"` 与角色名/UUID 展示)。**后续已改为在启动器内直接管理皮肤站贴图**,见 `docs/launcher-protocol.md` §7。
 - 活路径残留清理:还额外修掉了 7 处会跳到已停用路由的地方——`pages/library/Index.vue`(标签与"新建实例"按钮)、`pages/Index.vue`(首页新建动作改为触发服务端清单同步)、`pages/Downloads.vue`(移除"新建下载"按钮)、`components/GridDisplay.vue`(被保留的 `/library` 使用的"新建实例"按钮)、`helpers/shortcut-actions.ts`(删除 Discover/Lab/新建实例三个全局导航快捷键)、`components/ui/settings/settings-search-index.ts`(对应搜索项)、`composables/useDropImport.ts`(改为回首页)。
 
 ### 5.1 本轮已清理(阶段 5 的安全子集)
@@ -281,15 +282,33 @@ python -m http.server 8000
 
 ### 7.4 带着清单地址构建/启动
 
-清单地址是**构建期常量**,必须在构建前设置环境变量:
+三个地址**已硬编码在 `apps/app-frontend/src/config.ts`**（默认指向 `https://skin.sitmc.club/api/launcher/*`），所以正常发版**不需要设任何环境变量**：
+
+```powershell
+pnpm app:build        # 直接用社团默认地址构建
+```
+
+只有本地联调（清单跑在 `127.0.0.1` 上）才需要覆盖；**置为空串**表示关闭该功能：
 
 ```powershell
 $env:VITE_SITMC_MANIFEST_URL = 'http://127.0.0.1:8000/manifest.json'
 $env:VITE_SITMC_ANNOUNCEMENTS_URL = ''   # 留空即不请求公告
 $env:VITE_SITMC_UPDATE_URL = ''          # 留空即不查询最新版本
 pnpm app:dev          # 开发运行
-# 或：pnpm --filter @modrinth/app-frontend build  然后 cargo check/tauri build
 ```
+
+**签名发版（完整命令）**——`TAURI_SIGNING_*` 已在 `turbo.jsonc` 的 `passThroughEnv` 中登记，所以走 `pnpm` 也不会被 turbo 过滤掉：
+
+```powershell
+$env:TAURI_SIGNING_PRIVATE_KEY          = Get-Content "$env:USERPROFILE\.tauri\sitmc-updater.key" -Raw
+$env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD = Get-Content "$env:USERPROFILE\.tauri\sitmc-updater.key.password" -Raw
+$env:PATH = "$env:USERPROFILE\.cargo\bin;$env:PATH"
+pnpm --filter @modrinth/app build
+```
+
+签名成功的标志是日志最后出现 `Finished 1 updater signature at: ...setup.exe.sig`；若看到 `A public key has been found, but no private key`，说明私钥没被传下去（旧版 turbo 配置会在这里丢弃它），要么走上面的 `pnpm --filter`，要么直接在 `apps/app` 里 `npx tauri build --config tauri-release.conf.json`。
+
+> 私钥与密码是**仓库外**的本地/CI 机密，绝不提交；`docs/launcher-update-guide.md` 是发布流程的权威说明。
 
 ### 7.5 预期表现与已知限制
 
@@ -320,6 +339,6 @@ pnpm app:dev          # 开发运行
 | `packages/app-lib/src/sitmc.rs` | 站点/注册/登录/Yggdrasil API 根/Janus 基址/`client_id`/scope 串 | 站点域名或 `client_id` 变化时改这里;启动器的其他部分都引用这些常量 |
 | `apps/website`(Nuxt) | 上游政策页与介绍页 | 若社团不部署这个站点可忽略;若要部署,隐私政策应改指社团自己的条款(启动器内已指向 `https://www.sitmc.club/privacy`) |
 | 遥测 | `capabilities.ghsTelemetry: false`(已关闭) | 若将来要开,需先补隐私政策 |
-| 构建变量 | `VITE_SITMC_MANIFEST_URL`、`VITE_SITMC_ANNOUNCEMENTS_URL`、`VITE_SITMC_UPDATE_URL`(均未设置) | 至少设置清单地址,否则首页只显示"未配置社团实例清单地址";后两个留空即关闭对应功能(详见 §6.3) |
+| 构建变量 | `VITE_SITMC_MANIFEST_URL`、`VITE_SITMC_ANNOUNCEMENTS_URL`、`VITE_SITMC_UPDATE_URL` | **已处理**：默认值硬编码在 `apps/app-frontend/src/config.ts`，指向 `https://skin.sitmc.club/api/launcher/{manifest,announcements,update}`；环境变量仅用于本地联调覆盖，置空串可关闭对应功能（详见 `docs/launcher-protocol.md` §6.3） |
 
 > 关于「更新公告」:按仓库约定,启动器发版公告只能写在 `apps/app-frontend/src/announcements/catalog.ts`,并且需要确切的版本号;`scripts/axolotl/create-release-notes.mjs` 会用它生成 GitHub Release 正文,标签没有对应条目时发布会失败。

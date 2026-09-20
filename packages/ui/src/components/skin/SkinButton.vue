@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 
 const emit = defineEmits<{
 	(e: 'select'): void
@@ -24,20 +24,60 @@ const props = withDefaults(
 	},
 )
 
+/** A card must never sit behind its skeleton forever when an image never resolves. */
+const IMAGE_LOAD_TIMEOUT_MS = 8000
+
 const imagesLoaded = ref({
 	forward: false,
 })
+const imageFailed = ref(false)
+
+let loadTimeout: number | null = null
+
+const hasImage = computed(() => Boolean(props.forwardImageSrc))
+
+function clearLoadTimeout() {
+	if (loadTimeout !== null) {
+		window.clearTimeout(loadTimeout)
+		loadTimeout = null
+	}
+}
 
 function onImageLoad() {
+	imageFailed.value = false
 	imagesLoaded.value.forward = true
+	clearLoadTimeout()
+}
+
+function onImageError() {
+	imageFailed.value = true
+	clearLoadTimeout()
+}
+
+function scheduleLoadTimeout() {
+	clearLoadTimeout()
+
+	if (!hasImage.value) {
+		return
+	}
+
+	loadTimeout = window.setTimeout(() => {
+		loadTimeout = null
+		imageFailed.value = true
+	}, IMAGE_LOAD_TIMEOUT_MS)
 }
 
 watch(
 	() => props.forwardImageSrc,
 	() => {
 		imagesLoaded.value.forward = false
+		imageFailed.value = false
+		scheduleLoadTimeout()
 	},
+	{ immediate: true },
 )
+
+onUnmounted(clearLoadTimeout)
 </script>
 
 <template>
@@ -75,12 +115,14 @@ watch(
 			class="pointer-events-none absolute right-3 top-3 z-20 size-3 rounded-full border-2 border-solid border-surface-3 bg-green"
 		></span>
 
-		<div v-if="!imagesLoaded.forward" class="aspect-[31/40] h-full w-full">
-			<div class="skeleton absolute inset-0 aspect-[5/7]"></div>
-		</div>
+		<template v-if="!imagesLoaded.forward && !imageFailed">
+			<div class="aspect-[31/40] h-full w-full">
+				<div class="skeleton absolute inset-0 aspect-[5/7]"></div>
+			</div>
+		</template>
 
 		<span
-			v-show="imagesLoaded.forward"
+			v-show="imagesLoaded.forward || imageFailed"
 			:key="`${selected}-${active}`"
 			:class="[
 				'skin-button__image-parent w-full h-[95%] pointer-events-none relative z-0 mb-[1.5px] grid place-items-stretch with-shadow',
@@ -92,6 +134,7 @@ watch(
 				class="skin-button__image-facing col-start-1 row-start-1 h-full w-full object-contain"
 				height="504"
 				@load="onImageLoad"
+				@error="onImageError"
 			/>
 		</span>
 

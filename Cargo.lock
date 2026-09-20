@@ -6809,7 +6809,7 @@ dependencies = [
 
 [[package]]
 name = "theseus"
-version = "2.0.4"
+version = "2.0.6"
 dependencies = [
  "ariadne",
  "async-minecraft-ping",

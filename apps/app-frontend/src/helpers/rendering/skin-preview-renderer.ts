@@ -1,4 +1,5 @@
 import { ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
+import { arrayBufferToBase64 } from '@modrinth/utils'
 import {
 	applyCapeTexture,
 	createTransparentTexture,
@@ -8,7 +9,7 @@ import {
 import * as THREE from 'three'
 
 import type { Cape, Skin } from '../skins'
-import { determineModelType, get_normalized_skin_texture } from '../skins'
+import { determineModelType, get_normalized_skin_texture, normalize_skin_texture } from '../skins'
 import { headStorage } from '../storage/head-storage'
 import { skinPreviewStorage } from '../storage/skin-preview-storage'
 import {
@@ -199,6 +200,70 @@ function getModelUrlForVariant(variant: string): string {
 
 const DEBUG_MODE = false
 
+/**
+ * A single card may not keep the whole preview queue busy forever. The texture
+ * comes from a remote site and the render goes through WebGL, so either step can
+ * fail to settle; the queue moves on and the card simply keeps its cached or
+ * empty state instead of loading endlessly.
+ */
+const SKIN_PREVIEW_STEP_TIMEOUT_MS = 15000
+
+async function withTimeout<T>(work: Promise<T>, label: string): Promise<T> {
+	let timeout: number | undefined
+
+	try {
+		return await Promise.race([
+			work,
+			new Promise<never>((_resolve, reject) => {
+				timeout = window.setTimeout(
+					() => reject(new Error(`${label} timed out`)),
+					SKIN_PREVIEW_STEP_TIMEOUT_MS,
+				)
+			}),
+		])
+	} finally {
+		if (timeout !== undefined) window.clearTimeout(timeout)
+	}
+}
+
+/**
+ * WebGL refuses a texture the browser loaded as a cross-origin image, and the
+ * site that hosts the capes sends no CORS header, so a cape has to be turned
+ * into a same-origin data URL before it reaches the renderer — exactly what the
+ * skin texture already does. The conversion is remembered per URL because one
+ * cape is shared by many cards.
+ */
+const normalizedCapeTextures = new Map<string, Promise<string>>()
+
+async function prepareCapeTexture(texture: string | undefined): Promise<string | undefined> {
+	if (!texture) return undefined
+
+	const cached = normalizedCapeTextures.get(texture)
+	if (cached) {
+		try {
+			return await cached
+		} catch {
+			return undefined
+		}
+	}
+
+	const conversion = normalize_skin_texture(texture)
+		.then((bytes) => `data:image/png;base64,${arrayBufferToBase64(bytes)}`)
+		.catch((error) => {
+			normalizedCapeTextures.delete(texture)
+			throw error
+		})
+
+	normalizedCapeTextures.set(texture, conversion)
+
+	try {
+		return await conversion
+	} catch (error) {
+		console.warn('Could not prepare a cape texture for the preview:', error)
+		return undefined
+	}
+}
+
 let sharedRenderer: BatchSkinRenderer | null = null
 let latestPreviewGeneration = 0
 let previewGenerationQueue: Promise<void> = Promise.resolve()
@@ -287,7 +352,10 @@ async function generateSkinPreviewsForGeneration(
 			let variant = skin.variant
 			if (variant === 'UNKNOWN') {
 				try {
-					variant = await determineModelType(skin.texture)
+					variant = await withTimeout(
+						determineModelType(skin.texture),
+						`reading the model of ${key}`,
+					)
 				} catch (error) {
 					console.error(`Failed to determine model type for skin ${key}:`, error)
 					variant = 'CLASSIC'
@@ -296,22 +364,55 @@ async function generateSkinPreviewsForGeneration(
 
 			const modelUrl = getModelUrlForVariant(variant)
 			const cape: Cape | undefined = capes.find((_cape) => _cape.id === skin.cape_id)
-			const rawRenderResult = await renderer.renderSkin(
-				await get_normalized_skin_texture(skin),
-				modelUrl,
-				cape?.texture,
-			)
+			const capeTexture = await prepareCapeTexture(cape?.texture)
+
+			// The skin is rendered without the cape first: a cape the renderer
+			// cannot use must never keep the skin itself off the screen. When the
+			// cape can be rendered, a second pass replaces the plain preview.
+			const renderCape = async (capeUrl: string | undefined) => {
+				const normalizedTexture = await get_normalized_skin_texture(skin)
+				return await renderer.renderSkin(normalizedTexture, modelUrl, capeUrl)
+			}
+
+			const renderSkin = (capeUrl: string | undefined) =>
+				withTimeout(renderCape(capeUrl), `rendering the preview of ${key}`)
+
+			let rawRenderResult: RawRenderResult
+			try {
+				rawRenderResult = await renderSkin(undefined)
+			} catch (error) {
+				console.error(`Failed to render the preview for skin ${key}:`, error)
+				continue
+			}
 
 			if (!isCurrentGeneration()) return
 
-			const renderResult: RenderResult = {
+			let storedResult = rawRenderResult
+			let renderResult: RenderResult = {
 				forwards: URL.createObjectURL(rawRenderResult.forwards),
 			}
 
 			skinBlobUrlMap.set(key, renderResult)
 
+			if (capeTexture) {
+				try {
+					const withCape = await renderSkin(capeTexture)
+
+					if (isCurrentGeneration()) {
+						URL.revokeObjectURL(renderResult.forwards)
+						storedResult = withCape
+						renderResult = {
+							forwards: URL.createObjectURL(withCape.forwards),
+						}
+						skinBlobUrlMap.set(key, renderResult)
+					}
+				} catch (error) {
+					console.warn(`Could not render the cape for skin ${key}:`, error)
+				}
+			}
+
 			try {
-				await skinPreviewStorage.store(key, rawRenderResult)
+				await skinPreviewStorage.store(key, storedResult)
 			} catch (error) {
 				console.warn('Failed to store skin preview in persistent storage:', error)
 			}

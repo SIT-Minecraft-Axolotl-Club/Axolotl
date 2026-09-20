@@ -524,24 +524,22 @@ pub(crate) fn merged_to_version_info(
     })
 }
 
+/// Launch facts for a directly linked version whose entry cannot be found in
+/// the Minecraft manifest. Every Java 17+ release is well past the `23w14a`
+/// built-in quick play boundary, so a modern JVM implies built-in support;
+/// only pre-1.17 style versions fall back to the conservative answer.
 pub(crate) fn conservative_launch_facts(
     merged: &MergedVersion,
 ) -> (bool, super::QuickPlayVersion) {
-    use super::quick_play_version::{
-        QuickPlayServerVersion, QuickPlaySingleplayerVersion,
-    };
-
     let modern = merged
         .java_version
         .as_ref()
         .map_or(true, |java| java.major_version >= 17);
-    (
-        modern,
-        super::QuickPlayVersion {
-            server: QuickPlayServerVersion::Unsupported,
-            singleplayer: QuickPlaySingleplayerVersion::Unsupported,
-        },
-    )
+    if modern {
+        (modern, super::QuickPlayVersion::ASSUMED_MODERN)
+    } else {
+        (modern, super::QuickPlayVersion::UNSUPPORTED)
+    }
 }
 
 /// Rust port of HMCL `StringUtils.tokenize` (commit

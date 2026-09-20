@@ -2616,7 +2616,7 @@
     "message": "文件 {file}"
   },
   "app.instance.dependencies.graph-direction": {
-    "defaultMessage": "箭头从依赖方指向它使用的内容。"
+    "message": "箭头从依赖方指向它使用的内容。"
   },
   "app.instance.dependencies.graph-hint": {
     "message": "拖动画布以浏览关系；拖动卡片可调整布局。"
@@ -2643,7 +2643,7 @@
     "message": "未发现依赖关系。"
   },
   "app.instance.dependencies.no-graph-relations": {
-    "defaultMessage": "当前筛选条件下没有可显示的关系。"
+    "message": "当前筛选条件下没有可显示的关系。"
   },
   "app.instance.dependencies.no-matches": {
     "message": "没有依赖项符合这些筛选条件。"
@@ -8075,9 +8075,6 @@
   "app.skins.modal.arm-style-wide": {
     "message": "粗"
   },
-  "app.skins.modal.cape-fallback-name": {
-    "message": "披风"
-  },
   "app.skins.modal.cape-section": {
     "message": "披风"
   },
@@ -8086,12 +8083,6 @@
   },
   "app.skins.modal.make-edit-first-tooltip": {
     "message": "请先对皮肤进行编辑！"
-  },
-  "app.skins.modal.no-cape-tooltip": {
-    "message": "无披风"
-  },
-  "app.skins.modal.none-cape-option": {
-    "message": "无"
   },
   "app.skins.modal.replace-texture-button": {
     "message": "替换纹理"
@@ -10598,6 +10589,9 @@
   "app.navigation.screenshots": {
     "message": "截图中心"
   },
+  "app.navigation.skin-selector": {
+    "message": "皮肤"
+  },
   "app.screenshots.copied": {
     "message": "已复制"
   },
@@ -12331,5 +12325,131 @@
   },
   "sitmc-login.select-profile-on-site": {
     "message": "授权页面会让你选择要使用的角色，启动器会以该角色进入游戏。"
+  },
+  "app.skins.apply-button": {
+    "message": "应用"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "将永久删除所选皮肤，此操作无法撤销。"
+  },
+  "app.skins.delete-modal.title": {
+    "message": "确定要删除这款皮肤吗？"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "无法读取拖入的文件。"
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "处理文件出错"
+  },
+  "app.skins.offline-account.compatibility": {
+    "message": "离线皮肤通过本地资源包应用。Minecraft 1.6–1.19.2 的兼容性最佳；较新版本为尽力兼容。皮肤不会上传到 Mojang，并可能在你的客户端中同时替换其他使用默认皮肤的玩家；部分皮肤模组或服务器插件也可能覆盖它。"
+  },
+  "app.skins.offline-account.compatibility-title": {
+    "message": "离线皮肤兼容性"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "编辑皮肤"
+  },
+  "app.skins.previewing-badge": {
+    "message": "预览中"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "你更换皮肤过于频繁，Mojang 的服务器已暂时阻止后续请求。请稍等片刻后再试。"
+  },
+  "app.skins.rate-limit.title": {
+    "message": "慢一点！"
+  },
+  "app.skins.reorder-error.text": {
+    "message": "无法保存你的皮肤顺序。"
+  },
+  "app.skins.reorder-error.title": {
+    "message": "皮肤排序失败"
+  },
+  "app.skins.sign-in.axolotl-alt": {
+    "message": "Axolotl 启动器"
+  },
+  "app.skins.sign-in.button": {
+    "message": "登录"
+  },
+  "app.skins.sign-in.description": {
+    "message": "请登录你的 Minecraft 账户以使用 Axolotl 启动器的皮肤管理功能。"
+  },
+  "app.skins.sign-in.title": {
+    "message": "请先登录"
+  },
+  "app.skins.third-party-account.description": {
+    "message": "该账户的皮肤由其 Yggdrasil 提供方管理，请打开提供方网站更换。"
+  },
+  "app.skins.third-party-account.title": {
+    "message": "第三方皮肤管理"
+  },
+  "app.skins.title": {
+    "message": "皮肤"
+  },
+  "app.skins.no-skins.title": {
+    "message": "皮肤站上还没有皮肤"
+  },
+  "app.skins.no-skins.description": {
+    "message": "在下面添加一张 PNG，它就会上传到皮肤站并归属当前角色。"
+  },
+  "app.skins.site-error.unreachable.title": {
+    "message": "无法连接到皮肤站"
+  },
+  "app.skins.site-error.unreachable.text": {
+    "message": "皮肤站没有响应。请检查网络后重试，你的皮肤没有被改动。"
+  },
+  "app.skins.site-error.timeout.title": {
+    "message": "皮肤站响应太慢"
+  },
+  "app.skins.site-error.timeout.text": {
+    "message": "请求超时了。稍等片刻再试，你的皮肤没有被改动。"
+  },
+  "app.skins.site-error.too-many-changes.title": {
+    "message": "操作太频繁了"
+  },
+  "app.skins.site-error.too-many-changes.text": {
+    "message": "你更换皮肤的次数太多了，请稍等一会儿再试。"
+  },
+  "app.skins.site-error.auth.title": {
+    "message": "请重新登录后再管理皮肤"
+  },
+  "app.skins.site-error.auth.text": {
+    "message": "皮肤站已不再接受当前登录状态，请在顶栏账户菜单里重新登录。"
+  },
+  "app.skins.site-error.rejected.title": {
+    "message": "皮肤站拒绝了这张皮肤"
+  },
+  "app.skins.site-error.rejected.text": {
+    "message": "站点不接受这张贴图。请使用符合站点上传页尺寸规则的 PNG。"
+  },
+  "app.skins.site-error.missing.title": {
+    "message": "这张皮肤已经不在皮肤站上了"
+  },
+  "app.skins.site-error.missing.text": {
+    "message": "站点已经没有这张贴图了，请刷新页面后重新选择。"
+  },
+  "app.skins.site-error.server.title": {
+    "message": "皮肤站处理失败"
+  },
+  "app.skins.site-error.server.text": {
+    "message": "站点返回了错误，请稍后再试。"
+  },
+  "app.skins.site-error.generic.title": {
+    "message": "皮肤站拒绝了这次操作"
+  },
+  "app.skins.site-error.generic.text": {
+    "message": "皮肤站返回：{detail}"
+  },
+  "app.skins.applied.title": {
+    "message": "皮肤已应用"
+  },
+  "app.skins.applied.text": {
+    "message": "你的角色现在穿着 {name}。"
+  },
+  "app.skins.cooldown": {
+    "message": "请等待 {seconds} 秒后再更换"
+  },
+  "app.skins.open-library": {
+    "message": "打开皮肤中心"
   }
 }

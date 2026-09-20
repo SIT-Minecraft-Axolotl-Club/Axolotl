@@ -84,7 +84,17 @@ const MAX_GLOBAL_TAIL_HEDGES: usize = 8;
 pub(crate) const MAX_REDIRECT_LOCATION_BYTES: usize = 8 * 1024;
 const FILE_TRANSFER_CONNECT_TIMEOUT: time::Duration =
     time::Duration::from_secs(20);
+#[cfg(not(test))]
 const RESOURCE_WAIT_TIMEOUT: time::Duration = time::Duration::from_secs(45);
+#[cfg(test)]
+const RESOURCE_WAIT_TIMEOUT: time::Duration = time::Duration::from_millis(250);
+/// How many wait slices a connection request endures before the file fails.
+///
+/// An install queues hundreds of files on a handful of domains and the domain
+/// budget is deliberately small, so waiting past one slice means the queue is
+/// busy, not that the transfer is broken. Only a wait that never drains is
+/// treated as a wedged install.
+const MAX_RESOURCE_WAIT_SLICES: u32 = 10;
 #[cfg(not(test))]
 const FILE_TRANSFER_READ_TIMEOUT: time::Duration =
     time::Duration::from_secs(60);
@@ -3119,15 +3129,23 @@ fn segmented_concurrency_cap(available_permits: usize) -> usize {
     available_permits.min(MAX_SEGMENT_CONCURRENCY)
 }
 
+/// How many connections one file may open to its own domain.
+///
+/// The domain budget is small (eight connections) and an install queues
+/// hundreds of files on a handful of domains, so a file that claims the whole
+/// remaining budget stalls every other request on that domain until they time
+/// out. Keeping half of it in reserve lets the queue keep draining.
 fn route_segmented_concurrency_cap(
     route: &DownloadRoute,
     available_permits: usize,
+    authority_available: usize,
 ) -> usize {
     let fair_share = (available_permits / 2).max(2);
+    let authority_share = (authority_available / 2).max(1);
     let cap = segmented_concurrency_cap(available_permits)
         .min(fair_share)
         .min(8)
-        .min(crate::util::download::native_budget::available(route));
+        .min(authority_share);
     if route.source == DownloadRouteSource::Bmclapi
         || route.source == DownloadRouteSource::Tianpao
         || matches!(route.source, DownloadRouteSource::Official)
@@ -3218,6 +3236,60 @@ fn try_acquire_native_connection<'a>(
         _global: global,
         _native: native,
     })
+}
+
+/// Waits for a connection permit for as long as the domain queue stays busy.
+///
+/// The acquisition future is polled to completion instead of being recreated on
+/// every slice, because dropping it would forfeit this request's place in the
+/// semaphore's FIFO queue and let later requests overtake a starved one. Each
+/// elapsed slice logs a warning so a slow install stays diagnosable, and the
+/// wait is still interruptible through the request's cancellation token.
+async fn acquire_native_connection_patiently<'a>(
+    route: &DownloadRoute,
+    semaphore: &'a FetchSemaphore,
+    cancellation: Option<&tokio_util::sync::CancellationToken>,
+) -> crate::Result<NativeConnectionPermit<'a>> {
+    let acquisition = acquire_native_connection(route, semaphore);
+    tokio::pin!(acquisition);
+    let started = Instant::now();
+    let mut slices = 0_u32;
+    loop {
+        let slice = tokio::time::sleep(RESOURCE_WAIT_TIMEOUT);
+        tokio::pin!(slice);
+        if let Some(cancellation) = cancellation {
+            tokio::select! {
+                _ = cancellation.cancelled() => {
+                    return Err(ErrorKind::OtherError(
+                        "download canceled while waiting for native resources"
+                            .to_string(),
+                    )
+                    .into());
+                }
+                permit = &mut acquisition => return permit,
+                _ = &mut slice => {}
+            }
+        } else {
+            tokio::select! {
+                permit = &mut acquisition => return permit,
+                _ = &mut slice => {}
+            }
+        }
+        slices += 1;
+        if slices >= MAX_RESOURCE_WAIT_SLICES {
+            return Err(ErrorKind::NetworkError(
+                "timed out waiting for native download resources".to_string(),
+            )
+            .into());
+        }
+        tracing::warn!(
+            route = %sanitize_url_for_log(&route.url),
+            resource = "native_connection_and_fetch",
+            waited_s = started.elapsed().as_secs(),
+            remaining_slices = MAX_RESOURCE_WAIT_SLICES - slices,
+            "Still waiting for a free connection to this domain"
+        );
+    }
 }
 
 fn initial_segment_count(size: u64, available_permits: usize) -> usize {
@@ -4487,8 +4559,13 @@ async fn try_segmented_download(
         allow_low_throughput_abort,
     } = context;
     let configured_limit = configured_semaphore_limit(semaphore);
-    let concurrency_cap =
-        route_segmented_concurrency_cap(route, configured_limit);
+    let authority_available =
+        crate::util::download::native_budget::available(route);
+    let concurrency_cap = route_segmented_concurrency_cap(
+        route,
+        configured_limit,
+        authority_available,
+    );
     let requested_initial_count = initial_segment_count(size, concurrency_cap);
     if requested_initial_count < 2 {
         tracing::debug!(
@@ -4496,11 +4573,12 @@ async fn try_segmented_download(
             file_size = size,
             supports_range = true,
             configured_limit,
-            "Using a single connection because the configured limit is one"
+            authority_available,
+            "Using a single connection because only one is available to this file"
         );
         return SegmentedDownloadOutcome::FallbackSingle {
             disable_range: false,
-            reason: "configured connection limit is one",
+            reason: "only one connection is available to this file",
         };
     }
     if tokio::fs::metadata(part_path)
@@ -7228,8 +7306,70 @@ mod tests {
             true,
         );
 
-        assert_eq!(route_segmented_concurrency_cap(&bmclapi, 64), 4);
-        assert_eq!(route_segmented_concurrency_cap(&official, 64), 4);
+        assert_eq!(route_segmented_concurrency_cap(&bmclapi, 64, 8), 4);
+        assert_eq!(route_segmented_concurrency_cap(&official, 64, 8), 4);
+    }
+
+    #[test]
+    fn a_busy_domain_never_lends_a_file_more_than_half_of_its_connections() {
+        let route = route(
+            "https://resources.download.minecraft.net/file".to_string(),
+            DownloadRouteSource::Official,
+            false,
+            true,
+        );
+
+        assert_eq!(route_segmented_concurrency_cap(&route, 64, 8), 4);
+        assert_eq!(route_segmented_concurrency_cap(&route, 64, 4), 2);
+        assert_eq!(route_segmented_concurrency_cap(&route, 64, 2), 1);
+        assert_eq!(route_segmented_concurrency_cap(&route, 64, 1), 1);
+
+        // A domain with two connections left in reserve hands the file one
+        // connection so it starts now instead of queueing behind a batch.
+        let busy_cap = route_segmented_concurrency_cap(&route, 64, 2);
+        assert_eq!(initial_segment_count(16 * 1024 * 1024, busy_cap), 1);
+    }
+
+    #[tokio::test]
+    async fn a_starved_connection_wait_outlives_a_busy_domain() {
+        let semaphore = FetchSemaphore(Semaphore::new(1));
+        let held = semaphore.0.acquire().await.unwrap();
+        let route = direct_test_route(
+            "https://patient.example/file".to_string(),
+            DownloadRouteSource::Official,
+        );
+        let released_after =
+            RESOURCE_WAIT_TIMEOUT * 2 + time::Duration::from_millis(50);
+        let started = Instant::now();
+        let (_, permit) = tokio::join!(
+            async move {
+                tokio::time::sleep(released_after).await;
+                drop(held);
+            },
+            acquire_native_connection_patiently(&route, &semaphore, None),
+        );
+
+        assert!(permit.is_ok());
+        assert!(started.elapsed() >= released_after);
+    }
+
+    #[tokio::test]
+    async fn a_connection_wait_that_never_drains_still_fails() {
+        let semaphore = FetchSemaphore(Semaphore::new(1));
+        let _held = semaphore.0.acquire().await.unwrap();
+        let route = direct_test_route(
+            "https://wedged.example/file".to_string(),
+            DownloadRouteSource::Official,
+        );
+        let started = Instant::now();
+        let permit =
+            acquire_native_connection_patiently(&route, &semaphore, None).await;
+
+        assert!(permit.is_err());
+        assert!(
+            started.elapsed()
+                >= RESOURCE_WAIT_TIMEOUT * MAX_RESOURCE_WAIT_SLICES
+        );
     }
 
     #[test]
@@ -8509,25 +8649,13 @@ async fn run_native_route_attempts(
             DownloadItemStatus::WaitingForResource,
         )
         .await;
-        let permit_wait = tokio::time::timeout(
-            RESOURCE_WAIT_TIMEOUT,
-            acquire_native_connection(route, semaphore),
-        );
         let resource_wait_started = Instant::now();
-        let permit = if let Some(cancellation) = request.cancellation.as_ref() {
-            tokio::select! {
-                _ = cancellation.cancelled() => return Err(ErrorKind::OtherError("download canceled while waiting for native resources".to_string()).into()),
-                result = permit_wait => result,
-            }
-        } else {
-            permit_wait.await
-        }
-        .map_err(|_| {
-            ErrorKind::NetworkError(
-                "timed out waiting for native download resources"
-                    .to_string(),
-            )
-        })??;
+        let permit = acquire_native_connection_patiently(
+            route,
+            semaphore,
+            request.cancellation.as_ref(),
+        )
+        .await?;
         tracing::debug!(
             route = %sanitize_url_for_log(&route.url),
             resource = "native_connection_and_fetch",

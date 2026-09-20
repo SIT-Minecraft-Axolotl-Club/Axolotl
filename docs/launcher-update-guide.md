@@ -66,21 +66,29 @@ pnpm --filter @modrinth/app exec tauri signer generate -w "$env:USERPROFILE\.tau
 
 ### 3. 构建安装包(带签名)
 
-```powershell
-# 三个地址是构建期变量,不设的话客户端不会拉清单/公告/更新
-$env:VITE_SITMC_MANIFEST_URL       = 'https://skin.sitmc.club/api/launcher/manifest'
-$env:VITE_SITMC_ANNOUNCEMENTS_URL  = 'https://skin.sitmc.club/api/launcher/announcements'
-$env:VITE_SITMC_UPDATE_URL         = 'https://skin.sitmc.club/api/launcher/update'
+三个社团服务地址已**硬编码默认值**在 `apps/app-frontend/src/config.ts`(清单 / 公告 / 更新都指向 `https://skin.sitmc.club/api/launcher/*`),所以正常发版按下面的命令即可,**不必再设 `VITE_SITMC_*`**:
 
+```powershell
 # 签名:私钥内容 + 密码都要给(当前 CLI 不认 TAURI_SIGNING_PRIVATE_KEY_PATH)
 $env:TAURI_SIGNING_PRIVATE_KEY          = Get-Content "$env:USERPROFILE\.tauri\sitmc-updater.key" -Raw
 $env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD = Get-Content "$env:USERPROFILE\.tauri\sitmc-updater.key.password" -Raw
+$env:PATH = "$env:USERPROFILE\.cargo\bin;$env:PATH"   # cargo 不在 PATH 时
+$env:CARGO_BUILD_JOBS = '2'                            # 内存紧张时限制并行编译
 
 pnpm --filter @modrinth/app build                 # = tauri build --config tauri-release.conf.json
 ```
 
-> `turbo` 的严格环境模式会**丢弃未声明的环境变量**,这三个 `VITE_SITMC_*` 已加入 `turbo.jsonc` 的 `globalEnv`。
-> 构建时若看到 `A public key has been found, but no private key`,就是私钥变量没设;若停在 `Decrypting updater signing key, expect a prompt for password`,就是密码变量是空的(空值会让 CLI 转为交互式提问,CI/后台脚本会一直卡住)。
+只有本地联调才需要覆盖地址(置为空串表示关闭该功能):
+
+```powershell
+$env:VITE_SITMC_MANIFEST_URL       = 'http://127.0.0.1:8000/manifest.json'
+$env:VITE_SITMC_ANNOUNCEMENTS_URL  = ''
+$env:VITE_SITMC_UPDATE_URL         = ''
+```
+
+> `turbo` 的严格环境模式会**丢弃未声明的环境变量**:三个 `VITE_SITMC_*` 在 `globalEnv` 里,签名用的 `TAURI_SIGNING_PRIVATE_KEY` / `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` 在 `passThroughEnv` 里,**两者都必须保留**,否则构建仍然能成功但产不出 `.sig`。
+> 构建时若看到 `A public key has been found, but no private key`,就是私钥没传到 Rust 侧(先确认 turbo 配置里那两个变量没被删掉,或直接在 `apps/app` 里跑 `npx tauri build --config tauri-release.conf.json` 绕开 turbo);若停在 `Decrypting updater signing key, expect a prompt for password`,就是密码变量是空的(空值会让 CLI 转为交互式提问,CI/后台脚本会一直卡住)。
+> 成功的标志是构建末尾出现 `Finished 1 updater signature at: …setup.exe.sig`。
 
 产物(都在 `target/release/bundle/nsis/`):
 
@@ -142,15 +150,48 @@ curl.exe -i "https://skin.sitmc.club/api/launcher/update/windows/x86_64/1.0.0" `
 - `latest?channel=` 只用于界面提示,不参与安装。
 - 制品下载走客户端自己的 HTTP 客户端:CDN 需要支持 `HEAD`(用于取体积)与 `GET`,并允许任意 User-Agent。
 
+### 7. 皮肤站插件(皮肤契约)的部署
+
+启动器把「换皮肤」直接做在**皮肤站**上(契约见 `docs/launcher-protocol.md` §7),这条链路**不走启动器自更新**,改的是站点侧代码:
+
+| 启动器里的动作 | 站点端点 | 部署插件后是否需要玩家更新启动器 |
+| --- | --- | --- |
+| 打开皮肤页、列出衣柜 | `GET /api/launcher/skins` | 是(老启动器没有这个页面) |
+| 新增 / 替换皮肤贴图 | `POST /api/launcher/skins` | 是 |
+| 应用(装备/卸下皮肤、披风) | `PUT /api/launcher/skins/equip` | 是 |
+| 从衣柜移除 | `DELETE /api/launcher/skins` | 是(新增端点,见下) |
+
+发布顺序固定为**先站点、后启动器**:
+
+1. 把 `SITUserCenter/plugins/sitmc-launcher` 下的改动上传到站点(至少 `bootstrap.php` 与 `src/Http/Controllers/SkinController.php`);
+2. 在站点根目录清路由/配置缓存,否则新路由不生效:
+
+   ```bash
+   php artisan route:clear && php artisan config:clear
+   ```
+
+3. 用下面两条命令确认真实生效(把 `<token>` 换成任一玩家的启动器访问令牌,`<角色名>` 换成该玩家角色):
+
+   ```bash
+   curl.exe -i "https://skin.sitmc.club/api/launcher/skins?player=<角色名>" -H "Authorization: Bearer <token>"
+   curl.exe -i -X DELETE "https://skin.sitmc.club/api/launcher/skins" -H "Authorization: Bearer <token>" -H "Content-Type: application/json" -d "{\"player\":\"<角色名>\",\"tid\":0}"
+   ```
+
+   两条都不应返回 `404`(第一条 200、第二条 `missing_texture` 都说明路由已在);
+4. 再发布启动器版本。**老客户端调用不存在的端点只会报错、不会崩**,但玩家会看到「皮肤站没有响应」之类的提示,所以站点通常应先行或同时上线。
+
+老版本启动器上传皮肤时会在本地数据库留一份贴图镜像行,因此升级后「已保存皮肤」里可能出现同一张贴图的旧副本:这些行不再对应皮肤站上的贴图,选中后无法应用,从列表里删掉即可(不会影响站点上的贴图)。
+
 ---
 
 ## 三、常见问题
 
 | 现象 | 原因与处理 |
 | --- | --- |
-| 首页只显示「未配置社团实例清单地址」 | 构建时没设 `VITE_SITMC_MANIFEST_URL` |
-| 公告页/首页公告卡片没有内容 | 接口是通的(`/api/launcher/announcements`);检查后台是否有已生效的公告,以及构建时是否设了 `VITE_SITMC_ANNOUNCEMENTS_URL` |
-| 自更新一直提示「已是最新」 | 依次检查:构建时是否设了 `VITE_SITMC_UPDATE_URL`;`tauri-release.conf.json` 的 `createUpdaterArtifacts` 是否为 `true`;后台记录的版本号是否高于当前版本、是否勾选启用、是否填了制品地址与签名 |
+| 首页只显示「未配置社团实例清单地址」 | 构建时把 `VITE_SITMC_MANIFEST_URL` **显式设成了空串**(不设则用 `config.ts` 里的社团默认地址) |
+| 公告页/首页公告卡片没有内容 | 同上看是否被置空;再检查后台是否有已生效的公告 |
+| 自更新一直提示「已是最新」 | 依次检查:`VITE_SITMC_UPDATE_URL` 是否被置空;`tauri-release.conf.json` 的 `createUpdaterArtifacts` 是否为 `true`;后台记录的版本号是否高于当前版本、是否勾选启用、是否填了制品地址与签名 |
+| 构建没有产出 `.sig` | `TAURI_SIGNING_PRIVATE_KEY` 没传到 Rust 侧:turbo 的 `passThroughEnv` 里必须留有它;仍不行就绕开 turbo,在 `apps/app` 里跑 `npx tauri build --config tauri-release.conf.json` |
 | 下载完更新但安装失败 | 制品地址与签名不是同一对(重新复制 `.sig` 全文,注意别丢字符);或 CDN 对 `.exe` 返回了 HTML 错误页 |
 | 更新下载报网络错误 | CDN 不支持 `HEAD`、证书无效、或文件地址需要登录 |
 | 换过一次签名密钥后老客户端收不到更新 | 老客户端内置的是旧公钥,只能用旧私钥签名推送**最后一次**更新;新版本再从新公钥起算 |

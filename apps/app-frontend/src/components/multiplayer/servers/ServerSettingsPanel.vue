@@ -341,7 +341,7 @@ async function confirmDelete() {
 			class="fixed bottom-4 z-50 flex"
 			:style="{
 				left: 'calc(var(--left-bar-width) + 1.5rem)',
-				width: 'calc(100% - var(--left-bar-width) - var(--right-bar-width) - 3rem)',
+				width: 'calc(100% - var(--left-bar-width) - 3rem)',
 			}"
 		>
 			<div class="flex w-full items-center justify-end">

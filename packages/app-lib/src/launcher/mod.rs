@@ -66,6 +66,7 @@ mod direct_link;
 pub(crate) mod instance_runtime;
 mod local_artifact;
 mod natives;
+pub(crate) mod resource_pack_audit;
 
 pub mod download;
 pub mod jvm_args;
@@ -1927,6 +1928,8 @@ pub async fn launch_minecraft(
         )
         .await?
     };
+    audit_resource_packs(instance, &instance_path).await;
+
     let offline_skin_pack = if direct_launch.is_some() {
         // Writing the offline skin pack would modify the linked folder.
         crate::minecraft_skins::OfflineSkinPackOptions {
@@ -2480,9 +2483,10 @@ pub async fn launch_minecraft(
         }
     }
 
-    tracing::debug!(
-        "Found QuickPlayVersion for {}: {quick_play_version:?}",
-        content_set.game_version
+    tracing::info!(
+        game_version = %content_set.game_version,
+        ?quick_play_version,
+        "Resolved quick play support for this launch"
     );
     if let QuickPlayType::Server(address) = &mut quick_play_type
         && quick_play_version.server >= QuickPlayServerVersion::BuiltinLegacy
@@ -2513,6 +2517,24 @@ pub async fn launch_minecraft(
         }
 
         address.resolve().await?;
+
+        // Built-in quick play resolves the address against the instance's saved
+        // server list and bails out to the title screen when it is absent, so
+        // the entry has to exist before the game starts. The launcher did not
+        // write it before, which is why a server supplied by the manifest only
+        // auto-joined while the game still had the entry from its own earlier
+        // session.
+        if quick_play_version.server >= QuickPlayServerVersion::Builtin
+            && let Some((host, port)) = address.require_resolved().ok()
+        {
+            write_quick_play_server_entry(
+                instance,
+                &state,
+                &format_server_address(host, port),
+                &instance.name,
+            )
+            .await;
+        }
     }
 
     let (main_class_keep_alive, main_class_path) =
@@ -2844,6 +2866,208 @@ mod game_argument_encoding_tests {
             BASE64_STANDARD.decode(payload).unwrap(),
             original.as_bytes()
         );
+    }
+}
+
+/// Checks the instance's resource packs before the game starts.
+///
+/// Vanilla answers a broken pack by dropping *every* selected pack and
+/// reloading, which is both destructive and impossible to attribute from the
+/// game log. A broken pack is first re-downloaded from the hash the modpack
+/// recorded for it; anything that cannot be restored is moved aside, keeps the
+/// working packs, and turns a black-screen startup into a readable warning.
+async fn audit_resource_packs(instance: &Instance, instance_dir: &Path) {
+    let mut audit =
+        match resource_pack_audit::audit_instance_resource_packs(instance_dir)
+            .await
+        {
+            Ok(audit) => audit,
+            Err(error) => {
+                tracing::warn!(%error, "Resource pack audit failed");
+                return;
+            }
+        };
+    if audit.is_clean() {
+        tracing::info!(
+            checked = audit.checked,
+            "No broken resource packs found before launch"
+        );
+        return;
+    }
+
+    let mut message = String::new();
+    let repaired = repair_broken_resource_packs(instance, &audit, &mut message).await;
+    if repaired > 0
+        && let Ok(recheck) =
+            resource_pack_audit::audit_instance_resource_packs(instance_dir).await
+    {
+        audit = recheck;
+    }
+
+    for pack in &audit.broken {
+        tracing::error!(
+            pack = %pack.name,
+            reason = %pack.reason,
+            texture = pack.texture.as_deref().unwrap_or("-"),
+            "Broken resource pack detected before launch"
+        );
+    }
+
+    let quarantined = match resource_pack_audit::quarantine_broken_packs(&audit).await
+    {
+        Ok(quarantined) => quarantined,
+        Err(error) => {
+            tracing::warn!(%error, "Failed to quarantine broken resource packs");
+            Vec::new()
+        }
+    };
+
+    if !audit.broken.is_empty() {
+        let names = audit
+            .broken
+            .iter()
+            .map(|pack| match &pack.texture {
+                Some(texture) => format!("{} ({texture})", pack.name),
+                None => pack.name.clone(),
+            })
+            .collect::<Vec<_>>()
+            .join(", ");
+        if !message.is_empty() {
+            message.push(' ');
+        }
+        if quarantined.is_empty() {
+            message.push_str(&format!(
+                "Broken resource pack(s) found and left in place: {names}. The game will disable all selected resource packs if they stay selected."
+            ));
+        } else {
+            message.push_str(&format!(
+                "Broken resource pack(s) moved aside so the game can start: {names}."
+            ));
+        }
+    }
+
+    if message.is_empty() {
+        return;
+    }
+    if let Err(error) = crate::event::emit::emit_warning(&message).await {
+        tracing::warn!(%error, "Failed to emit the resource pack warning");
+    }
+}
+
+/// Re-downloads the broken packs a modpack owns, returning how many were
+/// restored and appending a summary to `message`.
+async fn repair_broken_resource_packs(
+    instance: &Instance,
+    audit: &resource_pack_audit::ResourcePackAudit,
+    message: &mut String,
+) -> usize {
+    let paths = crate::install::resource_pack_relative_paths(
+        audit.broken.iter().map(|pack| pack.name.clone()),
+    );
+    if paths.is_empty() {
+        return 0;
+    }
+
+    let repairs = match crate::install::repair_instance_files(instance, &paths).await
+    {
+        Ok(repairs) => repairs,
+        Err(error) => {
+            tracing::warn!(%error, "Failed to repair broken resource packs");
+            return 0;
+        }
+    };
+
+    let repaired = repairs
+        .iter()
+        .filter(|repair| repair.repaired())
+        .map(|repair| {
+            repair
+                .relative_path
+                .rsplit('/')
+                .next()
+                .unwrap_or(&repair.relative_path)
+                .to_string()
+        })
+        .collect::<Vec<_>>();
+    for repair in repairs.iter().filter(|repair| repair.repaired()) {
+        tracing::info!(
+            path = %repair.relative_path,
+            "Re-downloaded a damaged resource pack from its recorded hash"
+        );
+    }
+    for repair in &repairs {
+        if let crate::install::InstanceFileRepairOutcome::Failed(reason) =
+            &repair.outcome
+        {
+            tracing::warn!(
+                path = %repair.relative_path,
+                reason,
+                "Failed to repair an instance file"
+            );
+        }
+    }
+
+    if repaired.is_empty() {
+        return 0;
+    }
+    if !message.is_empty() {
+        message.push(' ');
+    }
+    message.push_str(&format!(
+        "Re-downloaded damaged resource pack(s): {}.",
+        repaired.join(", ")
+    ));
+    tracing::info!(
+        repaired = repaired.len(),
+        "Repaired damaged resource packs before launch"
+    );
+    repaired.len()
+}
+
+/// Formats a resolved server address the way quick play passes it on the
+/// command line (`host:port`, with IPv6 hosts bracketed).
+fn format_server_address(host: &str, port: u16) -> String {
+    if host.contains(':') {
+        format!("[{host}]:{port}")
+    } else {
+        format!("{host}:{port}")
+    }
+}
+
+/// Ensures the instance's `servers.dat` holds `address` so built-in quick play
+/// can resolve it. Best effort: a failure here must never block a launch.
+async fn write_quick_play_server_entry(
+    instance: &Instance,
+    state: &State,
+    address: &str,
+    fallback_name: &str,
+) {
+    let instance_dir = state.directories.resolve_game_dir(
+        &instance.path,
+        instance.game_dir_override.as_deref(),
+    );
+    match crate::api::worlds::servers_data::upsert(
+        &instance_dir,
+        address,
+        fallback_name,
+        true,
+    )
+    .await
+    {
+        Ok(inserted) => {
+            tracing::info!(
+                address,
+                inserted,
+                "Prepared the quick play server entry for this launch"
+            );
+        }
+        Err(error) => {
+            tracing::warn!(
+                %error,
+                address,
+                "Failed to prepare the quick play server entry"
+            );
+        }
     }
 }
 

@@ -2023,6 +2023,90 @@ impl TryFrom<PendingManualDownloadRow> for PendingManualDownload {
     }
 }
 
+/// A modpack-managed file that can be re-downloaded from its provider.
+///
+/// Carries the recorded content hash so a caller can tell whether the copy on
+/// disk still matches what the pack installed, plus the provider release
+/// identity needed to fetch a replacement.
+#[derive(Clone, Debug)]
+pub(crate) struct PackMemberRepairTarget {
+    pub relative_path: String,
+    pub expected_sha1: String,
+    pub provider: Option<ContentProvider>,
+    pub provider_project_id: Option<String>,
+    pub provider_release_id: Option<String>,
+}
+
+/// Returns the modpack-managed files of an instance that live under one of the
+/// given content directories (`resourcepacks`, `mods`, ...).
+pub(crate) async fn get_pack_member_repair_targets(
+    instance_id: &str,
+    content_dirs: &[&str],
+    pool: &SqlitePool,
+) -> crate::Result<Vec<PackMemberRepairTarget>> {
+    if content_dirs.is_empty() {
+        return Ok(Vec::new());
+    }
+    let directory_filter = content_dirs
+        .iter()
+        .map(|directory| {
+            format!(
+                "lower(file.relative_path) LIKE '{}/%'",
+                directory.replace('\'', "''")
+            )
+        })
+        .collect::<Vec<_>>()
+        .join(" OR ");
+
+    let rows = sqlx::query(&format!(
+        "SELECT file.relative_path AS relative_path,
+			member.expected_sha1 AS expected_sha1,
+			COALESCE(origin.provider, member.provider) AS provider,
+			COALESCE(origin.provider_project_id, member.provider_project_id)
+				AS provider_project_id,
+			COALESCE(origin.provider_release_id, member.provider_release_id)
+				AS provider_release_id
+		 FROM instances instance
+		 INNER JOIN instance_pack_members member
+			ON member.content_set_id = instance.applied_content_set_id
+		 INNER JOIN instance_files file
+			ON file.instance_id = instance.id
+			AND file.id = (
+				SELECT entry.file_id
+				FROM instance_content_entries entry
+				WHERE entry.id = member.content_entry_id
+			)
+		 LEFT JOIN instance_content_provider_refs origin
+			ON origin.content_entry_id = member.content_entry_id
+			AND origin.is_origin = 1
+		 WHERE instance.id = ?
+			AND member.materialization_state = 'present'
+			AND member.expected_sha1 IS NOT NULL
+			AND file.missing = 0
+			AND ({directory_filter})"
+    ))
+    .bind(instance_id)
+    .fetch_all(pool)
+    .await?;
+
+    rows.into_iter()
+        .map(|row| {
+            let provider = row
+                .try_get::<Option<String>, _>("provider")?
+                .as_deref()
+                .map(ContentProvider::from_str)
+                .transpose()?;
+            Ok(PackMemberRepairTarget {
+                relative_path: row.try_get("relative_path")?,
+                expected_sha1: row.try_get("expected_sha1")?,
+                provider,
+                provider_project_id: row.try_get("provider_project_id")?,
+                provider_release_id: row.try_get("provider_release_id")?,
+            })
+        })
+        .collect()
+}
+
 pub(crate) async fn get_pack_members(
     content_set_id: &str,
     pool: &SqlitePool,

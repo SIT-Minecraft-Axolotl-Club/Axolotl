@@ -628,14 +628,16 @@ type MinecraftCredential = {
 
 /**
  * What the rest of the shell reaches the account UI through: the error modals
- * call `login()` and the app follows `accountChangeRevision`, so the popover has
- * to keep publishing both now that it renders its own list.
+ * call `login()`, the app follows `accountChangeRevision`, and the skin page
+ * announces a new equipped skin, so the popover has to keep publishing all three
+ * now that it renders its own list.
  */
 type AccountsCardHandle = {
 	accountChangeRevision?: number
 	accounts?: MinecraftCredential[]
 	login?: () => void
 	refreshValues?: () => unknown
+	setEquippedSkin?: (skin: Skin | null) => void
 }
 
 const accountsCard = inject<Ref<AccountsCardHandle | null> | null>('accountsCard', null)
@@ -768,6 +770,7 @@ const accountsCardHandle: AccountsCardHandle = reactive({
 	accounts,
 	login: () => openSignInGate(),
 	refreshValues: () => refreshAccount(),
+	setEquippedSkin: (skin) => invalidateAccountHead(skin),
 })
 
 if (accountsCard) accountsCard.value = accountsCardHandle
@@ -821,21 +824,40 @@ async function renderAccountHeads(accountList: MinecraftCredential[]) {
 	const renderedHeads = await Promise.all(
 		accountList.map(async (account) => {
 			const skin = getAccountSkin(account)
-			if (!skin) return null
+			if (!skin) return [account.account_id, defaultSteveHeadUrl] as const
 			const headUrl = await getPlayerHeadUrl(skin).catch((error) => {
 				console.warn('Failed to render an account head in the action bar', error)
 				return null
 			})
-			return headUrl ? ([account.account_id, headUrl] as const) : null
+			return [account.account_id, headUrl ?? defaultSteveHeadUrl] as const
 		}),
 	)
 	if (generation !== accountRefreshGeneration) return
 
 	const nextHeadUrls = new Map(accountHeadUrls.value)
-	for (const entry of renderedHeads) {
-		if (entry) nextHeadUrls.set(entry[0], entry[1])
+	for (const [accountId, headUrl] of renderedHeads) {
+		nextHeadUrls.set(accountId, headUrl)
 	}
 	accountHeadUrls.value = nextHeadUrls
+}
+
+/**
+ * Throws away the rendered head of the account wearing this skin so the chip and
+ * the list re-render it from the texture that was just equipped.
+ */
+function invalidateAccountHead(skin: Skin | null) {
+	const accountId = skin
+		? (selectedAccount.value?.account_id ??
+			accounts.value.find((account) => account.profile.name === skin.name)?.account_id)
+		: selectedAccount.value?.account_id
+	if (!accountId) return
+
+	const nextHeadUrls = new Map(accountHeadUrls.value)
+	nextHeadUrls.delete(accountId)
+	accountHeadUrls.value = nextHeadUrls
+
+	const account = accounts.value.find((item) => item.account_id === accountId)
+	if (account) void renderAccountHeads([account])
 }
 
 /**

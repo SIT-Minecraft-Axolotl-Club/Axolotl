@@ -5930,6 +5930,9 @@
   "app.navigation.screenshots": {
     "message": "Screenshots"
   },
+  "app.navigation.skin-selector": {
+    "message": "Skin selector"
+  },
   "app.navigation.worlds": {
     "message": "Worlds"
   },
@@ -9677,9 +9680,6 @@
   "app.skins.modal.arm-style-wide": {
     "message": "Wide"
   },
-  "app.skins.modal.cape-fallback-name": {
-    "message": "Cape"
-  },
   "app.skins.modal.cape-section": {
     "message": "Cape"
   },
@@ -9688,12 +9688,6 @@
   },
   "app.skins.modal.make-edit-first-tooltip": {
     "message": "Make an edit to the skin first!"
-  },
-  "app.skins.modal.no-cape-tooltip": {
-    "message": "No cape"
-  },
-  "app.skins.modal.none-cape-option": {
-    "message": "None"
   },
   "app.skins.modal.replace-texture-button": {
     "message": "Replace texture"
@@ -12328,5 +12322,131 @@
   },
   "unknown-pack-warning-modal.warning.title": {
     "message": "Unknown file warning"
+  },
+  "app.skins.apply-button": {
+    "message": "Apply"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "This will permanently delete the selected skin. This action cannot be undone."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Are you sure you want to delete this skin?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Failed to read the dropped file."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Error processing file"
+  },
+  "app.skins.offline-account.compatibility": {
+    "message": "Offline skins are applied locally with a resource pack. Compatibility is best on Minecraft 1.6–1.19.2; newer versions are supported on a best-effort basis. The skin is not uploaded to Mojang, may also replace other default-skinned players on your client, and some skin mods or server plugins may override it."
+  },
+  "app.skins.offline-account.compatibility-title": {
+    "message": "Offline skin compatibility"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Edit skin"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Previewing"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "You're changing your skin too frequently. Mojang's servers have temporarily blocked further requests. Please wait a moment before trying again."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Slow down!"
+  },
+  "app.skins.reorder-error.text": {
+    "message": "Your skin order could not be saved."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Failed to reorder skins"
+  },
+  "app.skins.sign-in.axolotl-alt": {
+    "message": "Axolotl Launcher"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Sign In"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Please sign into your Minecraft account to use the skin management features of Axolotl Launcher."
+  },
+  "app.skins.sign-in.title": {
+    "message": "Please sign in"
+  },
+  "app.skins.third-party-account.description": {
+    "message": "Skins for this account are managed by its Yggdrasil provider. Open the provider website to change them."
+  },
+  "app.skins.third-party-account.title": {
+    "message": "Third-party skin management"
+  },
+  "app.skins.title": {
+    "message": "Skins"
+  },
+  "app.skins.no-skins.title": {
+    "message": "No skins on the skin site yet"
+  },
+  "app.skins.no-skins.description": {
+    "message": "Add a PNG below and it is uploaded to the skin site for this character."
+  },
+  "app.skins.site-error.unreachable.title": {
+    "message": "Cannot reach the skin site"
+  },
+  "app.skins.site-error.unreachable.text": {
+    "message": "The skin site did not answer. Check your connection and try again — your skin was not changed."
+  },
+  "app.skins.site-error.timeout.title": {
+    "message": "The skin site is too slow to answer"
+  },
+  "app.skins.site-error.timeout.text": {
+    "message": "The request timed out. Try again in a moment — your skin was not changed."
+  },
+  "app.skins.site-error.too-many-changes.title": {
+    "message": "Too many changes at once"
+  },
+  "app.skins.site-error.too-many-changes.text": {
+    "message": "You are changing your skin too often. Wait a moment before trying again."
+  },
+  "app.skins.site-error.auth.title": {
+    "message": "Sign in again to manage your skins"
+  },
+  "app.skins.site-error.auth.text": {
+    "message": "The skin site no longer accepts your session. Sign in again from the account menu."
+  },
+  "app.skins.site-error.rejected.title": {
+    "message": "The skin site rejected this skin"
+  },
+  "app.skins.site-error.rejected.text": {
+    "message": "The site refused the texture. It has to be a PNG that follows the size rules it shows on its upload page."
+  },
+  "app.skins.site-error.missing.title": {
+    "message": "That skin is no longer on the site"
+  },
+  "app.skins.site-error.missing.text": {
+    "message": "The site does not have this texture any more. Reload the page and pick another one."
+  },
+  "app.skins.site-error.server.title": {
+    "message": "The skin site failed to apply that"
+  },
+  "app.skins.site-error.server.text": {
+    "message": "The site reported an error. Try again later."
+  },
+  "app.skins.site-error.generic.title": {
+    "message": "The skin site refused that"
+  },
+  "app.skins.site-error.generic.text": {
+    "message": "The skin site answered: {detail}"
+  },
+  "app.skins.applied.title": {
+    "message": "Skin applied"
+  },
+  "app.skins.applied.text": {
+    "message": "{name} is now what your character wears."
+  },
+  "app.skins.cooldown": {
+    "message": "Wait {seconds}s before changing again"
+  },
+  "app.skins.open-library": {
+    "message": "Open the skin library"
   }
 }

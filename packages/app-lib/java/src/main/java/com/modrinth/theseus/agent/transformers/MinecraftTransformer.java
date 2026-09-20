@@ -42,11 +42,25 @@ public final class MinecraftTransformer extends ClassNodeTransformer {
                     // know which is real, just return so we don't call something we shouldn't.
                     // Note this can't happen unless some other mod is adding a method with this
                     // same descriptor.
+                    warn("Found more than one " + SET_SERVER_NAME_DESC + " method on " + classNode.name
+                            + ", not injecting server join support");
                     return false;
                 }
             }
         }
         if (constructor == null) {
+            warn("No constructor found on " + classNode.name + ", not injecting server join support");
+            return false;
+        }
+        if (setServerName == null) {
+            // Minecraft 1.20+ dropped the (String, int) server setter in favour of
+            // the built-in --quickPlayMultiplayer argument. Reaching this point
+            // means the launcher asked for the injected transport on a version
+            // that cannot support it, and the server would silently never be
+            // joined, so say so loudly instead.
+            warn("No " + SET_SERVER_NAME_DESC + " method found on " + classNode.name
+                    + ", so the injected server join cannot be applied. This game version requires"
+                    + " the launcher to use the built-in quick play argument instead.");
             return false;
         }
 
@@ -77,8 +91,11 @@ public final class MinecraftTransformer extends ClassNodeTransformer {
         // Minecraft String String
         it.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Integer", "parseInt", "(Ljava/lang/String;)I"));
         // Minecraft String int
-        it.add(new MethodInsnNode(
-                Opcodes.INVOKEVIRTUAL, "net/minecraft/client/Minecraft", setServerName, SET_SERVER_NAME_DESC));
+        // The owning class must be named exactly as the runtime sees it. Under
+        // Fabric loader the client class is the intermediary name
+        // (`net/minecraft/class_310`), so hardcoding the official name produced
+        // an owner that does not resolve at runtime.
+        it.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, classNode.name, setServerName, SET_SERVER_NAME_DESC));
         //
         it.add(new JumpInsnNode(Opcodes.GOTO, doneQuickPlayLabel));
         it.add(noQuickPlayLabel);
@@ -95,5 +112,9 @@ public final class MinecraftTransformer extends ClassNodeTransformer {
         //
 
         return true;
+    }
+
+    private static void warn(String message) {
+        System.out.println("[MODRINTH] Quick play: " + message);
     }
 }

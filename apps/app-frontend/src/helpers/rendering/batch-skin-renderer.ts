@@ -19,6 +19,7 @@ const headRenderPromises = new Map<string, Promise<string>>()
 
 const DEBUG_MODE = false
 const HEAD_RENDER_VERSION = 8
+const HEAD_RENDER_TIMEOUT_MS = 8000
 
 export function getHeadRenderKey(textureKey: string): string {
 	return `${textureKey}-head-v${HEAD_RENDER_VERSION}`
@@ -46,7 +47,26 @@ export async function cleanupUnusedPreviews(skins: Skin[]): Promise<void> {
 export async function generatePlayerHeadBlob(skinUrl: string): Promise<Blob> {
 	return new Promise((resolve, reject) => {
 		const img = new Image()
-		img.crossOrigin = 'anonymous'
+		let settled = false
+
+		function fail(error: Error) {
+			if (settled) return
+			settled = true
+			window.clearTimeout(timeout)
+			reject(error)
+		}
+
+		function succeed(blob: Blob) {
+			if (settled) return
+			settled = true
+			window.clearTimeout(timeout)
+			resolve(blob)
+		}
+
+		const timeout = window.setTimeout(
+			() => fail(new Error('Timed out loading the skin texture for a head render')),
+			HEAD_RENDER_TIMEOUT_MS,
+		)
 
 		img.onload = () => {
 			try {
@@ -88,19 +108,17 @@ export async function generatePlayerHeadBlob(skinUrl: string): Promise<Blob> {
 
 				outputCanvas.toBlob((blob) => {
 					if (blob) {
-						resolve(blob)
+						succeed(blob)
 					} else {
-						reject(new Error('Failed to create blob from canvas'))
+						fail(new Error('Failed to create blob from canvas'))
 					}
 				}, 'image/png')
 			} catch (error) {
-				reject(error)
+				fail(error instanceof Error ? error : new Error(String(error)))
 			}
 		}
 
-		img.onerror = () => {
-			reject(new Error('Failed to load skin texture image'))
-		}
+		img.onerror = () => fail(new Error('Failed to load skin texture image'))
 
 		img.src = skinUrl
 	})

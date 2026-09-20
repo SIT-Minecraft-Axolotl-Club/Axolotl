@@ -28,6 +28,146 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-2.0.6',
+		version: '2.0.6',
+		publishedAt: '2026-09-20',
+		title: {
+			'en-US': 'Axolotl Launcher 2.0.6',
+			'zh-CN': 'Axolotl 启动器 2.0.6',
+		},
+		changes: {
+			fixed: [
+				{
+					'en-US':
+						'Large modpack installs no longer fail and roll back when the download server is busy: a file that has to wait for a free connection now keeps waiting instead of reporting a network error that discarded everything already downloaded.',
+					'zh-CN':
+						'下载服务器繁忙时，大型整合包安装不再失败回滚：需要等待空闲连接的文件会继续等待，不再报网络错误并丢弃已经下载好的内容。',
+				},
+				{
+					'en-US':
+						'One file can no longer take more than half of the connections a server allows, so a single large file no longer starves every other download queued behind it.',
+					'zh-CN':
+						'单个文件不再占用某台服务器允许的一半以上连接，一个大文件不会再让排在它后面的其他下载一直等不到连接。',
+				},
+				{
+					'en-US':
+						'When a server has only a few connections left, a file downloads over a single connection instead of queuing for a parallel batch, so it starts immediately.',
+					'zh-CN':
+						'当某台服务器只剩少量连接时，文件会改为单连接下载，而不是排队等待一批并行连接，因此可以立刻开始。',
+				},
+			],
+		},
+	},
+	{
+		id: 'launcher-2.0.5',
+		version: '2.0.5',
+		publishedAt: '2026-09-19',
+		title: {
+			'en-US': 'Axolotl Launcher 2.0.5',
+			'zh-CN': 'Axolotl 启动器 2.0.5',
+		},
+		changes: {
+			added: [
+				{
+					'en-US':
+						'The game now joins a server after every launch, not just the first one: the launcher prepares the server entry the game needs before starting, so an instance whose server comes from the society manifest keeps connecting on later launches too.',
+					'zh-CN':
+						'现在每次启动都会自动进入服务器，不再只有第一次生效：启动器会在开始游戏前准备好游戏所需的服务器条目，因此由社团清单下发服务器的实例在后续启动时同样会自动进服。',
+				},
+				{
+					'en-US':
+						'Damaged resource packs are repaired before the game starts: a pack whose file no longer matches the version the modpack installed is downloaded again, so a half-finished download can no longer make the game drop every selected pack.',
+					'zh-CN':
+						'启动前会自动修复损坏的资源包：文件与整合包所装版本不一致的资源包会被重新下载，下载不完整不再导致游戏丢弃全部已选资源包。',
+				},
+				{
+					'en-US':
+						'The skin page now manages the skins on the skin site itself: the closet is listed with your character, so you can switch skins, change the arm model, replace a texture or remove one without leaving the launcher.',
+					'zh-CN':
+						'皮肤页现在直接管理皮肤站上的皮肤：会列出角色当前皮肤与衣柜，可以直接切换皮肤、修改手臂模型、替换贴图或移除，不用离开启动器。',
+				},
+				{
+					'en-US':
+						'The skin page has a button that opens the skin site library in your browser, for browsing skins other players published.',
+					'zh-CN':
+						'皮肤页新增「打开皮肤中心」按钮，可在浏览器里浏览其他玩家发布的皮肤。',
+				},
+			],
+			changed: [
+				{
+					'en-US':
+						'Quick play support is now detected from the game version itself, so modern versions (1.20 and newer, including 1.21.x) use the built-in quick play support instead of the older launcher-side method that no longer exists in them.',
+					'zh-CN':
+						'快速进入游戏的判定改为按游戏版本判断，1.20 及以后（含 1.21.x）改用游戏内置的快速进入功能，不再依赖这些版本里已经移除的启动器注入方式。',
+				},
+				{
+					'en-US':
+						'Broken resource packs that cannot be restored are named in a notification, and only those packs are set aside — the packs that still work stay selected.',
+					'zh-CN':
+						'无法修复的损坏资源包会在通知里点名，并且只会移走这些包，仍可正常使用的资源包保持选中。',
+				},
+				{
+					'en-US':
+						'Accounts moved to the top bar and the right sidebar is gone, so pages have the full window width. The skin selector no longer lists the skins the game ships with, only your own.',
+					'zh-CN':
+						'账户切换已移到顶栏，右侧栏整体移除，页面获得完整窗口宽度。皮肤选择器不再列出游戏自带皮肤，只显示你自己的皮肤。',
+				},
+				{
+					'en-US':
+						'The skin list is fetched far less often and changing a skin is followed by a short pause before the next change, and the launcher now says so. This keeps the skin site from answering "too many requests" and makes the list load reliably.',
+					'zh-CN':
+						'皮肤列表的读取频率大幅降低，更换皮肤后会短暂等待才能再次更换，并在界面上提示。这样可以避免皮肤站返回「请求过于频繁」，列表也就能稳定加载。',
+				},
+			],
+			removed: [
+				{
+					'en-US':
+						'Capes can no longer be changed from the launcher. The 3D preview still shows the cape your character is wearing; change capes on the skin site.',
+					'zh-CN':
+						'启动器内不再提供披风更换。3D 预览仍会显示角色当前披风，需要更换请前往皮肤站。',
+				},
+				{
+					'en-US':
+						'The built-in skin editor entry is gone; the launcher no longer opens a separate skin editor.',
+					'zh-CN':
+						'移除内置皮肤编辑器入口，启动器不再打开独立的皮肤编辑器。',
+				},
+			],
+			fixed: [
+				{
+					'en-US':
+						'Saving the server list no longer drops settings the game itself stores in it, such as the accepted code of conduct, and no longer loses a server icon.',
+					'zh-CN':
+						'保存服务器列表时不再丢弃游戏自己写入的设置（例如已确认的行为准则），也不再丢失服务器图标。',
+				},
+				{
+					'en-US':
+						'Changing your skin no longer takes your cape off: the launcher no longer sends the cape slot when it equips a skin.',
+					'zh-CN':
+						'更换皮肤不再把披风一起清掉：装备皮肤时启动器不再提交披风槽位。',
+				},
+				{
+					'en-US':
+						'The same skin is no longer listed twice, so the launcher shows exactly the skins the skin site has.',
+					'zh-CN':
+						'同一款皮肤不再重复出现，启动器里显示的皮肤数量与皮肤站完全一致。',
+				},
+				{
+					'en-US':
+						'Failures from the skin site are explained in your own language — being asked to slow down, a session that expired, a texture the site refused — instead of an HTTP status code.',
+					'zh-CN':
+						'皮肤站的失败原因会用人话说明（操作过于频繁、登录已失效、贴图被拒绝等），不再直接抛出 HTTP 状态码。',
+				},
+				{
+					'en-US':
+						'The skin page no longer sits on a loading animation: a cape that cannot be drawn no longer holds back the skins, and the textures the launcher fetches from the skin site now have a time limit, so a stalled request shows what it has instead of loading forever.',
+					'zh-CN':
+						'皮肤页不再一直停在加载动画上：画不出来的披风不会再把皮肤一起卡住，启动器向皮肤站发起的贴图请求也加了超时，请求卡住时会先显示已经拿到的内容，而不是永远转圈。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-2.0.4',
 		version: '2.0.4',
 		publishedAt: '2026-09-18',

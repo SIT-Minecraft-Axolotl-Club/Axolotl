@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { AuthFeature, TauriModrinthClient, VerboseLoggingFeature } from '@modrinth/api-client'
 import {
+	ChangeSkinIcon,
 	DownloadIcon,
 	FolderOpenIcon,
 	HomeIcon,
@@ -943,6 +944,10 @@ const messages = defineMessages({
 	discoverContent: {
 		id: 'app.navigation.discover-content',
 		defaultMessage: 'Discover content',
+	},
+	skinSelector: {
+		id: 'app.navigation.skin-selector',
+		defaultMessage: 'Skin selector',
 	},
 	library: {
 		id: 'app.navigation.library',
@@ -2055,6 +2060,11 @@ onMounted(() => {
 	})()
 })
 
+/**
+ * The account surface the rest of the shell reaches through `provide`: the action
+ * bar owns the account popover now, so it publishes its handle here for the error
+ * modals, the login gate and the skin page.
+ */
 type AccountsCardHandle = {
 	refreshValues?: () => unknown
 	accountChangeRevision?: number | string
@@ -2680,6 +2690,14 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					<HomeIcon />
 				</NavButton>
 				<NavButton
+					v-tooltip.right="formatMessage(messages.skinSelector)"
+					data-onboarding-id="nav-skins"
+					to="/skins"
+					:is-primary="(r) => r.path.startsWith('/skins')"
+				>
+					<ChangeSkinIcon />
+				</NavButton>
+				<NavButton
 					v-tooltip.right="formatMessage(messages.screenshots)"
 					data-onboarding-id="nav-screenshots"
 					to="/screenshots"
@@ -2797,7 +2815,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				:style="{
 					top: 'calc(var(--top-bar-height))',
 					left: 'calc(var(--left-bar-width))',
-					width: 'calc(100% - var(--left-bar-width) - var(--right-bar-width))',
+					width: 'calc(100% - var(--left-bar-width))',
 				}"
 			>
 				<LoadingBar position="absolute" />
@@ -2812,7 +2830,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				id="background-teleport-target"
 				class="absolute h-full -z-10 rounded-tl-[--radius-xl] overflow-hidden"
 				:style="{
-					width: 'calc(100% - var(--right-bar-width))',
+					width: '100%',
 				}"
 			></div>
 			<Admonition
@@ -3118,17 +3136,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 </template>
 
 <style lang="scss" scoped>
-@property --right-bar-width {
-	syntax: '<length>';
-	inherits: true;
-	initial-value: 0px;
-}
-
 .app-grid-layout,
 .app-contents {
 	--top-bar-height: 3rem;
 	--left-bar-width: 4rem;
-	--right-bar-width: 0px;
 }
 
 .app-contents.studio-mode {
@@ -3222,10 +3233,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	// Keep sticky/fixed chrome and the page-layer stack from spilling or
 	// re-anchoring while slide/opacity transitions repaint.
 	isolation: isolate;
-	--right-bar-width: 0px;
 
 	display: grid;
-	grid-template-columns: 1fr;
+	grid-template-columns: minmax(0, 1fr);
 	// 显式行高：让 .app-viewport 的 height: 100% 有确定参照（隐式 auto 行会使百分比高度失效）
 	grid-template-rows: 1fr;
 

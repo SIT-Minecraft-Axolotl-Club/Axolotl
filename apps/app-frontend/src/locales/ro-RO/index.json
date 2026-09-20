@@ -328,5 +328,119 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Încărcătorul este furnizat de server"
+  },
+  "app.skins.add-button": {
+    "message": "Add skin"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Drag and drop"
+  },
+  "app.skins.apply-button": {
+    "message": "Apply"
+  },
+  "app.skins.delete-button": {
+    "message": "Delete skin"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "This will permanently delete the selected skin. This action cannot be undone."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Are you sure you want to delete this skin?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Failed to read the dropped file."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Error processing file"
+  },
+  "app.skins.edit-button": {
+    "message": "Edit skin"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Add skin"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Adding a skin"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Arm style"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Slim"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Wide"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Cape"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Editing skin"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Make an edit to the skin first!"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Replace texture"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Save skin"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Saving..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Texture"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Upload a skin first!"
+  },
+  "app.skins.offline-account.compatibility": {
+    "message": "Offline skins are applied locally with a resource pack. Compatibility is best on Minecraft 1.6–1.19.2; newer versions are supported on a best-effort basis. The skin is not uploaded to Mojang, may also replace other default-skinned players on your client, and some skin mods or server plugins may override it."
+  },
+  "app.skins.offline-account.compatibility-title": {
+    "message": "Offline skin compatibility"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Edit skin"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Previewing"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "You're changing your skin too frequently. Mojang's servers have temporarily blocked further requests. Please wait a moment before trying again."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Slow down!"
+  },
+  "app.skins.reorder-error.text": {
+    "message": "Your skin order could not be saved."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Failed to reorder skins"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Saved skins"
+  },
+  "app.skins.sign-in.axolotl-alt": {
+    "message": "Axolotl Launcher"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Sign In"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Please sign into your Minecraft account to use the skin management features of Axolotl Launcher."
+  },
+  "app.skins.sign-in.title": {
+    "message": "Please sign in"
+  },
+  "app.skins.third-party-account.description": {
+    "message": "Skins for this account are managed by its Yggdrasil provider. Open the provider website to change skins or capes."
+  },
+  "app.skins.third-party-account.title": {
+    "message": "Third-party skin management"
+  },
+  "app.skins.title": {
+    "message": "Skin selector"
   }
 }

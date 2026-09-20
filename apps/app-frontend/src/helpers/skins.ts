@@ -47,6 +47,13 @@ export function filterSavedSkins(list: Skin[]) {
 	return customSkins
 }
 
+/**
+ * How long a texture may take to decode before it is treated as unreadable. A
+ * skin card renders behind a loading skeleton until its texture resolves, so a
+ * request that never settles would leave the card loading forever.
+ */
+const MODEL_TYPE_TIMEOUT_MS = 8000
+
 export async function determineModelType(texture: string): Promise<'SLIM' | 'CLASSIC'> {
 	return new Promise((resolve, reject) => {
 		const canvas = document.createElement('canvas')
@@ -57,42 +64,71 @@ export async function determineModelType(texture: string): Promise<'SLIM' | 'CLA
 		}
 
 		const image = new Image()
-		image.crossOrigin = 'anonymous'
+		let settled = false
+
+		function settle(result: 'SLIM' | 'CLASSIC' | Error) {
+			if (settled) return
+			settled = true
+			window.clearTimeout(timeout)
+			image.onload = null
+			image.onerror = null
+
+			if (result instanceof Error) {
+				reject(result)
+			} else {
+				resolve(result)
+			}
+		}
+
+		const timeout = window.setTimeout(
+			() => settle(new Error('Timed out reading the skin texture.')),
+			MODEL_TYPE_TIMEOUT_MS,
+		)
+
+		// The texture server does not send CORS headers, so a cross-origin byte
+		// read is not available; the canvas then throws and the caller falls back
+		// to the classic model. Asking for CORS instead would make an image that
+		// never fires either event, which is what left cards loading forever.
 		image.src = texture
 
 		image.onload = () => {
-			canvas.width = image.width
-			canvas.height = image.height
+			try {
+				canvas.width = image.width
+				canvas.height = image.height
 
-			context.drawImage(image, 0, 0)
+				context.drawImage(image, 0, 0)
 
-			const armX = 54
-			const armY = 20
-			const armWidth = 2
-			const armHeight = 12
-			const imageData = context.getImageData(armX, armY, armWidth, armHeight).data
-			for (let alphaIndex = 3; alphaIndex < imageData.length; alphaIndex += 4) {
-				if (imageData[alphaIndex] !== 0) {
-					resolve('CLASSIC')
-					return
+				const armX = 54
+				const armY = 20
+				const armWidth = 2
+				const armHeight = 12
+				const imageData = context.getImageData(armX, armY, armWidth, armHeight).data
+				for (let alphaIndex = 3; alphaIndex < imageData.length; alphaIndex += 4) {
+					if (imageData[alphaIndex] !== 0) {
+						settle('CLASSIC')
+						return
+					}
 				}
+
+				settle('SLIM')
+			} catch (error) {
+				settle(error instanceof Error ? error : new Error(String(error)))
 			}
-
-			canvas.remove()
-			resolve('SLIM')
 		}
 
-		image.onerror = () => {
-			canvas.remove()
-			reject(new Error('Failed to load the image.'))
-		}
+		image.onerror = () => settle(new Error('Failed to load the image.'))
 	})
 }
 
 export async function fixUnknownSkins(list: Skin[]) {
 	const unknownSkins = list.filter((s) => s.variant === 'UNKNOWN')
 	for (const unknownSkin of unknownSkins) {
-		unknownSkin.variant = await determineModelType(unknownSkin.texture)
+		try {
+			unknownSkin.variant = await determineModelType(unknownSkin.texture)
+		} catch (error) {
+			console.warn('Failed to determine the model of a skin, assuming classic:', error)
+			unknownSkin.variant = 'CLASSIC'
+		}
 	}
 }
 

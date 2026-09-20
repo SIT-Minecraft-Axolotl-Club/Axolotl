@@ -1,3 +1,4 @@
+mod content_repair;
 mod diagnostics;
 pub mod events;
 pub mod import_plan;
@@ -7,6 +8,10 @@ pub mod recovery;
 pub mod runner;
 pub mod store;
 
+pub use content_repair::{
+    InstanceFileRepair, InstanceFileRepairOutcome, repair_instance_files,
+    resource_pack_relative_paths,
+};
 pub use events::InstallProgressReporter;
 pub use import_plan::{
     ImportPlanCounts, ImportPlanRequest, ImportPlanSnapshot, ImportPlanStage,

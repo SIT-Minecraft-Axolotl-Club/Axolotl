@@ -721,10 +721,7 @@ mod tests {
             WindowSize(854, 480),
             "x86_64",
             &QuickPlayType::None,
-            QuickPlayVersion {
-                server: QuickPlayServerVersion::Unsupported,
-                singleplayer: QuickPlaySingleplayerVersion::Unsupported,
-            },
+            QuickPlayVersion::UNSUPPORTED,
         )
         .await
         .unwrap();
@@ -850,10 +847,7 @@ mod tests {
             WindowSize(854, 480),
             "x86_64",
             &QuickPlayType::None,
-            QuickPlayVersion {
-                server: QuickPlayServerVersion::Unsupported,
-                singleplayer: QuickPlaySingleplayerVersion::Unsupported,
-            },
+            QuickPlayVersion::UNSUPPORTED,
         )
         .await
         .unwrap();
@@ -901,10 +895,7 @@ mod tests {
             WindowSize(854, 480),
             "x86_64",
             &QuickPlayType::None,
-            QuickPlayVersion {
-                server: QuickPlayServerVersion::Unsupported,
-                singleplayer: QuickPlaySingleplayerVersion::Unsupported,
-            },
+            QuickPlayVersion::UNSUPPORTED,
         )
         .await
         .unwrap();
