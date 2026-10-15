@@ -3449,27 +3449,6 @@
   "app.java-arguments.presets.use": {
     "message": "使用预设"
   },
-  "app.java-download-confirmation.body": {
-    "message": "未找到兼容的 Java {version} 安装。你可以立即下载，也可以稍后设置 Java；其他游戏资源仍会继续下载。"
-  },
-  "app.java-download-confirmation.download": {
-    "message": "下载 Java"
-  },
-  "app.java-download-confirmation.later-description": {
-    "message": "稍后配置 Java {version} 后，请修复实例以完成安装。"
-  },
-  "app.java-download-confirmation.postponed-body": {
-    "message": "实例将继续完成安装。启动前请先配置 Java {version}。"
-  },
-  "app.java-download-confirmation.postponed-title": {
-    "message": "Java 设置已推迟"
-  },
-  "app.java-download-confirmation.set-up-later": {
-    "message": "稍后设置"
-  },
-  "app.java-download-confirmation.title": {
-    "message": "下载 Java {version}？"
-  },
   "app.java.already-installed": {
     "message": "已安装"
   },

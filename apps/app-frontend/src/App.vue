@@ -84,7 +84,6 @@ import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal
 import CommunityAnnouncementModal from '@/components/ui/modal/CommunityAnnouncementModal.vue'
 import CurseForgeManualDownloadsModal from '@/components/ui/modal/CurseForgeManualDownloadsModal.vue'
 import InstanceIconPickerModal from '@/components/ui/modal/InstanceIconPickerModal.vue'
-import JavaDownloadConfirmationModal from '@/components/ui/modal/JavaDownloadConfirmationModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import ModpackInstallModal from '@/components/ui/modal/ModpackInstallModal.vue'
 import PrivacyConsentModal from '@/components/ui/modal/PrivacyConsentModal.vue'
@@ -114,7 +113,6 @@ import {
 	command_listener,
 	credentials_expired_listener,
 	drop_classify_progress_listener,
-	java_download_confirmation_listener,
 	warning_listener,
 } from '@/helpers/events.js'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
@@ -383,7 +381,6 @@ let unlistenSystemAccentColor: (() => void) | undefined
 let maximizedStateTimer: ReturnType<typeof setTimeout> | undefined
 let unlistenWindowResize: (() => void) | undefined
 const minecraftCrashModal = ref()
-const javaDownloadConfirmationModal = ref()
 const pendingUpdateAnnouncementVersion = ref(null)
 const updateAnnouncementShowing = ref(false)
 
@@ -1443,9 +1440,6 @@ async function setupApp() {
 		// instead of letting every action fail on the dead sign-in.
 		sessionExpired.value = true
 		await refreshMinecraftAccounts()
-	})
-	await java_download_confirmation_listener((request) => {
-		javaDownloadConfirmationModal.value?.show(request)
 	})
 	await drop_classify_progress_listener((payload) => {
 		if (dropProcessingNotificationId.value === null) return
@@ -2944,7 +2938,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@complete="handleSitmcLoginComplete"
 	/>
 	<MinecraftCrashModal ref="minecraftCrashModal" @error="handleError" />
-	<JavaDownloadConfirmationModal ref="javaDownloadConfirmationModal" />
 	<PrivacyConsentModal ref="privacyConsentModal" @saved="handlePrivacyConsentSaved" />
 	<CommunityAnnouncementModal ref="communityAnnouncementModal" />
 	<RemoteAnnouncements

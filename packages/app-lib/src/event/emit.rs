@@ -7,36 +7,17 @@ use crate::event::{
 #[cfg(feature = "tauri")]
 use crate::event::{
     CredentialsExpiredPayload, InstancePayload, JavaDiscoveryPayload,
-    JavaDownloadConfirmationPayload, LoadingPayload, LogShareAiEventPayload,
-    ProcessPayload, ServerPayload, WarningPayload,
+    LoadingPayload, LogShareAiEventPayload, ProcessPayload, ServerPayload,
+    WarningPayload,
 };
 use futures::prelude::*;
 use serde_json::Value;
 #[cfg(feature = "tauri")]
-use std::sync::LazyLock;
-#[cfg(feature = "tauri")]
 use tauri::{Emitter, Manager};
-#[cfg(feature = "tauri")]
-use tokio::sync::oneshot;
 use uuid::Uuid;
 
 #[cfg(feature = "cli")]
 const CLI_PROGRESS_BAR_TOTAL: u64 = 1000;
-
-#[cfg(feature = "tauri")]
-static JAVA_DOWNLOAD_CONFIRMATIONS: LazyLock<
-    dashmap::DashMap<Uuid, oneshot::Sender<bool>>,
-> = LazyLock::new(dashmap::DashMap::new);
-
-#[cfg(feature = "tauri")]
-struct PendingJavaDownloadConfirmation(Uuid);
-
-#[cfg(feature = "tauri")]
-impl Drop for PendingJavaDownloadConfirmation {
-    fn drop(&mut self) {
-        JAVA_DOWNLOAD_CONFIRMATIONS.remove(&self.0);
-    }
-}
 
 /*
    Events are a way we can communicate with the Tauri frontend from the Rust backend.
@@ -274,46 +255,6 @@ pub async fn emit_credentials_expired(
         "The account site refused to renew a stored sign-in; the account was signed out"
     );
     Ok(())
-}
-
-#[allow(unused_variables)]
-pub async fn request_java_download_confirmation(
-    version: u32,
-) -> crate::Result<bool> {
-    #[cfg(feature = "tauri")]
-    {
-        let event_state = crate::EventState::get()?;
-        let request_id = Uuid::new_v4();
-        let (sender, receiver) = oneshot::channel();
-        JAVA_DOWNLOAD_CONFIRMATIONS.insert(request_id, sender);
-        let _pending = PendingJavaDownloadConfirmation(request_id);
-
-        event_state
-            .app
-            .emit(
-                "java_download_confirmation",
-                JavaDownloadConfirmationPayload {
-                    request_id,
-                    version,
-                },
-            )
-            .map_err(EventError::from)?;
-
-        Ok(receiver.await.unwrap_or(false))
-    }
-
-    #[cfg(not(feature = "tauri"))]
-    Ok(true)
-}
-
-#[cfg(feature = "tauri")]
-pub fn respond_to_java_download_confirmation(
-    request_id: Uuid,
-    approved: bool,
-) -> bool {
-    JAVA_DOWNLOAD_CONFIRMATIONS
-        .remove(&request_id)
-        .is_some_and(|(_, sender)| sender.send(approved).is_ok())
 }
 
 #[allow(unused_variables)]

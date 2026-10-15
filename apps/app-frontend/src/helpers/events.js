@@ -146,17 +146,6 @@ export async function credentials_expired_listener(callback) {
 	return await listen('credentials_expired', (event) => callback(event.payload))
 }
 
-/// Payload for the 'java_download_confirmation' event
-/*
-    JavaDownloadConfirmationPayload {
-        requestId: unique identifier for the confirmation request
-        version: required Java major version
-    }
-*/
-export async function java_download_confirmation_listener(callback) {
-	return await listen('java_download_confirmation', (event) => callback(event.payload))
-}
-
 export async function notification_listener(callback) {
 	return await listen('notification', (event) => callback(event.payload))
 }

@@ -1217,31 +1217,48 @@ async fn install_minecraft_with_local_source(
             )
             .await?;
     }
+    // The runtime is installed rather than asked about: the launcher only starts
+    // the game on the one Mojang publishes, so a missing one can only be fetched.
+    // A download that fails falls back to a runtime already on disk, and only a
+    // version with no runtime at all ends the launch.
     let java_installation = if let Some(java_version) =
         get_java_version_from_launch_context(context, &version_info).await?
     {
         Some((std::path::PathBuf::from(java_version.path), false))
-    } else if let Some(discovered) = crate::api::jre::find_java_for_version(key)
+    } else if let Some(bundled) = crate::api::jre::find_java_for_version(key)
         .await
         .unwrap_or_default()
     {
         tracing::info!(
-            "Reusing discovered Java {} at {}",
-            discovered.version,
-            discovered.path
+            "Reusing the bundled Java {} at {}",
+            bundled.version,
+            bundled.path
         );
-        Some((std::path::PathBuf::from(discovered.path), true))
+        Some((std::path::PathBuf::from(bundled.path), true))
     } else {
-        if let Some(reporter) = &reporter {
-            crate::api::jre::auto_install_java_with_reporter(
-                key,
-                reporter.clone(),
-            )
-            .await?
+        let installed = if let Some(reporter) = &reporter {
+            crate::api::jre::auto_install_java_with_reporter(key, reporter.clone())
+                .await
         } else {
-            crate::api::jre::auto_install_java_with_loading(key, true).await?
+            crate::api::jre::auto_install_java_with_loading(key, true).await
+        };
+
+        match installed {
+            Ok(Some(path)) => Some((path, true)),
+            Ok(None) | Err(_) => {
+                let fallback =
+                    crate::api::jre::find_compatible_java_for_version(key).await?;
+                match fallback {
+                    Some(java) => Some((std::path::PathBuf::from(java.path), true)),
+                    None => {
+                        return Err(crate::ErrorKind::LauncherError(format!(
+                            "Java {key} could not be installed, and no runtime already on this computer can run the instance"
+                        ))
+                        .into());
+                    }
+                }
+            }
         }
-        .map(|path| (path, true))
     };
 
     let java_version = if let Some((java_path, set_java)) = java_installation {
@@ -2252,10 +2269,19 @@ pub async fn launch_minecraft(
             );
             java
         } else {
-            return Err(crate::ErrorKind::LauncherError(
-                "Missing correct java installation".to_string(),
-            )
-            .into());
+            // Nothing on disk can run it, so the runtime Mojang publishes for
+            // this version is installed instead of failing the launch. This is
+            // also the way back for a launch that failed earlier with a missing
+            // Java: running it again installs what it needs.
+            match crate::api::jre::auto_install_java_with_loading(key, true).await? {
+                Some(path) => crate::api::jre::check_jre(path).await?,
+                None => {
+                    return Err(crate::ErrorKind::LauncherError(format!(
+                        "Java {key} could not be installed, and no runtime already on this computer can run the instance"
+                    ))
+                    .into());
+                }
+            }
         }
     };
 

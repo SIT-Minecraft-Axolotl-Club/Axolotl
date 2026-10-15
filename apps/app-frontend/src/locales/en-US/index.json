@@ -3326,27 +3326,6 @@
   "app.java-arguments.presets.use": {
     "message": "Use preset"
   },
-  "app.java-download-confirmation.body": {
-    "message": "No compatible Java {version} installation was found. You can download it now or postpone Java setup while the remaining game resources continue downloading."
-  },
-  "app.java-download-confirmation.download": {
-    "message": "Download Java"
-  },
-  "app.java-download-confirmation.later-description": {
-    "message": "The instance will finish installing, but Java {version} must be configured before you can play."
-  },
-  "app.java-download-confirmation.postponed-body": {
-    "message": "The instance will finish installing. Configure Java {version} before launching it."
-  },
-  "app.java-download-confirmation.postponed-title": {
-    "message": "Java setup postponed"
-  },
-  "app.java-download-confirmation.set-up-later": {
-    "message": "Set up later"
-  },
-  "app.java-download-confirmation.title": {
-    "message": "Download Java {version}?"
-  },
   "app.java.already-installed": {
     "message": "Already installed"
   },
