@@ -28,6 +28,31 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-2.0.9',
+		version: '2.0.9',
+		publishedAt: '2026-10-15',
+		title: {
+			'en-US': 'Axolotl Launcher 2.0.9',
+			'zh-CN': 'Axolotl 启动器 2.0.9',
+		},
+		changes: {
+			fixed: [
+				{
+					'en-US':
+						'Java is downloaded without asking first: the launcher used to offer to postpone the runtime it needs to start the game, and choosing that left the instance unable to launch. The runtime is now installed on its own, with the download shown as progress.',
+					'zh-CN':
+						'Java 不再先询问再下载：此前启动器会询问是否「稍后设置」启动游戏所需的运行时，选了之后实例就无法启动。现在运行时会自动安装，下载进度正常显示。',
+				},
+				{
+					'en-US':
+						'An instance that failed for a missing Java runtime recovers by itself: launching it again installs the runtime instead of reporting the same error, so no manual repair step is needed.',
+					'zh-CN':
+						'因缺少 Java 运行时启动失败的实例可以自行恢复：再次启动会直接安装所需运行时，而不是继续报同样的错，不需要手动修复。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-2.0.8',
 		version: '2.0.8',
 		publishedAt: '2026-10-15',
