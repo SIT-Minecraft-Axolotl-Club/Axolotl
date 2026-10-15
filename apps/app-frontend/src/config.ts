@@ -61,6 +61,7 @@ export const config = {
 const DEFAULT_MANIFEST_URL = 'https://skin.sitmc.club/api/launcher/manifest'
 const DEFAULT_ANNOUNCEMENTS_URL = 'https://skin.sitmc.club/api/launcher/announcements'
 const DEFAULT_UPDATE_URL = 'https://skin.sitmc.club/api/launcher/update'
+const DEFAULT_DOCS_URL = 'https://sit-minecraft.feishu.cn/wiki/BlvtwrH8diexAtklJg8cntwmnwc'
 
 const manifestUrl = (import.meta.env.VITE_SITMC_MANIFEST_URL ?? DEFAULT_MANIFEST_URL).trim()
 const announcementsUrl = (
@@ -69,6 +70,7 @@ const announcementsUrl = (
 	DEFAULT_ANNOUNCEMENTS_URL
 ).trim()
 const updateUrl = (import.meta.env.VITE_SITMC_UPDATE_URL ?? DEFAULT_UPDATE_URL).trim()
+const docsUrl = (import.meta.env.VITE_SITMC_DOCS_URL ?? DEFAULT_DOCS_URL).trim()
 
 export const SitmcConfig = Object.freeze({
 	serverLabel: 'SIT-Minecraft',
@@ -82,4 +84,5 @@ export const SitmcConfig = Object.freeze({
 	manifestUrl: trimTrailingSlash(manifestUrl),
 	announcementsUrl: trimTrailingSlash(announcementsUrl),
 	updateUrl: trimTrailingSlash(updateUrl),
+	docsUrl: trimTrailingSlash(docsUrl),
 })

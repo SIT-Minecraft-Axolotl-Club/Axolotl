@@ -13,8 +13,10 @@ mod util;
 
 mod api;
 pub mod brand;
+pub mod docs_tree;
 mod error;
 mod event;
+pub mod feishu;
 pub mod install;
 mod launcher;
 mod logger;

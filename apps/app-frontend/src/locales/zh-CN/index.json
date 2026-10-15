@@ -5912,6 +5912,9 @@
   "app.navigation.lab": {
     "message": "实验室"
   },
+  "app.navigation.docs": {
+    "message": "文档"
+  },
   "app.navigation.library": {
     "message": "实例库"
   },
@@ -12155,6 +12158,21 @@
   "app.shortcut-settings.nav-map-description": {
     "message": "打开地图。"
   },
+  "app.docs.contents": {
+    "message": "目录"
+  },
+  "app.docs.failed": {
+    "message": "文档加载失败，请点击上方“在浏览器打开”。"
+  },
+  "app.docs.loading": {
+    "message": "正在加载文档…"
+  },
+  "app.docs.overview": {
+    "message": "总览"
+  },
+  "app.docs.title": {
+    "message": "使用文档"
+  },
   "app.map.title": {
     "message": "地图"
   },
@@ -12196,6 +12214,9 @@
   },
   "sitmc-login.device-expired": {
     "message": "授权码已过期，请重新开始登录。"
+  },
+  "sitmc-login.session-expired": {
+    "message": "皮肤站已不再接受保存的登录凭证，账号已被登出。请重新登录后继续游戏。"
   },
   "sitmc-login.password-fallback": {
     "message": "改用账号密码登录"

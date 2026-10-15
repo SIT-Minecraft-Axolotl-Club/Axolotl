@@ -286,11 +286,6 @@ export const settingsSearchEntries: SettingsSearchEntry[] = [
 		label: message('app.settings.privacy.discord-rpc', 'Discord rich presence'),
 	},
 	{
-		id: 'java-installations',
-		categoryId: 'java-performance',
-		label: message('app.settings.tabs.java-installations', 'Java installations'),
-	},
-	{
 		id: 'java-memory',
 		categoryId: 'java-performance',
 		targetId: 'settings-target-java-memory',

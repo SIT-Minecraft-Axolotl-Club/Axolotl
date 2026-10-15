@@ -286,8 +286,20 @@ pub(super) async fn refresh_credentials_with_oidc(
     exec: impl sqlx::Executor<'_, Database = Sqlite> + Copy,
 ) -> crate::Result<()> {
     let provider = provider_metadata().await?;
-    let tokens =
-        request_refreshed_tokens(&provider, &credentials.refresh_token).await?;
+    let tokens = match request_refreshed_tokens(
+        &provider,
+        &credentials.refresh_token,
+    )
+    .await
+    {
+        Ok(tokens) => tokens,
+        Err(error) => {
+            if matches!(&*error.raw, ErrorKind::CredentialsExpired { .. }) {
+                sign_out_dead_session(credentials, exec).await;
+            }
+            return Err(error);
+        }
+    };
 
     let lifetime = token_lifetime(&tokens);
     credentials.access_token = tokens.access_token.clone();
@@ -315,6 +327,38 @@ pub(super) async fn refresh_credentials_with_oidc(
     credentials.upsert(exec).await?;
 
     Ok(())
+}
+
+/// Signs out a session the account site has stopped honouring.
+///
+/// The refresh token is what the site refused, so nothing the launcher can do
+/// renews it; leaving the row behind would make every later action fail with the
+/// same refusal and never ask the player to sign in again. The character's saved
+/// skins are keyed by the character's UUID rather than by this row, so a new
+/// sign-in for the same character finds them again.
+async fn sign_out_dead_session(
+    credentials: &Credentials,
+    exec: impl sqlx::Executor<'_, Database = Sqlite> + Copy,
+) {
+    tracing::warn!(
+        player = %credentials.offline_profile.name,
+        "The account site refused to renew this sign-in; signing the account out so the player can sign in again"
+    );
+
+    if let Some(account_id) = credentials.account_id.as_deref()
+        && let Err(error) = super::Credentials::remove(account_id, exec).await
+    {
+        tracing::warn!("Could not remove the expired account: {error}");
+    }
+
+    if let Err(error) = crate::event::emit::emit_credentials_expired(
+        credentials.account_id.as_deref(),
+        &credentials.offline_profile.name,
+    )
+    .await
+    {
+        tracing::warn!("Could not report the expired sign-in: {error}");
+    }
 }
 
 async fn complete_login(
@@ -588,6 +632,9 @@ async fn request_refreshed_tokens(
     let status = response.status();
     let body = response.text().await?;
     if !status.is_success() {
+        if let Some(detail) = refused_session_detail(&body) {
+            return Err(ErrorKind::CredentialsExpired { detail }.as_error());
+        }
         return Err(oauth_error(status, &body));
     }
 
@@ -622,28 +669,45 @@ async fn get_json<T: for<'de> Deserialize<'de>>(url: &str) -> crate::Result<T> {
     Ok(response.json().await?)
 }
 
+/// The OAuth error code and the human-readable detail the provider sent, if the
+/// body is an OAuth error at all.
+fn oauth_error_parts(body: &str) -> Option<(String, String)> {
+    let error = serde_json::from_str::<OAuthErrorResponse>(body).ok()?;
+    let detail = match error.error_description {
+        Some(description) if !description.trim().is_empty() => {
+            format!("{}: {description}", error.error)
+        }
+        _ => error.error.clone(),
+    };
+
+    Some((error.error, detail))
+}
+
+/// Whether a token endpoint refusal means the stored session is gone for good.
+///
+/// Only the two codes that name the grant itself qualify: the launcher signs the
+/// account out on them, so a rate limit, a gateway error or a maintenance page
+/// must never be mistaken for an expired session — that would ask every player
+/// to sign in again because the site had a bad minute.
+fn refused_session_detail(body: &str) -> Option<String> {
+    let (code, detail) = oauth_error_parts(body)?;
+
+    matches!(code.as_str(), "invalid_grant" | "invalid_token")
+        .then_some(detail)
+}
+
 /// Turns an OAuth failure into an error that says what to do about it.
 fn oauth_error(status: StatusCode, body: &str) -> crate::Error {
-    let parsed = serde_json::from_str::<OAuthErrorResponse>(body).ok();
-    let (code, detail) = match parsed {
-        Some(error) => {
-            let detail = match error.error_description {
-                Some(description) if !description.trim().is_empty() => {
-                    format!("{}: {description}", error.error)
-                }
-                _ => error.error.clone(),
-            };
-            (error.error, detail)
-        }
-        None => (
+    let (code, detail) = oauth_error_parts(body).unwrap_or_else(|| {
+        (
             String::new(),
             if body.trim().is_empty() {
                 format!("HTTP {status}")
             } else {
                 format!("HTTP {status}: {body}")
             },
-        ),
-    };
+        )
+    });
 
     let hint = match code.as_str() {
         "invalid_scope" => {
@@ -694,4 +758,40 @@ fn device_login_expired() -> crate::Error {
             .to_string(),
     )
     .as_error()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::refused_session_detail;
+
+    #[test]
+    fn a_refused_grant_is_the_only_refusal_that_ends_the_session() {
+        let invalid_grant = concat!(
+            r#"{"error":"invalid_grant","#,
+            r#""error_description":"grant request is invalid"}"#
+        );
+        assert_eq!(
+            refused_session_detail(invalid_grant),
+            Some("invalid_grant: grant request is invalid".to_string())
+        );
+
+        let invalid_token = r#"{"error":"invalid_token"}"#;
+        assert!(refused_session_detail(invalid_token).is_some());
+    }
+
+    #[test]
+    fn a_site_hiccup_keeps_the_stored_session() {
+        let hiccups = [
+            r#"{"error":"invalid_client"}"#,
+            r#"{"error":"invalid_scope"}"#,
+            r#"{"error":"access_denied"}"#,
+            "<html>502 Bad Gateway</html>",
+            "",
+            "{}",
+        ];
+
+        for body in hiccups {
+            assert_eq!(refused_session_detail(body), None, "body: {body}");
+        }
+    }
 }

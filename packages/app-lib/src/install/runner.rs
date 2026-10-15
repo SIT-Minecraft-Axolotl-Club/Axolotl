@@ -14,7 +14,7 @@ use super::model::{
 use super::{diagnostics, recovery, store};
 use crate::ErrorKind;
 use crate::api::pack::install_from::{
-    CreatePackLocation, generate_pack_from_file,
+    CreatePack, CreatePackLocation, generate_pack_from_file,
     generate_pack_from_version_id_with_reporter, get_instance_from_pack,
 };
 use crate::api::pack::install_mrpack::{
@@ -1178,11 +1178,15 @@ fn modpack_details(location: &CreatePackLocation) -> InstallPhaseDetails {
             version_id: Some(version_id.clone()),
             title: Some(title.clone()),
         },
-        CreatePackLocation::FromFile { .. } => InstallPhaseDetails::Modpack {
-            project_id: None,
-            version_id: None,
-            title: None,
-        },
+        CreatePackLocation::FromFile { display, .. } => {
+            InstallPhaseDetails::Modpack {
+                project_id: None,
+                version_id: None,
+                title: display
+                    .as_ref()
+                    .and_then(|identity| identity.name.clone()),
+            }
+        }
     }
 }
 

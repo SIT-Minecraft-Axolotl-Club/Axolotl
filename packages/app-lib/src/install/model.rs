@@ -543,7 +543,11 @@ mod tests {
         let mut job =
             InstallJobState::new(InstallRequest::CreateModpackInstance {
                 location: CreatePackLocation::FromFile {
-                    path: PathBuf::from("test.mrpack"),
+                    path: Some(PathBuf::from("test.mrpack")),
+                    url: None,
+                    sha1: None,
+                    size: None,
+                    display: None,
                 },
                 post_install_edit: None,
             });
@@ -596,7 +600,11 @@ mod tests {
         let mut job =
             InstallJobState::new(InstallRequest::CreateModpackInstance {
                 location: CreatePackLocation::FromFile {
-                    path: PathBuf::from("test.mrpack"),
+                    path: Some(PathBuf::from("test.mrpack")),
+                    url: None,
+                    sha1: None,
+                    size: None,
+                    display: None,
                 },
                 post_install_edit: None,
             });

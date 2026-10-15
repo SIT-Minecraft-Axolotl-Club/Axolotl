@@ -57,7 +57,10 @@ const emit = defineEmits<{
 	close: []
 }>()
 
-const props = withDefaults(defineProps<{ overlay?: boolean }>(), { overlay: false })
+const props = withDefaults(
+	defineProps<{ overlay?: boolean; sessionExpired?: boolean }>(),
+	{ overlay: false, sessionExpired: false },
+)
 
 const { formatMessage } = useVIntl()
 
@@ -106,6 +109,11 @@ const messages = defineMessages({
 	deviceExpired: {
 		id: 'sitmc-login.device-expired',
 		defaultMessage: 'The authorization code expired. Start the sign-in again.',
+	},
+	sessionExpired: {
+		id: 'sitmc-login.session-expired',
+		defaultMessage:
+			'The account site stopped accepting the saved sign-in, so your account was signed out. Sign in again to keep playing.',
 	},
 	passwordFallback: {
 		id: 'sitmc-login.password-fallback',
@@ -386,6 +394,12 @@ defineExpose({ resetAll })
 						{{ formatMessage(messages.title) }}
 					</h1>
 					<p class="m-0 text-sm text-secondary">{{ formatMessage(messages.subtitle) }}</p>
+					<p
+						v-if="props.sessionExpired"
+						class="m-0 rounded-lg bg-surface-3 px-3 py-2 text-sm text-secondary"
+					>
+						{{ formatMessage(messages.sessionExpired) }}
+					</p>
 				</header>
 
 				<template v-if="profiles.length > 0">

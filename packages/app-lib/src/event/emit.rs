@@ -6,9 +6,9 @@ use crate::event::{
 };
 #[cfg(feature = "tauri")]
 use crate::event::{
-    InstancePayload, JavaDiscoveryPayload, JavaDownloadConfirmationPayload,
-    LoadingPayload, LogShareAiEventPayload, ProcessPayload, ServerPayload,
-    WarningPayload,
+    CredentialsExpiredPayload, InstancePayload, JavaDiscoveryPayload,
+    JavaDownloadConfirmationPayload, LoadingPayload, LogShareAiEventPayload,
+    ProcessPayload, ServerPayload, WarningPayload,
 };
 use futures::prelude::*;
 use serde_json::Value;
@@ -242,6 +242,37 @@ pub async fn emit_java_discovery_update(count: usize) -> crate::Result<()> {
             .map_err(EventError::from)?;
     }
     tracing::debug!("Java discovery updated: {count} installations");
+    Ok(())
+}
+
+/// Tells the frontend that a stored sign-in can no longer be renewed.
+///
+/// The account has already been signed out by the time this is emitted, so the
+/// frontend only has to bring its own account list up to date and ask the player
+/// to sign in again.
+#[allow(unused_variables)]
+pub async fn emit_credentials_expired(
+    account_id: Option<&str>,
+    player_name: &str,
+) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get()?;
+        event_state
+            .app
+            .emit(
+                "credentials_expired",
+                CredentialsExpiredPayload {
+                    account_id: account_id.map(str::to_string),
+                    player_name: player_name.to_string(),
+                },
+            )
+            .map_err(EventError::from)?;
+    }
+    tracing::warn!(
+        player_name = player_name,
+        "The account site refused to renew a stored sign-in; the account was signed out"
+    );
     Ok(())
 }
 

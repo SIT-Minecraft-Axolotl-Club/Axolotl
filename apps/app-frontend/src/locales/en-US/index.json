@@ -5336,6 +5336,21 @@
   "app.map.tabs.survival": {
     "message": "Survival Satellite"
   },
+  "app.docs.contents": {
+    "message": "Contents"
+  },
+  "app.docs.failed": {
+    "message": "The documentation could not be loaded. Use \"Open in browser\" above."
+  },
+  "app.docs.loading": {
+    "message": "Loading the documentation…"
+  },
+  "app.docs.overview": {
+    "message": "Overview"
+  },
+  "app.docs.title": {
+    "message": "Documentation"
+  },
   "app.map.title": {
     "message": "Map"
   },
@@ -5920,6 +5935,9 @@
   },
   "app.navigation.lab": {
     "message": "Lab"
+  },
+  "app.navigation.docs": {
+    "message": "Docs"
   },
   "app.navigation.library": {
     "message": "Library"
@@ -12280,6 +12298,9 @@
   },
   "sitmc-login.select-profile-on-site": {
     "message": "The authorization page asks which character to play as, and the launcher starts the game with that character."
+  },
+  "sitmc-login.session-expired": {
+    "message": "The account site stopped accepting the saved sign-in, so your account was signed out. Sign in again to keep playing."
   },
   "sitmc-login.sign-in": {
     "message": "Sign in"

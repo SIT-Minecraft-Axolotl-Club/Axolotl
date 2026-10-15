@@ -37,6 +37,7 @@ pub mod content_search;
 pub mod curseforge;
 pub mod datapacks;
 pub mod drop;
+pub mod feishu;
 pub mod files;
 pub mod friends;
 pub mod worlds;

@@ -7139,7 +7139,11 @@ async fn install_manual_download(
         crate::install::install_pack_to_existing_instance(
             instance_id.to_string(),
             crate::api::pack::install_from::CreatePackLocation::FromFile {
-                path: verified_source,
+                path: Some(verified_source),
+                url: None,
+                sha1: None,
+                size: None,
+                display: None,
             },
             None,
         )
@@ -10488,10 +10492,14 @@ mod tests {
             crate::install::model::InstallRequest::InstallPackToExistingInstance {
                 instance_id: instance_id.to_string(),
                 location: crate::api::pack::install_from::CreatePackLocation::FromFile {
-                    path: PathBuf::from(format!(
+                    path: Some(PathBuf::from(format!(
                         "missing-stage-6-{}.mrpack",
                         uuid::Uuid::new_v4()
-                    )),
+                    ))),
+                    url: None,
+                    sha1: None,
+                    size: None,
+                    display: None,
                 },
                 post_install_edit: None,
             },

@@ -44,6 +44,14 @@ export default new createRouter({
 			},
 		},
 		{
+			path: '/docs',
+			name: 'Docs',
+			component: () => import('@/pages/Docs.vue'),
+			meta: {
+				breadcrumb: [{ name: 'Docs' }],
+			},
+		},
+		{
 			path: '/downloads',
 			name: 'Downloads',
 			component: () => import('@/pages/Downloads.vue'),

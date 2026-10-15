@@ -135,6 +135,17 @@ export async function java_discovery_listener(callback) {
 	return await listen('java_discovery_update', (event) => callback(event.payload))
 }
 
+/// Payload for the 'credentials_expired' event
+/*
+    CredentialsExpiredPayload {
+        accountId: the account the launcher signed out, when it had one
+        playerName: the character whose sign-in the account site stopped accepting
+    }
+*/
+export async function credentials_expired_listener(callback) {
+	return await listen('credentials_expired', (event) => callback(event.payload))
+}
+
 /// Payload for the 'java_download_confirmation' event
 /*
     JavaDownloadConfirmationPayload {

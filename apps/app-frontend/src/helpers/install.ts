@@ -12,9 +12,24 @@ export interface PackLocationVersionId {
 	icon_url?: string | null
 }
 
+/** Identity the caller already knows, so the install need not open the pack. */
+export interface PackDisplayIdentity {
+	name?: string | null
+	gameVersion?: string | null
+	loader?: string | null
+	loaderVersion?: string | null
+	iconUrl?: string | null
+}
+
 export interface PackLocationFile {
 	type: 'fromFile'
-	path: string
+	/** File already on disk. Omitted when the pack has to be downloaded. */
+	path?: string
+	/** Pack the launcher downloads itself, through the shared downloader. */
+	url?: string
+	sha1?: string | null
+	size?: number | null
+	display?: PackDisplayIdentity | null
 }
 
 export type CreatePackLocation = PackLocationVersionId | PackLocationFile

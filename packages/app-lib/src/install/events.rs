@@ -1289,7 +1289,11 @@ mod tests {
         let job_id = Uuid::new_v4();
         let request = InstallRequest::CreateModpackInstance {
             location: CreatePackLocation::FromFile {
-                path: "test.mrpack".into(),
+                path: Some("test.mrpack".into()),
+                url: None,
+                sha1: None,
+                size: None,
+                display: None,
             },
             post_install_edit: None,
         };

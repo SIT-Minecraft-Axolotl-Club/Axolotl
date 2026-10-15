@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { AuthFeature, TauriModrinthClient, VerboseLoggingFeature } from '@modrinth/api-client'
 import {
+	BookTextIcon,
 	ChangeSkinIcon,
 	DownloadIcon,
 	FolderOpenIcon,
@@ -100,7 +101,7 @@ import { useDropImport } from '@/composables/useDropImport'
 import { useManagedInstances } from '@/composables/useManagedInstances'
 import { minecraftLaunchErrorKey } from '@/composables/useMinecraftLaunchError'
 import { useNetworkStatus } from '@/composables/useNetworkStatus'
-import { AxolotlBrandConfig, config, getOfficialLabrinthBaseUrl } from '@/config'
+import { AxolotlBrandConfig, config, getOfficialLabrinthBaseUrl, SitmcConfig } from '@/config'
 import { trackEvent } from '@/helpers/analytics'
 import { users as getUsers } from '@/helpers/auth'
 import { check_reachable } from '@/helpers/auth.js'
@@ -111,6 +112,7 @@ import { getMissingContentScannerSettings } from '@/helpers/downloads-scanner'
 import { classifyDroppedItem } from '@/helpers/drop'
 import {
 	command_listener,
+	credentials_expired_listener,
 	drop_classify_progress_listener,
 	java_download_confirmation_listener,
 	warning_listener,
@@ -351,6 +353,22 @@ watch(
 const stateInitialized = ref(false)
 const privacyConsentModal = ref<InstanceType<typeof PrivacyConsentModal>>()
 const privacyConsentPending = ref(false)
+
+/**
+ * Sign-in state the shell watches while it is still starting up.
+ *
+ * `minecraftAccounts` holds the accounts the launcher can start the game with;
+ * an empty list means the player has not signed in to the society's account site
+ * yet. `sessionExpired` records a sign-in the account site stopped accepting,
+ * which the backend answered by signing that account out.
+ *
+ * Both are declared here, before the event listeners below, because the
+ * credential-expired event can arrive while this script is still awaiting its
+ * startup reads: a callback that touched a ref declared further down would throw
+ * instead of opening the gate.
+ */
+const minecraftAccounts = ref<unknown[]>([])
+const sessionExpired = ref(false)
 const communityAnnouncementModal = ref()
 const surveyModal = ref()
 const updateAnnouncementModal = ref()
@@ -961,6 +979,10 @@ const messages = defineMessages({
 		id: 'app.navigation.map',
 		defaultMessage: 'Map',
 	},
+	docs: {
+		id: 'app.navigation.docs',
+		defaultMessage: 'Docs',
+	},
 	screenshots: {
 		id: 'app.navigation.screenshots',
 		defaultMessage: 'Screenshots',
@@ -1414,6 +1436,13 @@ async function setupApp() {
 			text: e.message,
 			type: 'warn',
 		})
+	})
+	await credentials_expired_listener(async () => {
+		// The backend has already signed the account out, so the launcher is
+		// unusable until the player signs in again: ask for that right away
+		// instead of letting every action fail on the dead sign-in.
+		sessionExpired.value = true
+		await refreshMinecraftAccounts()
 	})
 	await java_download_confirmation_listener((request) => {
 		javaDownloadConfirmationModal.value?.show(request)
@@ -2074,20 +2103,19 @@ const accounts = ref<AccountsCardHandle | null>(null)
 provide('accountsCard', accounts)
 
 /**
- * Accounts the launcher can start the game with.
- *
- * An empty list means the player has not signed in to the society's account site
- * yet, which blocks the whole launcher behind `SitmcLoginGate`.
- */
-const minecraftAccounts = ref<unknown[]>([])
-
-/**
  * The login gate comes before everything else: the launcher is useless without a
  * society account, and the onboarding tour walks through pages that need one.
+ *
+ * A sign-in the account site refused opens it too, even when another account is
+ * still stored, because the signed-out account cannot be used until it signs in
+ * again.
  */
 const loginGateVisible = computed(
 	() =>
-		stateInitialized.value && !privacyConsentPending.value && minecraftAccounts.value.length === 0,
+		sessionExpired.value ||
+		(stateInitialized.value &&
+			!privacyConsentPending.value &&
+			minecraftAccounts.value.length === 0),
 )
 
 /**
@@ -2113,6 +2141,7 @@ async function refreshMinecraftAccounts() {
 }
 
 async function handleSitmcLoginComplete() {
+	sessionExpired.value = false
 	await refreshMinecraftAccounts()
 	await accounts.value?.refreshValues?.()
 }
@@ -2739,6 +2768,13 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<NavButton v-tooltip.right="formatMessage(messages.map)" to="/map">
 					<MapIcon />
 				</NavButton>
+				<NavButton
+					v-if="SitmcConfig.docsUrl"
+					v-tooltip.right="formatMessage(messages.docs)"
+					to="/docs"
+				>
+					<BookTextIcon />
+				</NavButton>
 			</NavRail>
 			<div class="h-px w-6 mx-auto my-2 bg-surface-5"></div>
 			<div class="quick-instance-scroll flex-1 min-h-0 overflow-x-hidden overflow-y-auto">
@@ -2902,7 +2938,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</p>
 		</div>
 	</div>
-	<SitmcLoginGate v-if="loginGateVisible" @complete="handleSitmcLoginComplete" />
+	<SitmcLoginGate
+		v-if="loginGateVisible"
+		:session-expired="sessionExpired"
+		@complete="handleSitmcLoginComplete"
+	/>
 	<MinecraftCrashModal ref="minecraftCrashModal" @error="handleError" />
 	<JavaDownloadConfirmationModal ref="javaDownloadConfirmationModal" />
 	<PrivacyConsentModal ref="privacyConsentModal" @saved="handlePrivacyConsentSaved" />

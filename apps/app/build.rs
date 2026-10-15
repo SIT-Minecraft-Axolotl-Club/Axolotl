@@ -632,7 +632,6 @@ fn main() {
                         "managed_fetch_manifest",
                         "managed_sync",
                         "managed_list",
-                        "managed_prepare_pack",
                         "managed_mark_installed",
                         "managed_register_instance",
                         "managed_ensure_runnable",
@@ -825,6 +824,18 @@ fn main() {
                         "drop_detect_file_lock",
                         "drop_extract_mod_metadata",
                         "drop_lookup_mod_hash",
+                    ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
+                "feishu",
+                InlinedPlugin::new()
+                    .commands(&[
+                        "feishu_component_auth",
+                        "feishu_resolve_document",
+                        "feishu_docs_tree",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

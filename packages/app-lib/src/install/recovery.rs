@@ -122,8 +122,12 @@ fn display_from_request(state: &InstallJobState) -> Option<InstallJobDisplay> {
                 icon: icon_url.clone(),
             }),
             crate::api::pack::install_from::CreatePackLocation::FromFile {
+                display,
                 ..
-            } => None,
+            } => display
+                .as_ref()
+                .and_then(|identity| identity.name.clone())
+                .map(|title| InstallJobDisplay { title, icon: None }),
         },
         InstallRequest::ImportInstance {
             instance_folder, ..
@@ -1169,7 +1173,11 @@ mod tests {
         let request = InstallRequest::InstallPackToExistingInstance {
             instance_id: instance_id.clone(),
             location: CreatePackLocation::FromFile {
-                path: root.join("new.mrpack"),
+                path: Some(root.join("new.mrpack")),
+                url: None,
+                sha1: None,
+                size: None,
+                display: None,
             },
             post_install_edit: None,
         };

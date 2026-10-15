@@ -153,7 +153,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             managed_fetch_manifest,
             managed_sync,
             managed_list,
-            managed_prepare_pack,
             managed_mark_installed,
             managed_register_instance,
             managed_ensure_runnable,
@@ -1983,14 +1982,6 @@ pub async fn managed_sync(
 pub async fn managed_list()
 -> Result<Vec<theseus::managed::ManagedInstanceRecord>> {
     Ok(theseus::managed::list_managed_instances().await?)
-}
-
-#[tauri::command]
-pub async fn managed_prepare_pack(
-    server_instance_id: String,
-    revision: i64,
-) -> Result<String> {
-    Ok(theseus::managed::prepare_pack(&server_instance_id, revision).await?)
 }
 
 #[tauri::command]

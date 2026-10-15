@@ -871,6 +871,7 @@ fn main() {
         .plugin(api::curseforge::init())
         .plugin(api::datapacks::init())
         .plugin(api::drop::init())
+        .plugin(api::feishu::init())
         .plugin(api::files::init())
         .plugin(api::friends::init())
         .plugin(api::worlds::init())

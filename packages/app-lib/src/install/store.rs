@@ -933,7 +933,11 @@ mod tests {
 			super::super::model::InstallRequest::InstallPackToExistingInstance {
 				instance_id: instance_id.clone(),
 				location: crate::api::pack::install_from::CreatePackLocation::FromFile {
-					path: std::path::PathBuf::from("unused.mrpack"),
+					path: Some(std::path::PathBuf::from("unused.mrpack")),
+					url: None,
+					sha1: None,
+					size: None,
+					display: None,
 				},
 				post_install_edit: None,
 			},

@@ -120,8 +120,306 @@ pub enum CreatePackLocation {
     },
     // Create a pack from a file (such as an .mrpack for installing from a file, or a folder name for importing)
     FromFile {
-        path: PathBuf,
+        /// File the caller already holds. Absent for a pack the launcher is
+        /// asked to download itself, where only `url` is known.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        path: Option<PathBuf>,
+        /// Pack to download. The install owns the transfer, so a large archive
+        /// gets progress reporting, several connections, resumed transfers and
+        /// retries instead of one bare request that has to succeed in one go.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        url: Option<String>,
+        /// SHA-1 and byte size the download has to match. Absent for a file the
+        /// player chose, which is trusted as it is.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        sha1: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        size: Option<u64>,
+        /// Identity the caller already knows about the pack. A server-managed
+        /// instance declares its own name, game version and loader, so the
+        /// install does not have to open the archive to learn them, and it
+        /// still names the instance correctly if the download never lands.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        display: Option<PackDisplayIdentity>,
     },
+}
+
+/// Cache folder holding packs the launcher downloaded itself.
+const DOWNLOADED_PACK_CACHE_FOLDER: &str = "modpacks";
+
+impl CreatePackLocation {
+    /// Local file the pack lives in, downloading it first when the caller only
+    /// named a URL.
+    ///
+    /// A pack that is already on disk and still matches its declared SHA-1 and
+    /// size is reused untouched. Anything else is a partial or replaced file,
+    /// and the shared downloader completes or re-fetches it in place, which is
+    /// what makes an interrupted pack download survive a restart.
+    pub async fn resolve_pack_path(
+        &self,
+        reporter: InstallProgressReporter,
+    ) -> crate::Result<PathBuf> {
+        let CreatePackLocation::FromFile {
+            path,
+            url,
+            sha1,
+            size,
+            ..
+        } = self
+        else {
+            return Err(crate::ErrorKind::InputError(
+                "A pack from a version id does not resolve to a local file"
+                    .to_string(),
+            )
+            .as_error());
+        };
+
+        let remote =
+            url.as_deref().map(str::trim).filter(|url| !url.is_empty());
+
+        let file = match (path.clone(), remote) {
+            (Some(file), _) => file,
+            (None, Some(_)) => downloaded_pack_path(sha1.as_deref()).await?,
+            (None, None) => {
+                return Err(crate::ErrorKind::InputError(
+                    "The pack location names neither a file nor a URL"
+                        .to_string(),
+                )
+                .as_error());
+            }
+        };
+
+        match remote {
+            Some(url) => {
+                download_pack_with_progress(
+                    url,
+                    sha1.as_deref(),
+                    *size,
+                    &file,
+                    reporter,
+                )
+                .await?;
+            }
+            // A file the caller already holds. A declared SHA-1 or size is
+            // still enforced: it is the only thing standing between a truncated
+            // file that came off the network earlier and the archive reader.
+            None => verify_pack_file(&file, sha1.as_deref(), *size).await?,
+        }
+
+        Ok(file)
+    }
+}
+
+/// Enforces the declared SHA-1 and size of a pack that is already on disk.
+async fn verify_pack_file(
+    path: &Path,
+    sha1: Option<&str>,
+    size: Option<u64>,
+) -> crate::Result<()> {
+    let metadata = tokio::fs::metadata(path).await.map_err(|error| {
+        crate::ErrorKind::InputError(format!(
+            "Modpack file {} is not readable: {error}",
+            path.display()
+        ))
+    })?;
+    if let Some(expected) = size
+        && metadata.len() != expected
+    {
+        return Err(crate::ErrorKind::InputError(format!(
+            "Modpack file {} is {actual} bytes, but {expected} bytes were declared",
+            path.display(),
+            actual = metadata.len()
+        ))
+        .as_error());
+    }
+    if let Some(expected) = sha1.map(str::trim).filter(|sha1| !sha1.is_empty())
+    {
+        let (_, actual) = sha1_file_async(path).await?;
+        if !actual.eq_ignore_ascii_case(expected) {
+            return Err(crate::ErrorKind::HashError(
+                expected.to_ascii_lowercase(),
+                actual,
+            )
+            .as_error());
+        }
+    }
+    Ok(())
+}
+
+/// Where a downloaded pack is cached.
+///
+/// The cache entry is keyed by the pack's own SHA-1, so the same revision of the
+/// same pack always resolves to the same file across runs: a finished download
+/// is reused, and an interrupted one resumes where it stopped.
+async fn downloaded_pack_path(sha1: Option<&str>) -> crate::Result<PathBuf> {
+    let key = sha1
+        .map(|sha1| sha1.trim().to_ascii_lowercase())
+        .filter(|sha1| sha1.len() >= 16)
+        .map(|sha1| sha1[..16].to_string())
+        .unwrap_or_else(|| "unverified".to_string());
+    let state = State::get().await?;
+    Ok(state
+        .directories
+        .caches_dir()
+        .join(DOWNLOADED_PACK_CACHE_FOLDER)
+        .join(format!("{key}.mrpack")))
+}
+
+/// Downloads a pack while reporting progress into the install job that asked for
+/// it.
+#[tracing::instrument(skip(reporter))]
+async fn download_pack_with_progress(
+    url: &str,
+    sha1: Option<&str>,
+    size: Option<u64>,
+    destination: &Path,
+    reporter: InstallProgressReporter,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    if let Some(parent) = destination.parent() {
+        tokio::fs::create_dir_all(parent).await?;
+    }
+
+    let integrity = Integrity {
+        size,
+        sha1: sha1.map(str::to_string),
+        content: ContentValidation::Jar,
+        ..Integrity::default()
+    };
+
+    let mut last_reported_bytes = 0_u64;
+    let mut progress =
+        |current: u64,
+         total: u64|
+         -> Pin<Box<dyn Future<Output = crate::Result<()>> + Send>> {
+            // A pack is hundreds of megabytes over a slow link, so the job is
+            // told where it is often enough to look alive without writing a
+            // database row per chunk.
+            let min_delta = (total / 200).max(512 * 1024);
+            if current < total
+                && current.saturating_sub(last_reported_bytes) < min_delta
+            {
+                return Box::pin(async { Ok(()) });
+            }
+            last_reported_bytes = current;
+
+            let reporter = reporter.clone();
+            Box::pin(async move {
+                reporter
+                    .update(
+                        InstallPhaseId::DownloadingPackFile,
+                        Some(InstallProgress {
+                            current,
+                            total,
+                            secondary: None,
+                        }),
+                        InstallPhaseDetails::Modpack {
+                            project_id: None,
+                            version_id: None,
+                            title: None,
+                        },
+                    )
+                    .await?;
+                Ok(())
+            })
+        };
+
+    let item_name = destination
+        .file_name()
+        .map(|name| name.to_string_lossy().to_string())
+        .unwrap_or_else(|| "pack.mrpack".to_string());
+    let result = download_to_path(
+        DownloadRequest::new(url, ResourceClass::Modpack)
+            .with_integrity(integrity)
+            .with_h2_range_concurrency(16)
+            .with_install_tracking(
+                reporter.clone(),
+                destination.display().to_string(),
+                item_name,
+            ),
+        destination,
+        &state.download_semaphore,
+        &state.pool,
+        Some(&mut progress as &mut FetchProgressFn<'_>),
+    )
+    .await?;
+
+    if result.attempts > 0 {
+        reporter
+            .record_download_metrics(
+                result.source.as_str(),
+                result.fallback_count as u64,
+            )
+            .await?;
+    }
+    Ok(())
+}
+
+/// Pack identity a caller can supply instead of letting the launcher read it
+/// out of the archive itself.
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct PackDisplayIdentity {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub game_version: Option<String>,
+    /// Loader the caller names. An unrecognised one is ignored rather than
+    /// rejected: the manifest's loader vocabulary is the server's, and a value
+    /// this build predates must not cost the player the whole install.
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "deserialize_known_loader"
+    )]
+    pub loader: Option<ModLoader>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub loader_version: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub icon_url: Option<String>,
+}
+
+fn deserialize_known_loader<'de, D>(
+    deserializer: D,
+) -> Result<Option<ModLoader>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let name = Option::<String>::deserialize(deserializer)?;
+    Ok(name
+        .as_deref()
+        .map(str::trim)
+        .filter(|name| !name.is_empty())
+        .and_then(|name| {
+            ModLoader::try_from_string(name)
+                .inspect_err(|_| {
+                    tracing::warn!(
+                        loader = %name,
+                        "Ignoring a pack loader this launcher does not know"
+                    );
+                })
+                .ok()
+        }))
+}
+
+impl PackDisplayIdentity {
+    fn into_preview(self, fallback_name: String) -> CreatePackInstance {
+        // A caller that declares no identity still has to yield a usable
+        // instance, so the placeholder defaults stand in until the install
+        // reads the real ones out of the archive.
+        let defaults = CreatePackInstance::default();
+        CreatePackInstance {
+            name: self
+                .name
+                .filter(|name| !name.trim().is_empty())
+                .unwrap_or(fallback_name),
+            game_version: self.game_version.unwrap_or(defaults.game_version),
+            modloader: self.loader.unwrap_or(defaults.modloader),
+            loader_version: self.loader_version,
+            icon_url: self.icon_url,
+            ..Default::default()
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -258,7 +556,27 @@ pub async fn get_instance_from_pack(
             }),
             ..Default::default()
         }),
-        CreatePackLocation::FromFile { path } => {
+        CreatePackLocation::FromFile {
+            path,
+            display: Some(display),
+            ..
+        } => {
+            let file_name = path
+                .as_deref()
+                .and_then(Path::file_stem)
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_string();
+            Ok(display.into_preview(file_name))
+        }
+        CreatePackLocation::FromFile { path, .. } => {
+            let path = path.ok_or_else(|| {
+                crate::ErrorKind::InputError(
+                    "A pack to download needs a declared identity to name its instance"
+                        .to_string(),
+                )
+                .as_error()
+            })?;
             let file_name = path
                 .file_stem()
                 .unwrap_or_default()

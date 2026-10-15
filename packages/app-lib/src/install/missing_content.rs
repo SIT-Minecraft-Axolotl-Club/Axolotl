@@ -1514,7 +1514,11 @@ mod tests {
         let mut job_state =
             InstallJobState::new(InstallRequest::CreateModpackInstance {
                 location: CreatePackLocation::FromFile {
-                    path: PathBuf::from("test.mrpack"),
+                    path: Some(PathBuf::from("test.mrpack")),
+                    url: None,
+                    sha1: None,
+                    size: None,
+                    display: None,
                 },
                 post_install_edit: None,
             });
@@ -1641,7 +1645,11 @@ mod tests {
             InstallRequest::InstallPackToExistingInstance {
                 instance_id: instance_id.clone(),
                 location: CreatePackLocation::FromFile {
-                    path: root.join("stage-3.mrpack"),
+                    path: Some(root.join("stage-3.mrpack")),
+                    url: None,
+                    sha1: None,
+                    size: None,
+                    display: None,
                 },
                 post_install_edit: None,
             },

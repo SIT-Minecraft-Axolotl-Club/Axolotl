@@ -459,12 +459,22 @@ pub async fn get_java_version_from_launch_context(
     version_info: &VersionInfo,
 ) -> crate::Result<Option<JavaVersion>> {
     if let Some(java) = context.launch_overrides.java_path.as_ref() {
-        let java =
-            crate::api::jre::check_jre(std::path::PathBuf::from(java)).await;
+        // An instance may name its own Java, but only one the launcher installed
+        // for itself is accepted: the game is never started on a runtime the
+        // player installed, whatever an instance asks for.
+        let path = std::path::PathBuf::from(java);
+        if crate::api::jre::is_bundled_java(&path).await {
+            let java = crate::api::jre::check_jre(path).await;
 
-        if let Ok(java) = java {
-            validate_loader_java_version(version_info, &java)?;
-            return Ok(Some(java));
+            if let Ok(java) = java {
+                validate_loader_java_version(version_info, &java)?;
+                return Ok(Some(java));
+            }
+        } else {
+            tracing::warn!(
+                path = %java,
+                "Ignoring an instance's Java override: only the launcher's own runtime is used"
+            );
         }
     }
 
@@ -2183,7 +2193,27 @@ pub async fn launch_minecraft(
     let java_version = if let Some(java) =
         context.launch_overrides.java_path.as_ref()
     {
-        crate::api::jre::check_jre(std::path::PathBuf::from(java)).await?
+        // Only a runtime the launcher installed itself honours an instance's Java
+        // override; anything else falls through to the launcher's own runtime.
+        let path = std::path::PathBuf::from(java);
+        if crate::api::jre::is_bundled_java(&path).await {
+            crate::api::jre::check_jre(path).await?
+        } else {
+            tracing::warn!(
+                path = %java,
+                "Ignoring an instance's Java override: only the launcher's own runtime is used"
+            );
+            let key = required_java_major(&version_info);
+            match crate::api::jre::find_compatible_java_for_version(key).await? {
+                Some(java) => java,
+                None => {
+                    return Err(crate::ErrorKind::LauncherError(format!(
+                        "No bundled Java runtime can run this instance (Java {key} is required)"
+                    ))
+                    .into());
+                }
+            }
+        }
     } else if direct_launch
         .as_ref()
         .is_some_and(|direct| direct.dialect == LinkedLauncherDialect::Hmcl)

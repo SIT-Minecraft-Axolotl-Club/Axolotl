@@ -27,6 +27,13 @@ pub const JANUS_BASE_URL: &str = "https://skin.sitmc.club/api/janus";
 /// one itself.
 pub const SITE_LABEL: &str = "SIT-Minecraft";
 
+/// The society's documentation, as shown in the launcher's Documentation page.
+///
+/// It is a Feishu wiki node, which is what lets the launcher walk the pages
+/// below it for the page's own navigation.
+pub const DOCS_URL: &str =
+    "https://sit-minecraft.feishu.cn/wiki/BlvtwrH8diexAtklJg8cntwmnwc";
+
 /// Client ID the site reserves for launchers (`shared_client_id` in the
 /// OpenID provider metadata). The metadata is preferred when it announces one.
 pub const OIDC_CLIENT_ID: &str = "11";

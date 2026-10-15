@@ -209,6 +209,16 @@ pub struct JavaDiscoveryPayload {
     pub count: usize,
 }
 
+/// A stored sign-in the account site no longer honours, reported so the frontend
+/// can ask the player to sign in again instead of leaving them with an error.
+#[derive(Serialize, Clone)]
+#[cfg(feature = "tauri")]
+#[serde(rename_all = "camelCase")]
+pub struct CredentialsExpiredPayload {
+    pub account_id: Option<String>,
+    pub player_name: String,
+}
+
 #[derive(Serialize, Clone)]
 #[cfg(feature = "tauri")]
 #[serde(rename_all = "snake_case")]

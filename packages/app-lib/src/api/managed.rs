@@ -12,13 +12,10 @@ use crate::State;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::InstanceInstallStage;
-use crate::util::fetch::{INSECURE_REQWEST_CLIENT, sha1_file_async};
+use crate::util::fetch::INSECURE_REQWEST_CLIENT;
 use chrono::Utc;
-use futures::StreamExt;
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
-use std::path::{Path, PathBuf};
-use tokio::io::AsyncWriteExt;
+use std::collections::HashSet;
 
 /// Highest manifest schema this build understands. A manifest that declares a
 /// higher schema is rejected instead of being partially interpreted.
@@ -26,9 +23,6 @@ const SUPPORTED_MANIFEST_SCHEMA: u32 = 1;
 
 /// Only pack format the existing pack install pipeline can consume.
 const MRPACK_KIND: &str = "mrpack";
-
-/// Folder inside the launcher cache directory that holds downloaded packs.
-const MANAGED_CACHE_FOLDER: &str = "managed";
 
 /// Longest managed instance id accepted, matching the manifest contract.
 const MAX_INSTANCE_ID_LEN: usize = 64;
@@ -243,7 +237,6 @@ pub async fn sync_manifest(
         validate_managed_spec(spec)?;
     }
 
-    let previous = cached_specs(&state).await;
     store_manifest_body(&state, manifest_url, &body).await?;
 
     let updated = Utc::now().timestamp();
@@ -391,61 +384,6 @@ pub async fn managed_owner(
         server_instance_id,
         required: required != 0,
     }))
-}
-
-/// Downloads and verifies the pack of a managed instance and returns the local
-/// file path to hand to the existing pack install commands.
-///
-/// Only `mrpack` is supported today, and the manifest must declare a SHA-1:
-/// an unverified pack is never installed.
-#[tracing::instrument]
-pub async fn prepare_pack(
-    server_instance_id: &str,
-    revision: i64,
-) -> crate::Result<String> {
-    validate_server_instance_id(server_instance_id)?;
-    let state = State::get().await?;
-    let spec = cached_spec(&state, server_instance_id, revision).await?;
-
-    if spec.pack.kind != MRPACK_KIND {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Managed instance {server_instance_id} uses pack format \"{}\", which this launcher cannot install yet",
-            spec.pack.kind
-        ))
-        .as_error());
-    }
-    let expected_sha1 = spec
-        .pack
-        .sha1
-        .as_deref()
-        .map(str::trim)
-        .filter(|value| !value.is_empty())
-        .map(str::to_ascii_lowercase)
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(format!(
-                "Managed instance {server_instance_id} does not declare a pack SHA-1, so the pack cannot be verified"
-            ))
-            .as_error()
-        })?;
-
-    let directory = state.directories.caches_dir().join(MANAGED_CACHE_FOLDER);
-    tokio::fs::create_dir_all(&directory).await?;
-    let target =
-        directory.join(format!("{server_instance_id}-{revision}.mrpack"));
-
-    if tokio::fs::try_exists(&target).await? {
-        let (size, sha1) = sha1_file_async(&target).await?;
-        if sha1 == expected_sha1
-            && spec.pack.size.is_none_or(|expected| expected == size)
-        {
-            return Ok(target.to_string_lossy().to_string());
-        }
-    }
-
-    download_pack(&spec.pack.url, &target, &expected_sha1, spec.pack.size)
-        .await?;
-
-    Ok(target.to_string_lossy().to_string())
 }
 
 /// Records that the local instance now holds the given applied revision.
@@ -784,148 +722,6 @@ async fn store_manifest_body(
     .execute(&state.pool)
     .await?;
     Ok(())
-}
-
-/// Latest successfully fetched manifest body, or `None` when nothing usable has
-/// been stored yet. The snapshot is untrusted local data, so a body that no
-/// longer parses is ignored instead of failing the sync.
-async fn load_cached_manifest(
-    state: &State,
-) -> crate::Result<Option<ManagedManifest>> {
-    let body: Option<String> = sqlx::query_scalar::<_, String>(
-        "SELECT body FROM managed_manifest_cache
-         ORDER BY updated DESC
-         LIMIT 1",
-    )
-    .fetch_optional(&state.pool)
-    .await?;
-
-    Ok(body.and_then(|body| serde_json::from_str(&body).ok()))
-}
-
-async fn cached_specs(state: &State) -> HashMap<String, ManagedInstanceSpec> {
-    load_cached_manifest(state)
-        .await
-        .ok()
-        .flatten()
-        .map(|manifest| {
-            manifest
-                .instances
-                .into_iter()
-                .map(|spec| (spec.id.clone(), spec))
-                .collect()
-        })
-        .unwrap_or_default()
-}
-
-async fn cached_spec(
-    state: &State,
-    server_instance_id: &str,
-    revision: i64,
-) -> crate::Result<ManagedInstanceSpec> {
-    let manifest = load_cached_manifest(state).await?.ok_or_else(|| {
-        crate::ErrorKind::InputError(
-            "No instance manifest has been synced yet; sync it before preparing a managed pack"
-                .to_string(),
-        )
-        .as_error()
-    })?;
-    validate_manifest_schema(manifest.schema)?;
-
-    let spec = manifest
-        .instances
-        .into_iter()
-        .find(|spec| spec.id == server_instance_id)
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(format!(
-                "The cached instance manifest no longer declares managed instance {server_instance_id}"
-            ))
-            .as_error()
-        })?;
-
-    if spec.revision != revision {
-        return Err(crate::ErrorKind::InputError(format!(
-            "The cached instance manifest declares revision {} for {server_instance_id}, but revision {revision} was requested; sync the manifest again",
-            spec.revision
-        ))
-        .as_error());
-    }
-
-    Ok(spec)
-}
-
-async fn download_pack(
-    url: &str,
-    target: &Path,
-    expected_sha1: &str,
-    expected_size: Option<u64>,
-) -> crate::Result<()> {
-    let response = INSECURE_REQWEST_CLIENT.get(url).send().await?;
-    let status = response.status();
-    if !status.is_success() {
-        return Err(crate::ErrorKind::HttpError {
-            status: status.as_u16(),
-            method: "GET".to_string(),
-            url: url.to_string(),
-        }
-        .as_error());
-    }
-
-    let part = part_path(target);
-    if let Err(error) = stream_to_file(response, &part).await {
-        let _ = tokio::fs::remove_file(&part).await;
-        return Err(error);
-    }
-
-    let (size, sha1) = match sha1_file_async(&part).await {
-        Ok(hashed) => hashed,
-        Err(error) => {
-            let _ = tokio::fs::remove_file(&part).await;
-            return Err(error);
-        }
-    };
-    if sha1 != expected_sha1 {
-        let _ = tokio::fs::remove_file(&part).await;
-        return Err(crate::ErrorKind::HashError(
-            expected_sha1.to_string(),
-            sha1,
-        )
-        .as_error());
-    }
-    if let Some(expected) = expected_size
-        && expected != size
-    {
-        let _ = tokio::fs::remove_file(&part).await;
-        return Err(crate::ErrorKind::InputError(format!(
-            "Managed pack size mismatch: expected {expected} bytes, got {size}"
-        ))
-        .as_error());
-    }
-
-    tokio::fs::rename(&part, target).await?;
-    Ok(())
-}
-
-/// Streams a response into the `.part` staging file next to its destination, so
-/// a failed or truncated transfer never replaces a verified pack.
-async fn stream_to_file(
-    response: reqwest::Response,
-    part: &Path,
-) -> crate::Result<()> {
-    let mut file = tokio::fs::File::create(part).await?;
-    let mut stream = response.bytes_stream();
-    while let Some(chunk) = stream.next().await {
-        let chunk = chunk?;
-        file.write_all(&chunk).await?;
-    }
-    file.flush().await?;
-    Ok(())
-}
-
-fn part_path(target: &Path) -> PathBuf {
-    let mut path = target.as_os_str().to_os_string();
-    path.push(".part");
-    PathBuf::from(path)
 }
 
 fn clamp_i32(value: i64) -> i32 {

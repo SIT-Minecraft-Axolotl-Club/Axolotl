@@ -11,7 +11,6 @@ import { platform } from '@tauri-apps/plugin-os'
 import { computed, readonly, ref, watch } from 'vue'
 
 import JavaArgumentsInput from '@/components/ui/JavaArgumentsInput.vue'
-import JavaSelector from '@/components/ui/JavaSelector.vue'
 import MemoryAllocationDisplay from '@/components/ui/MemoryAllocationDisplay.vue'
 import useMemorySlider from '@/composables/useMemorySlider'
 import { collectGcContext, extractJavaMajorVersion } from '@/helpers/gc/context'
@@ -87,26 +86,16 @@ const { instance } = injectInstanceSettings()
 const supportsMemoryOptimization = (await platform()) === 'windows'
 
 const globalSettings = (await get().catch(handleError)) as unknown as AppSettings
-const optimalJava = readonly(await get_optimal_jre_key(instance.value.id).catch(handleError))
-const requiredJavaVersion = optimalJava?.parsed_version ?? null
 
-const overrideJavaInstall = ref(!!instance.value.java_path)
-const overrideJava = ref({
-	...(optimalJava ?? {}),
-	path: instance.value.java_path ?? optimalJava?.path ?? '',
-})
-const displayedJava = computed({
-	get: () => (overrideJavaInstall.value ? overrideJava.value : (optimalJava ?? overrideJava.value)),
-	set: (value) => {
-		overrideJava.value = value
-	},
-})
-
-watch(overrideJavaInstall, (enabled) => {
-	if (enabled && !overrideJava.value.path) {
-		overrideJava.value = { ...(optimalJava ?? {}), path: optimalJava?.path ?? '' }
-	}
-})
+/**
+ * Java the launcher will actually run this instance with.
+ *
+ * The launcher only ever starts the game on the runtime it installs itself, so
+ * this instance has no say in which Java is used and the page offers none. The
+ * value is still read to describe the runtime when explaining memory or garbage
+ * collection choices.
+ */
+const runJava = readonly(await get_optimal_jre_key(instance.value.id).catch(handleError))
 
 const overrideJavaArgs = ref((instance.value.extra_launch_args?.length ?? 0) > 0)
 const javaArgs = ref(
@@ -136,7 +125,7 @@ const snapPoints = memData.snapPoints
 const gcContext = ref<GcContext | null>(null)
 
 async function updateGcContext() {
-	const javaMajorVersion = extractJavaMajorVersion(displayedJava.value?.parsed_version)
+	const javaMajorVersion = extractJavaMajorVersion(runJava?.parsed_version)
 	let modCount = 0
 	try {
 		const snapshot = await get_content_snapshot(instance.value.id)
@@ -156,13 +145,9 @@ async function updateGcContext() {
 
 await updateGcContext()
 
-watch([memory, displayedJava, () => instance.value.loader], updateGcContext)
+watch([memory, () => instance.value.loader], updateGcContext)
 
 const editInstanceObject = computed(() => ({
-	java_path:
-		overrideJavaInstall.value && overrideJava.value.path
-			? overrideJava.value.path.replace('java.exe', 'javaw.exe')
-			: null,
 	extra_launch_args: overrideJavaArgs.value
 		? javaArgs.value.trim().split(/\s+/).filter(Boolean)
 		: null,
@@ -177,16 +162,7 @@ const editInstanceObject = computed(() => ({
 }))
 
 watch(
-	[
-		overrideJavaInstall,
-		overrideJava,
-		overrideJavaArgs,
-		javaArgs,
-		overrideEnvVars,
-		envVars,
-		overrideMemorySettings,
-		memory,
-	],
+	[overrideJavaArgs, javaArgs, overrideEnvVars, envVars, overrideMemorySettings, memory],
 	async () => {
 		await edit(instance.value.id, editInstanceObject.value).catch(handleError)
 	},
@@ -196,23 +172,7 @@ watch(
 
 <template>
 	<div>
-		<h2 class="m-0 mb-2 block text-base font-extrabold text-contrast">
-			{{ formatMessage(messages.javaInstallation) }}
-		</h2>
-		<Checkbox
-			v-model="overrideJavaInstall"
-			:label="formatMessage(messages.customJavaInstallation)"
-			class="mb-2"
-		/>
-		<JavaSelector
-			v-model="displayedJava"
-			:disabled="!overrideJavaInstall"
-			:placeholder="formatMessage(messages.javaPathPlaceholder)"
-			:version="requiredJavaVersion"
-			select-all-versions
-		/>
-
-		<h2 class="mb-1 mt-4 block text-base font-extrabold text-contrast">
+		<h2 class="mb-1 block text-base font-extrabold text-contrast">
 			{{ formatMessage(messages.javaMemory) }}
 		</h2>
 		<Checkbox

@@ -413,47 +413,110 @@ pub async fn find_cached_java(
     Ok(None)
 }
 
-/// Resolves an installed Java for `major_version` without downloading: serves
-/// it from the discovery cache when present, otherwise runs a system scan and
-/// checks again. Returns `None` only when no matching Java is installed, so
-/// launch/install callers fall back to downloading a runtime as a last resort.
+/// Resolves the Java runtime that may run `major_version`.
+///
+/// Only the runtime the launcher installed itself is ever returned. Java that
+/// the player happens to have on their machine is deliberately ignored: the
+/// society ships one known runtime per game version and does not want a launch
+/// to depend on whatever a player installed. That also means a version whose
+/// runtime is missing resolves to nothing here, and the caller downloads the
+/// Mojang runtime instead of falling back to a foreign one.
 pub async fn find_java_for_version(
     major_version: u32,
 ) -> crate::Result<Option<JavaVersion>> {
-    let state = State::get().await?;
-    if let Some(configured) =
-        JavaVersion::get(major_version, &state.pool).await?
-    {
-        let path = PathBuf::from(&configured.path);
-        if let Ok(java) = jre::check_java_at_filepath(&path).await
-            && java.parsed_version == major_version
-        {
-            java.upsert(&state.pool).await?;
-            return Ok(Some(java));
-        }
-
-        tracing::warn!(
-            major_version,
-            path = %configured.path,
-            "Configured Java default is no longer valid"
-        );
-        JavaVersion::remove_default(major_version, &state.pool).await?;
-    }
-
-    if let Some(java) = find_cached_java(major_version).await? {
-        return Ok(Some(java));
-    }
-
-    let scanned = get_available_jres(false, false, false).await?;
-    Ok(scanned
-        .into_iter()
-        .find(|java| java.parsed_version == major_version))
+    find_bundled_java(major_version).await
 }
 
-/// Resolves an installed Java that can run `major_version` without
-/// downloading. Prefers an exact match, then falls back to the closest newer
-/// runtime so a user-installed Java can still be used when the metadata's
-/// recommended major version is not present.
+/// Whether a Java executable is one the launcher installed for itself.
+///
+/// An instance may name its own Java, but only a runtime under the launcher's
+/// version directory is accepted: a path pointing at something the player
+/// installed is refused, so the game never ends up running on it.
+pub async fn is_bundled_java(path: &Path) -> bool {
+    let Ok(state) = State::get().await else {
+        return false;
+    };
+    let root = state.directories.java_versions_dir();
+    let Ok(relative) = path.strip_prefix(&root) else {
+        return false;
+    };
+
+    relative
+        .components()
+        .next()
+        .and_then(|first| match first {
+            Component::Normal(name) => Some(name.to_string_lossy().to_string()),
+            _ => None,
+        })
+        .is_some_and(|name| name.starts_with(MOJANG_RUNTIME_PREFIX))
+}
+
+/// Finds the launcher's own runtime for `major_version`, if it is installed.
+///
+/// The launcher keeps Mojang runtimes under `<java_versions>/mojang-<component>-
+/// <platform>-<hash>`, so the directory itself is the record of what has been
+/// installed; nothing has to be scanned outside of it.
+pub async fn find_bundled_java(
+    major_version: u32,
+) -> crate::Result<Option<JavaVersion>> {
+    let state = State::get().await?;
+    let root = state.directories.java_versions_dir();
+    let Ok(mut entries) = tokio::fs::read_dir(&root).await else {
+        return Ok(None);
+    };
+
+    let mut runtime_roots = Vec::new();
+    while let Ok(Some(entry)) = entries.next_entry().await {
+        let name = entry.file_name().to_string_lossy().to_string();
+        if name.starts_with(MOJANG_RUNTIME_PREFIX)
+            && entry.file_type().await.is_ok_and(|kind| kind.is_dir())
+        {
+            runtime_roots.push(entry.path());
+        }
+    }
+    runtime_roots.sort();
+
+    for runtime_root in runtime_roots {
+        for executable in runtime_executables(&runtime_root) {
+            let Ok(java) = jre::check_java_at_filepath(&executable).await else {
+                continue;
+            };
+            if java.parsed_version == major_version {
+                return Ok(Some(java));
+            }
+        }
+    }
+
+    Ok(None)
+}
+
+/// Every path a bundled runtime might keep its launcher at.
+///
+/// A runtime is installed for one platform, but the layouts differ between
+/// them, so each candidate is simply tried until one is a Java executable.
+fn runtime_executables(root: &Path) -> Vec<PathBuf> {
+    const LAYOUTS: [&str; 3] = [
+        "bin/java",
+        "Contents/Home/bin/java",
+        "jre/bin/java",
+    ];
+
+    LAYOUTS
+        .iter()
+        .flat_map(|relative| {
+            [
+                root.join(relative),
+                root.join(format!("{relative}.exe")),
+            ]
+        })
+        .collect()
+}
+
+/// Resolves the launcher's own runtime that can run `major_version`.
+///
+/// Like [`find_java_for_version`], this never reaches for a Java the player
+/// installed: the exact bundled runtime is used when it exists, and otherwise
+/// the closest newer bundled one.
 pub async fn find_compatible_java_for_version(
     major_version: u32,
 ) -> crate::Result<Option<JavaVersion>> {
@@ -461,10 +524,40 @@ pub async fn find_compatible_java_for_version(
         return Ok(Some(java));
     }
 
+    let bundled = list_bundled_javas().await?;
+    Ok(closest_compatible_java(bundled.iter(), major_version))
+}
+
+/// Every runtime the launcher has installed for this machine.
+pub async fn list_bundled_javas() -> crate::Result<Vec<JavaVersion>> {
     let state = State::get().await?;
-    let mut jres = get_available_jres(false, false, false).await?;
-    jres.extend(JavaVersion::get_all(&state.pool).await?);
-    Ok(closest_compatible_java(jres.iter(), major_version))
+    let root = state.directories.java_versions_dir();
+    let Ok(mut entries) = tokio::fs::read_dir(&root).await else {
+        return Ok(Vec::new());
+    };
+
+    let mut runtime_roots = Vec::new();
+    while let Ok(Some(entry)) = entries.next_entry().await {
+        let name = entry.file_name().to_string_lossy().to_string();
+        if name.starts_with(MOJANG_RUNTIME_PREFIX)
+            && entry.file_type().await.is_ok_and(|kind| kind.is_dir())
+        {
+            runtime_roots.push(entry.path());
+        }
+    }
+    runtime_roots.sort();
+
+    let mut found = Vec::new();
+    for runtime_root in runtime_roots {
+        for executable in runtime_executables(&runtime_root) {
+            if let Ok(java) = jre::check_java_at_filepath(&executable).await {
+                found.push(java);
+                break;
+            }
+        }
+    }
+
+    Ok(found)
 }
 
 fn closest_compatible_java<'a>(
@@ -500,6 +593,12 @@ pub async fn auto_install_java_with_reporter(
 const JAVA_INSTALL_STEPS: u64 = 4;
 const JAVA_DOWNLOAD_PROGRESS_MIN_BYTES: u64 = 256 * 1024;
 const MOJANG_RUNTIME_INDEX_URL: &str = "https://piston-meta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json";
+
+/// Prefix of the runtime directories the launcher installs for itself.
+///
+/// It is what tells a runtime the launcher owns apart from one the player
+/// installed, which the launcher deliberately never starts the game with.
+const MOJANG_RUNTIME_PREFIX: &str = "mojang-";
 
 static JAVA_INSTALL_LOCK: LazyLock<tokio::sync::Mutex<()>> =
     LazyLock::new(|| tokio::sync::Mutex::new(()));
@@ -545,16 +644,7 @@ enum MojangRuntimeFile {
 
 #[derive(Deserialize)]
 struct AzulPackageSummary {
-    package_uuid: String,
     java_version: Vec<u32>,
-}
-
-#[derive(Deserialize)]
-struct AzulPackage {
-    download_url: String,
-    name: PathBuf,
-    sha256_hash: String,
-    size: u64,
 }
 
 // ── JetBrains JDK feed types ────────────────────────────────────────────────
@@ -712,7 +802,12 @@ async fn auto_install_java_inner(
     )
     .await?;
 
-    if let Some(path) = install_mojang_runtime(
+    // Only the runtime Mojang publishes for this game version is installed. No
+    // other distribution is used as a fallback: the society ships one known
+    // runtime per version, and a player's own Java is never a substitute for
+    // it. A version Mojang ships no runtime for therefore fails here instead of
+    // silently starting on something else.
+    match install_mojang_runtime(
         &state,
         java_version,
         loading_bar.as_ref(),
@@ -720,17 +815,12 @@ async fn auto_install_java_inner(
     )
     .await?
     {
-        return Ok(Some(path));
+        Some(path) => Ok(Some(path)),
+        None => Err(crate::ErrorKind::LauncherError(format!(
+            "No Mojang Java runtime is published for Java {java_version}, and this launcher only starts the game with the runtime Mojang ships"
+        ))
+        .into()),
     }
-
-    install_azul_runtime(
-        &state,
-        java_version,
-        loading_bar.as_ref(),
-        reporter.as_ref(),
-    )
-    .await
-    .map(Some)
 }
 
 fn mojang_runtime_component(java_version: u32) -> Option<&'static str> {
@@ -1209,246 +1299,6 @@ async fn install_mojang_runtime(
     ))
 }
 
-fn validate_archive_file_name(name: &Path) -> crate::Result<()> {
-    if name.as_os_str().is_empty()
-        || name.is_absolute()
-        || name.components().count() != 1
-        || !matches!(name.components().next(), Some(Component::Normal(_)))
-    {
-        return Err(crate::ErrorKind::InputError(
-            "Java package metadata contains an invalid file name".to_string(),
-        )
-        .into());
-    }
-    Ok(())
-}
-
-fn extract_azul_archive(
-    archive_path: &Path,
-    staging_root: &Path,
-) -> crate::Result<PathBuf> {
-    let file = std::fs::File::open(archive_path)?;
-    let mut archive = zip::ZipArchive::new(file).map_err(|error| {
-        crate::ErrorKind::InputError(format!(
-            "Failed to read Java archive: {error}"
-        ))
-    })?;
-    let root = archive
-        .file_names()
-        .find_map(|name| {
-            name.split('/').find(|component| !component.is_empty())
-        })
-        .map(PathBuf::from)
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Java archive does not contain an install directory"
-                    .to_string(),
-            )
-        })?;
-    validate_archive_file_name(&root)?;
-    archive.extract(staging_root).map_err(|error| {
-        crate::ErrorKind::InputError(format!(
-            "Failed to extract Java archive: {error}"
-        ))
-    })?;
-    Ok(root)
-}
-
-async fn install_azul_runtime(
-    state: &State,
-    java_version: u32,
-    loading_bar: Option<&crate::event::LoadingBarId>,
-    reporter: Option<&InstallProgressReporter>,
-) -> crate::Result<PathBuf> {
-    let metadata_url = format!(
-        "https://api.azul.com/metadata/v1/zulu/packages?arch={}&java_version={}&os={}&archive_type=zip&javafx_bundled=false&java_package_type=jre&page_size=1",
-        std::env::consts::ARCH,
-        java_version,
-        std::env::consts::OS
-    );
-    if let Some(reporter) = reporter {
-        reporter
-            .set_context(
-                InstallErrorContext::new("fetch Azul Java package metadata")
-                    .urls(vec![metadata_url.clone()])
-                    .java_version(java_version)
-                    .os(std::env::consts::OS)
-                    .arch(std::env::consts::ARCH)
-                    .build(),
-            )
-            .await?;
-    }
-    let packages = fetch_json::<Vec<AzulPackageSummary>>(
-        Method::GET,
-        &metadata_url,
-        None,
-        None,
-        None,
-        &state.api_semaphore,
-        &state.pool,
-    )
-    .await?;
-    let summary = packages.first().ok_or_else(|| {
-        crate::ErrorKind::LauncherError(format!(
-            "No Java Version found for Java version {}, OS {}, and Architecture {}",
-            java_version,
-            std::env::consts::OS,
-            std::env::consts::ARCH,
-        ))
-    })?;
-    let details_url = format!(
-        "https://api.azul.com/metadata/v1/zulu/packages/{}",
-        summary.package_uuid
-    );
-    let download = fetch_json::<AzulPackage>(
-        Method::GET,
-        &details_url,
-        None,
-        None,
-        None,
-        &state.api_semaphore,
-        &state.pool,
-    )
-    .await?;
-    validate_archive_file_name(&download.name)?;
-
-    let archive_path = state
-        .directories
-        .caches_dir()
-        .join("java")
-        .join("azul")
-        .join(&summary.package_uuid)
-        .join(&download.name);
-    if let Some(reporter) = reporter {
-        reporter
-            .set_context(
-                InstallErrorContext::new("download Azul Java archive")
-                    .urls(vec![download.download_url.clone()])
-                    .file_path(download.name.display().to_string())
-                    .target_path(archive_path.display().to_string())
-                    .expected_hash(download.sha256_hash.clone())
-                    .expected_size(download.size)
-                    .java_version(java_version)
-                    .os(std::env::consts::OS)
-                    .arch(std::env::consts::ARCH)
-                    .build(),
-            )
-            .await?;
-    }
-    update_java_install_progress(
-        reporter,
-        java_version,
-        InstallJavaStep::Downloading,
-        Some(InstallProgress {
-            current: 0,
-            total: download.size,
-            secondary: None,
-        }),
-    )
-    .await?;
-    if let Some(loading_bar) = loading_bar {
-        emit_loading(loading_bar, 10.0, Some("Downloading java version"))?;
-    }
-    let mut last_reported_bytes = 0_u64;
-    let download_reporter = reporter.cloned();
-    let mut progress =
-        |current: u64,
-         total: u64|
-         -> Pin<Box<dyn Future<Output = crate::Result<()>> + Send>> {
-            let min_delta = (total / 200).max(JAVA_DOWNLOAD_PROGRESS_MIN_BYTES);
-            if current < total
-                && current.saturating_sub(last_reported_bytes) < min_delta
-            {
-                return Box::pin(async { Ok(()) });
-            }
-            last_reported_bytes = current;
-            let reporter = download_reporter.clone();
-            Box::pin(async move {
-                update_java_install_progress(
-                    reporter.as_ref(),
-                    java_version,
-                    InstallJavaStep::Downloading,
-                    Some(InstallProgress {
-                        current,
-                        total,
-                        secondary: None,
-                    }),
-                )
-                .await
-            })
-        };
-    let mut request =
-        DownloadRequest::new(&download.download_url, ResourceClass::Java)
-            .with_integrity(Integrity {
-                size: None,
-                sha256: Some(download.sha256_hash.clone()),
-                content: ContentValidation::Jar,
-                ..Integrity::default()
-            });
-    if let Some(reporter) = reporter {
-        request = request.with_install_tracking(
-            reporter.clone(),
-            archive_path.display().to_string(),
-            archive_path
-                .file_name()
-                .map(|name| name.to_string_lossy().into_owned())
-                .unwrap_or_else(|| "java-runtime".to_string()),
-        );
-    }
-    let download_result = download_to_path(
-        request,
-        &archive_path,
-        &state.download_semaphore,
-        &state.pool,
-        Some(&mut progress as &mut FetchProgressFn<'_>),
-    )
-    .await?;
-    if let Some(reporter) = reporter
-        && download_result.attempts > 0
-    {
-        reporter
-            .record_download_metrics(
-                download_result.source.as_str(),
-                download_result.fallback_count as u64,
-            )
-            .await?;
-    }
-    if let Some(loading_bar) = loading_bar {
-        emit_loading(loading_bar, 80.0, Some("Extracting java"))?;
-    }
-    update_java_install_progress(
-        reporter,
-        java_version,
-        InstallJavaStep::Extracting,
-        Some(java_step_progress(3)),
-    )
-    .await?;
-
-    let java_root = state.directories.java_versions_dir();
-    let staging_root =
-        java_root.join(format!(".azul-{}.installing", summary.package_uuid));
-    remove_path_if_present(&staging_root).await?;
-    io::create_dir_all(&staging_root).await?;
-    let archive_path_for_extract = archive_path.clone();
-    let staging_for_extract = staging_root.clone();
-    let extracted_root = tokio::task::spawn_blocking(move || {
-        extract_azul_archive(&archive_path_for_extract, &staging_for_extract)
-    })
-    .await??;
-    let extracted_path = staging_root.join(&extracted_root);
-    let final_root = java_root.join(&extracted_root);
-    remove_path_if_present(&final_root).await?;
-    tokio::fs::rename(&extracted_path, &final_root).await?;
-    remove_path_if_present(&staging_root).await?;
-
-    let executable = if cfg!(target_os = "macos") {
-        final_root.join("Contents/Home/bin/java")
-    } else {
-        final_root.join("bin").join(jre::JAVA_BIN)
-    };
-    validate_installed_java(executable, java_version, reporter, loading_bar)
-        .await
-}
 
 // Validates JRE at a given at a given path
 pub async fn check_jre(path: PathBuf) -> crate::Result<JavaVersion> {

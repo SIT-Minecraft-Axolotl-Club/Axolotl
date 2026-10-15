@@ -134,13 +134,6 @@ export async function managed_list() {
 	return await invoke<ManagedInstanceRecord[]>('plugin:instance|managed_list')
 }
 
-export async function managed_prepare_pack(serverInstanceId: string, revision: number) {
-	return await invoke<string>('plugin:instance|managed_prepare_pack', {
-		serverInstanceId,
-		revision,
-	})
-}
-
 export async function managed_mark_installed(
 	serverInstanceId: string,
 	instanceId: string,
@@ -203,19 +196,36 @@ export function managedOptionalActions(report: ManagedSyncReport): ManagedInstan
 /**
  * Installs or updates one managed instance.
  *
- * The pack is downloaded and integrity-checked by the Rust side first; the actual
- * install then runs through the normal install-job pipeline, so progress,
- * retries, resume and rollback all behave like a manual install. Returns the
- * local instance id the action now refers to.
+ * The pack travels into the install job as a URL plus its declared SHA-1 and
+ * size, so the job's own downloader owns the transfer: a pack of hundreds of
+ * megabytes is fetched with progress, several connections, a resumed partial
+ * file and retries, instead of a separate blocking download that reports
+ * nothing and has to succeed in one request. The install then runs through the
+ * same pipeline as a manual install, so rollback behaves identically. Returns
+ * the local instance id the action now refers to.
  */
 export async function applyManagedInstanceAction(action: ManagedInstanceAction): Promise<string> {
 	const spec = action.spec
 	if (spec.pack.kind !== MANAGED_PACK_KIND) {
 		throw new Error(`Managed instance "${spec.id}" uses unsupported pack kind "${spec.pack.kind}"`)
 	}
+	if (!spec.pack.url.trim()) {
+		throw new Error(`Managed instance "${spec.id}" declares no pack URL`)
+	}
 
-	const path = await managed_prepare_pack(spec.id, spec.revision)
-	const location: CreatePackLocation = { type: 'fromFile', path }
+	const location: CreatePackLocation = {
+		type: 'fromFile',
+		url: spec.pack.url,
+		sha1: spec.pack.sha1,
+		size: spec.pack.size,
+		display: {
+			name: spec.name,
+			gameVersion: spec.minecraft.game_version,
+			loader: spec.minecraft.loader,
+			loaderVersion: spec.minecraft.loader_version,
+			iconUrl: spec.icon_url,
+		},
+	}
 
 	if (action.action === 'update' && action.instance_id) {
 		const job = await install_pack_to_existing_instance(action.instance_id, location, {

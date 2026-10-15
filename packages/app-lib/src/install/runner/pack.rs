@@ -16,7 +16,23 @@ pub(super) async fn install_pack(
         )
         .await?;
 
-    let create_pack = match location {
+    // A pack the launcher was only given a URL for is fetched here, through the
+    // shared downloader: an archive of hundreds of megabytes gets progress
+    // reporting, several connections, a resumed partial file and retries
+    // instead of one bare request that has to succeed in one go. A file the
+    // caller already holds is only checked for integrity.
+    let remote_pack = match &location {
+        CreatePackLocation::FromFile {
+            path: None, url, ..
+        } => url.clone().filter(|url| !url.trim().is_empty()),
+        _ => None,
+    };
+    let resolved_pack = match &remote_pack {
+        Some(_) => Some(location.resolve_pack_path(reporter.clone()).await?),
+        None => None,
+    };
+
+    let create_pack = match &location {
         CreatePackLocation::FromVersionId {
             project_id,
             version_id,
@@ -32,58 +48,46 @@ pub(super) async fn install_pack(
                 )
                 .await?;
             generate_pack_from_version_id_with_reporter(
-                project_id,
-                version_id,
-                title,
-                icon_url,
+                project_id.clone(),
+                version_id.clone(),
+                title.clone(),
+                icon_url.clone(),
                 instance_id.clone(),
                 reason,
                 reporter.clone(),
             )
             .await?
         }
-        CreatePackLocation::FromFile { path } => {
-            reporter
-                .set_context(
-                    InstallErrorContext::new("read local modpack file")
-                        .source_path(path.display().to_string())
-                        .build(),
-                )
-                .await?;
-            match crate::api::pack::detect::detect_local_pack(&path).await {
-                Ok(detected) => {
-                    if detected.format
-                        != crate::api::pack::detect::LocalPackFormat::Mrpack
-                    {
-                        // Non-mrpack format — dispatch to format-specific
-                        // installer via install_local_pack_file.
-                        return install_local_pack_file(
-                            detected,
-                            path,
-                            instance_id,
-                            reporter,
-                        )
-                        .await;
-                    }
-                    // Mrpack — fall through to standard mrpack install.
-                    generate_pack_from_file(path, instance_id.clone()).await?
-                }
-                Err(detect_error) => {
-                    // No format recognised — try recursive extraction
-                    // (3-level deep search for sub-archives, bundled
-                    // packs, etc.) before giving up.
-                    tracing::debug!(
-                        "Local pack format detection failed, trying recursive extraction: {detect_error}"
-                    );
-                    return install_local_pack_file_recursive(
-                        path,
-                        instance_id,
-                        reporter,
-                        0,
-                        3,
+        CreatePackLocation::FromFile { path, .. } => {
+            let path = match resolved_pack {
+                Some(path) => path,
+                None => path.clone().ok_or_else(|| {
+                    crate::ErrorKind::InputError(
+                        "The pack location names neither a file nor a URL"
+                            .to_string(),
                     )
-                    .await;
-                }
+                    .as_error()
+                })?,
+            };
+            let context = match &remote_pack {
+                Some(url) => InstallErrorContext::new("download modpack file")
+                    .urls(vec![url.clone()])
+                    .source_path(path.display().to_string())
+                    .build(),
+                None => InstallErrorContext::new("read local modpack file")
+                    .source_path(path.display().to_string())
+                    .build(),
+            };
+            reporter.set_context(context).await?;
+            match detect_and_install_local_pack(
+                path,
+                instance_id.clone(),
+                reporter.clone(),
+            )
+            .await?
+            {
+                Some(create_pack) => create_pack,
+                None => return Ok(InstallExecutionOutcome::Completed(())),
             }
         }
     };
@@ -103,6 +107,45 @@ pub(super) async fn install_pack(
             InstallExecutionOutcome::WaitingForUser(reason)
         }
     })
+}
+
+/// Turns a local pack file into the object the mrpack installer consumes.
+///
+/// Returns `Ok(None)` when the file turned out not to be an mrpack at all: the
+/// format-specific installer ran to completion inside this function, so the
+/// caller is already done. An unrecognised archive falls back to recursive
+/// extraction (bundled packs and the like) before giving up.
+async fn detect_and_install_local_pack(
+    path: PathBuf,
+    instance_id: String,
+    reporter: InstallProgressReporter,
+) -> crate::Result<Option<CreatePack>> {
+    match crate::api::pack::detect::detect_local_pack(&path).await {
+        Ok(detected) => {
+            if detected.format
+                != crate::api::pack::detect::LocalPackFormat::Mrpack
+            {
+                install_local_pack_file(detected, path, instance_id, reporter)
+                    .await?;
+                return Ok(None);
+            }
+            Ok(Some(generate_pack_from_file(path, instance_id).await?))
+        }
+        Err(detect_error) => {
+            tracing::debug!(
+                "Local pack format detection failed, trying recursive extraction: {detect_error}"
+            );
+            install_local_pack_file_recursive(
+                path,
+                instance_id,
+                reporter,
+                0,
+                3,
+            )
+            .await?;
+            Ok(None)
+        }
+    }
 }
 
 /// Recursively tries to detect and install a modpack, up to max_depth levels.

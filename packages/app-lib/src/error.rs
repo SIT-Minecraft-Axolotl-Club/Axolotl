@@ -143,6 +143,16 @@ pub enum ErrorKind {
     #[error("User is not logged in, no credentials available!")]
     NoCredentialsError,
 
+    /// The account site refused to renew a stored sign-in.
+    ///
+    /// The refresh token itself is what was rejected — expired, revoked or
+    /// already rotated away — so the session cannot be renewed by retrying and
+    /// the player has to sign in again.
+    #[error(
+        "The account site no longer accepts this sign-in ({detail}). Sign in again."
+    )]
+    CredentialsExpired { detail: String },
+
     #[error("JRE error: {0}")]
     JREError(#[from] crate::util::jre::JREError),
 
