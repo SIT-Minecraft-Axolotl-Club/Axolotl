@@ -28,6 +28,70 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-2.0.8',
+		version: '2.0.8',
+		publishedAt: '2026-10-15',
+		title: {
+			'en-US': 'Axolotl Launcher 2.0.8',
+			'zh-CN': 'Axolotl 启动器 2.0.8',
+		},
+		changes: {
+			added: [
+				{
+					'en-US':
+						'The launcher has a Documentation page: the society handbook is shown inside the launcher, with its own page list beside it so you can move between the guide for each server without opening a browser.',
+					'zh-CN':
+						'新增「文档」页：社团文档直接显示在启动器内，左侧列出各篇文档，可以直接在各服务器指南之间切换，不必再打开浏览器。',
+				},
+			],
+			fixed: [
+				{
+					'en-US':
+						'Large server instances download properly now: the launcher fetched the whole pack in the background before the instance was even created, with no progress and no way to recover from an interruption. The pack is now downloaded by the launcher downloader itself, so it reports progress, resumes where it stopped when the connection drops, and can be retried.',
+					'zh-CN':
+						'服务端下发的大型实例现在能正常下载了：此前启动器要先在后台把整个整合包下完才创建实例，既没有进度、一旦中断也无法恢复。现在整合包由启动器下载器负责，会显示进度、断线后从断点继续，并且可以重试。',
+				},
+				{
+					'en-US':
+						'Java now always comes from the runtime Mojang publishes for the game: the launcher no longer starts the game with a Java installation found on your computer, so every player runs the same runtime. A version whose runtime is missing downloads it first.',
+					'zh-CN':
+						'Java 现在只使用 Mojang 为游戏发布的运行时：启动器不再用你电脑上已有的 Java 启动游戏，所有玩家使用同一套运行时。缺少对应版本的运行时会先自动下载。',
+				},
+				{
+					'en-US':
+						'Java selection has been removed from the settings, because the launcher only ever uses its own runtime; picking one no longer changed anything. Memory allocation, Java arguments, and the high-performance GPU option stay where they were.',
+					'zh-CN':
+						'设置里已移除 Java 选择项，因为启动器只使用自带运行时，之前选了也不会生效。内存分配、Java 参数与高性能 GPU 选项保持原样。',
+				},
+			],
+		},
+	},
+	{
+		id: 'launcher-2.0.7',
+		version: '2.0.7',
+		publishedAt: '2026-09-30',
+		title: {
+			'en-US': 'Axolotl Launcher 2.0.7',
+			'zh-CN': 'Axolotl 启动器 2.0.7',
+		},
+		changes: {
+			fixed: [
+				{
+					'en-US':
+						'An expired sign-in no longer leaves the launcher failing at everything: when the account site stops accepting the saved sign-in, the launcher signs that account out and asks the player to sign in again right away, without a restart.',
+					'zh-CN':
+						'登录凭证过期后启动器不再什么都做不了：站点一旦不再接受已保存的登录凭证，启动器会自动登出该账号并立刻请玩家重新登录，无需重启启动器。',
+				},
+				{
+					'en-US':
+						'The sign-in screen says that the saved sign-in expired, and the skins saved for the character stay in place and come back when that character signs in again.',
+					'zh-CN':
+						'登录页会说明是已保存的登录凭证失效；角色已保存的皮肤不会丢失，用同一角色重新登录后依然可用。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-2.0.6',
 		version: '2.0.6',
 		publishedAt: '2026-09-20',
@@ -89,8 +153,7 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 				{
 					'en-US':
 						'The skin page has a button that opens the skin site library in your browser, for browsing skins other players published.',
-					'zh-CN':
-						'皮肤页新增「打开皮肤中心」按钮，可在浏览器里浏览其他玩家发布的皮肤。',
+					'zh-CN': '皮肤页新增「打开皮肤中心」按钮，可在浏览器里浏览其他玩家发布的皮肤。',
 				},
 			],
 			changed: [
@@ -123,14 +186,12 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 				{
 					'en-US':
 						'Capes can no longer be changed from the launcher. The 3D preview still shows the cape your character is wearing; change capes on the skin site.',
-					'zh-CN':
-						'启动器内不再提供披风更换。3D 预览仍会显示角色当前披风，需要更换请前往皮肤站。',
+					'zh-CN': '启动器内不再提供披风更换。3D 预览仍会显示角色当前披风，需要更换请前往皮肤站。',
 				},
 				{
 					'en-US':
 						'The built-in skin editor entry is gone; the launcher no longer opens a separate skin editor.',
-					'zh-CN':
-						'移除内置皮肤编辑器入口，启动器不再打开独立的皮肤编辑器。',
+					'zh-CN': '移除内置皮肤编辑器入口，启动器不再打开独立的皮肤编辑器。',
 				},
 			],
 			fixed: [
@@ -143,14 +204,12 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 				{
 					'en-US':
 						'Changing your skin no longer takes your cape off: the launcher no longer sends the cape slot when it equips a skin.',
-					'zh-CN':
-						'更换皮肤不再把披风一起清掉：装备皮肤时启动器不再提交披风槽位。',
+					'zh-CN': '更换皮肤不再把披风一起清掉：装备皮肤时启动器不再提交披风槽位。',
 				},
 				{
 					'en-US':
 						'The same skin is no longer listed twice, so the launcher shows exactly the skins the skin site has.',
-					'zh-CN':
-						'同一款皮肤不再重复出现，启动器里显示的皮肤数量与皮肤站完全一致。',
+					'zh-CN': '同一款皮肤不再重复出现，启动器里显示的皮肤数量与皮肤站完全一致。',
 				},
 				{
 					'en-US':
