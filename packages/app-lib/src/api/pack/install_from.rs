@@ -147,6 +147,13 @@ pub enum CreatePackLocation {
 /// Cache folder holding packs the launcher downloaded itself.
 const DOWNLOADED_PACK_CACHE_FOLDER: &str = "modpacks";
 
+/// How long an instance's icon may take before the install stops waiting.
+///
+/// The icon is decoration and the pack download is what the player is waiting
+/// for, so a host that answers slowly is given up on rather than holding the
+/// install back.
+const ICON_DOWNLOAD_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(8);
+
 impl CreatePackLocation {
     /// Local file the pack lives in, downloading it first when the caller only
     /// named a URL.
@@ -879,42 +886,58 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
     // Only fetch the pack icon when icon_url is provided (new profile).
     // When installing to an existing profile (e.g. server projects),
     // icon_url is None and we preserve the profile's existing icon.
+    //
+    // The icon is decoration, so it never delays or fails an install: a
+    // decorative image from a host that does not answer must not hold up the
+    // pack download the player is waiting for. One short attempt is made and a
+    // failure simply leaves the instance without an icon.
     let icon = if has_icon_url {
         if let Some(icon_url) = project.icon_url {
             let state = State::get().await?;
-            reporter
-                .set_context(
-                    InstallErrorContext::new("download modpack icon")
-                        .urls(vec![icon_url.clone()])
-                        .project_id(project_id.clone())
-                        .version_id(version_id.clone())
-                        .build(),
-                )
-                .await?;
-            let icon_bytes = fetch(
-                &icon_url,
-                None,
-                None,
-                None,
-                &state.fetch_semaphore,
-                &state.pool,
+            match tokio::time::timeout(
+                ICON_DOWNLOAD_TIMEOUT,
+                fetch(
+                    &icon_url,
+                    None,
+                    None,
+                    None,
+                    &state.fetch_semaphore,
+                    &state.pool,
+                ),
             )
-            .await?;
+            .await
+            {
+                Ok(Ok(icon_bytes)) => {
+                    let filename = icon_url.rsplit('/').next();
 
-            let filename = icon_url.rsplit('/').next();
-
-            if let Some(filename) = filename {
-                Some(
-                    write_cached_icon(
-                        filename,
-                        &state.directories.caches_dir(),
-                        icon_bytes,
-                        &state.io_semaphore,
-                    )
-                    .await?,
-                )
-            } else {
-                None
+                    match filename {
+                        Some(filename) => write_cached_icon(
+                            filename,
+                            &state.directories.caches_dir(),
+                            icon_bytes,
+                            &state.io_semaphore,
+                        )
+                        .await
+                        .ok(),
+                        None => None,
+                    }
+                }
+                Ok(Err(error)) => {
+                    tracing::warn!(
+                        url = %icon_url,
+                        error = %error,
+                        "Could not download the pack icon; installing without it"
+                    );
+                    None
+                }
+                Err(_) => {
+                    tracing::warn!(
+                        url = %icon_url,
+                        seconds = ICON_DOWNLOAD_TIMEOUT.as_secs(),
+                        "The pack icon host did not answer; installing without it"
+                    );
+                    None
+                }
             }
         } else {
             None

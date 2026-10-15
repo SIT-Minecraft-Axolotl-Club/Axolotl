@@ -49,6 +49,12 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 					'zh-CN':
 						'因缺少 Java 运行时启动失败的实例可以自行恢复：再次启动会直接安装所需运行时，而不是继续报同样的错，不需要手动修复。',
 				},
+				{
+					'en-US':
+						'Installing an instance no longer waits on its icon: the launcher used to retry a decorative image for a minute and fail the whole install when the host did not answer, so the pack download now starts right away and a missing icon is simply left out.',
+					'zh-CN':
+						'安装实例不再等待图标：此前若图标所在域名不响应，启动器会反复重试约一分钟，甚至让整个安装失败。现在整合包会立刻开始下载，图标拿不到就只当作没有图标。',
+				},
 			],
 		},
 	},
