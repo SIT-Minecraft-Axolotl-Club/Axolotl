@@ -39,9 +39,29 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 			added: [
 				{
 					'en-US':
-						'The home page now shows instances that friend societies recommend: each one names the society it comes from, its game version and its server, and installs with one click as an ordinary local instance you can delete whenever you like.',
+						'Instances that friend societies recommend now have a page of their own, reachable from the second entry in the sidebar: each society is listed with the instances it publishes, their game version, loader and server address, and one click installs one as an ordinary local instance you can delete whenever you like.',
 					'zh-CN':
-						'首页新增「友社推荐实例」：会列出友社推荐给玩家的实例，标明来源社团、游戏版本与服务器地址，点一下即可安装成普通的本地实例，随时可以删除。',
+						'友社推荐的实例现在有独立页面，入口在侧栏第二项：按社团列出它们发布的实例，含游戏版本、加载器与服务器地址，点一下即可安装成普通的本地实例，随时可以删除。',
+				},
+			],
+			fixed: [
+				{
+					'en-US':
+						'A sign-in the account site has already cancelled is renewed before it is used: the launcher asks the site whether the session is still valid, renews it on its own, and only asks you to sign in again when the site refuses to renew it. Starting the game and opening the skins page both do this, so the game no longer launches with a session the server rejects.',
+					'zh-CN':
+						'站点已取消的登录会在使用前自动续期：启动器先向站点确认会话是否仍然有效，能续期就自动续期，只有站点拒绝续期时才请你重新登录。启动游戏和打开皮肤页都会这样做，游戏不会再拿着被服务器拒绝的会话启动。',
+				},
+				{
+					'en-US':
+						'Install failures are no longer repeated: the launcher retried a failed instance on every background refresh, and replayed every past failure on startup. A failed instance is now left alone for a while, one failure no longer stops the others, and only failures from the last half hour are reported.',
+					'zh-CN':
+						'安装失败不再反复出现：此前每次后台刷新都会重试失败的实例，启动时还会把过去的失败重新列出来。现在失败的实例会先搁置一段时间，一个实例失败也不会中断其他实例，且只有最近半小时内的失败才会提示。',
+				},
+				{
+					'en-US':
+						'The instance panel on the home page no longer shows a "0 of 0" progress line or a line of red error text; failures are reported through the notification dialog instead.',
+					'zh-CN':
+						'首页的实例面板不再显示「已完成 0/0」的进度条和一行红色错误文字，失败改为在通知弹窗中提示。',
 				},
 			],
 		},
