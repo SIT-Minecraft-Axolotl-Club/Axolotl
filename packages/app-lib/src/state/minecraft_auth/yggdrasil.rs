@@ -409,6 +409,72 @@ pub async fn refresh_yggdrasil_credentials(
     Ok(())
 }
 
+/// Checks with the account site whether a stored session is still honoured.
+///
+/// The stored `expires` value is only the launcher's own expectation. The site
+/// can stop honouring a session long before that (another sign-in rotated the
+/// token, an administrator signed the player out), and a token the site already
+/// rejected is exactly what makes the game fail to join a server with an invalid
+/// session while the launcher still believes the player is signed in.
+///
+/// A rejection is renewed the same way an expired token is; anything that is not
+/// an explicit rejection (offline, timeout, 5xx, rate limit) is treated as "cannot
+/// tell" so a network problem never signs a player out.
+pub async fn verify_yggdrasil_session(
+    credentials: &mut Credentials,
+    exec: impl sqlx::Executor<'_, Database = Sqlite> + Copy,
+) -> crate::Result<()> {
+    let Some(account) = credentials.yggdrasil.clone() else {
+        return Ok(());
+    };
+
+    let validate_url = endpoint(&account.api_root, "validate")?;
+    let response = INSECURE_REQWEST_CLIENT
+        .post(validate_url)
+        .json(&json!({
+            "accessToken": credentials.access_token,
+            "clientToken": account.client_token,
+        }))
+        .send()
+        .await;
+
+    let response = match response {
+        Ok(response) => response,
+        Err(error) => {
+            tracing::warn!(
+                "Could not reach the account site to verify the session: {error}"
+            );
+            return Ok(());
+        }
+    };
+
+    let status = response.status();
+
+    if status.is_success() {
+        credentials.expires = Utc::now() + Duration::minutes(5);
+        credentials.upsert(exec).await?;
+        return Ok(());
+    }
+
+    if status.as_u16() != 401 && status.as_u16() != 403 {
+        tracing::warn!(
+            "The account site answered {status} while verifying a session; keeping it"
+        );
+        return Ok(());
+    }
+
+    tracing::info!(
+        player = %credentials.offline_profile.name,
+        "The account site no longer honours this session; renewing it"
+    );
+
+    // Treat the token as expired and let the normal refresh path decide how to
+    // renew it: an OpenID Connect refresh token when there is one, otherwise the
+    // classic re-select-profile call.
+    credentials.expires = Utc::now() - Duration::seconds(1);
+    refresh_yggdrasil_credentials(credentials, exec).await
+}
+
 pub async fn fetch_yggdrasil_profile(
     account: &YggdrasilAccount,
     profile_id: Uuid,

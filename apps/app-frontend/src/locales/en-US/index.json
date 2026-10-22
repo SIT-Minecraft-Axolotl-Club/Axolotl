@@ -12161,9 +12161,6 @@
   "managed-instances.play-downloads": {
     "message": "Play (downloads first)"
   },
-  "managed-instances.progress": {
-    "message": "{done} of {total} done"
-  },
   "managed-instances.ready": {
     "message": "Up to date"
   },
@@ -12175,9 +12172,6 @@
   },
   "managed-instances.remove-hint": {
     "message": "Removing it frees the disk space; the instance stays listed so you can download it again."
-  },
-  "managed-instances.retry": {
-    "message": "Retry"
   },
   "managed-instances.starting": {
     "message": "Starting..."

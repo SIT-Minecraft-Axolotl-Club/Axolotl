@@ -267,6 +267,16 @@ const visibleJobStatuses = new Set<InstallJobStatus>([
 	'interrupted',
 ])
 const retainedJobStatuses = new Set<InstallJobStatus>(['succeeded', 'canceled'])
+
+/**
+ * How old a failed install may be and still be listed when the launcher opens.
+ *
+ * Every failed job is persisted, so without this the launcher replays the whole
+ * history as notifications on each start — often several entries for the same
+ * instance. A failure is worth reporting while it is still news; older ones stay
+ * in the Downloads page.
+ */
+const FAILURE_REPLAY_WINDOW_MS = 30 * 60 * 1000
 const activeJobStatuses = new Set<InstallJobStatus>([
 	'queued',
 	'running',
@@ -490,6 +500,13 @@ export async function useInstallJobNotifications(opts: {
 
 	function isFinishedJob(job: InstallJobSnapshot): boolean {
 		return isFailedJob(job) || retainedJobStatuses.has(job.status)
+	}
+
+	/** Whether a failure from a previous session is recent enough to re-report. */
+	function isReplayableFailure(job: InstallJobSnapshot): boolean {
+		const stamp = Date.parse(job.modified || job.created)
+		if (Number.isNaN(stamp)) return false
+		return Date.now() - stamp <= FAILURE_REPLAY_WINDOW_MS
 	}
 
 	function canShowStalledProgressDetails(job: InstallJobSnapshot): boolean {
@@ -728,11 +745,17 @@ export async function useInstallJobNotifications(opts: {
 		}
 
 		const currentJobIds = new Set(jobs.value.map((job) => job.job_id))
-		const visibleJobs = nextJobs.filter(
-			(job) =>
-				visibleJobStatuses.has(job.status) ||
-				(retainedJobStatuses.has(job.status) && currentJobIds.has(job.job_id)),
-		)
+		const visibleJobs = nextJobs.filter((job) => {
+			if (visibleJobStatuses.has(job.status)) {
+				// A job this session already showed keeps showing; a failure
+				// restored from an earlier session only while it is still recent.
+				if (isFailedJob(job) && !currentJobIds.has(job.job_id) && !isReplayableFailure(job)) {
+					return false
+				}
+				return true
+			}
+			return retainedJobStatuses.has(job.status) && currentJobIds.has(job.job_id)
+		})
 		syncProgressSnapshots(visibleJobs)
 
 		jobs.value = visibleJobs.sort(

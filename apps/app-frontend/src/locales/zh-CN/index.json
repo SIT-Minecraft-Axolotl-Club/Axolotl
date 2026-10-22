@@ -12329,14 +12329,8 @@
   "managed-instances.updating": {
     "message": "正在更新 {name}"
   },
-  "managed-instances.progress": {
-    "message": "已完成 {done}/{total}"
-  },
   "managed-instances.ready": {
     "message": "已是最新版本"
-  },
-  "managed-instances.retry": {
-    "message": "重试"
   },
   "managed-instances.refresh": {
     "message": "检查更新"

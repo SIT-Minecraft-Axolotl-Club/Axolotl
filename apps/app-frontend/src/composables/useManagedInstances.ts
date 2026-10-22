@@ -45,6 +45,18 @@ const launcherUpdateRequired = ref<string | null>(null)
  */
 const downloadsAllowed = ref(false)
 
+/**
+ * Instances whose install failed, and when.
+ *
+ * The background sync is triggered by several events (mount, window focus,
+ * visibility, a timer, sign-in), so without this an instance that cannot be
+ * installed is retried by every one of them, reporting the same failure over
+ * and over. A failed instance is left alone for a while; pressing the button
+ * still retries it immediately.
+ */
+const failedAt = new Map<string, number>()
+const RETRY_COOLDOWN_MS = 15 * 60 * 1000
+
 let inFlight: Promise<void> | null = null
 let syncedThisSession = false
 
@@ -162,7 +174,7 @@ function stopPeriodicSync() {
 	syncTimer = null
 }
 
-async function runSync(): Promise<void> {
+async function runSync(force = false): Promise<void> {
 	state.value = 'syncing'
 	error.value = null
 
@@ -170,23 +182,58 @@ async function runSync(): Promise<void> {
 	report.value = result
 	await applyLauncherPolicy(result.launcher ?? null)
 
-	const pendingActions = downloadsAllowed.value ? managedRequiredActions(result) : []
+	const pendingActions = downloadsAllowed.value
+		? managedRequiredActions(result).filter((action) => shouldAttempt(action, force))
+		: []
 	totalUpdates.value = pendingActions.length
 	completedUpdates.value = 0
+
+	const failures: string[] = []
 
 	if (pendingActions.length > 0) {
 		state.value = 'updating'
 		for (const action of pendingActions) {
 			updatingName.value = action.spec.name
-			await applyManagedInstanceAction(action)
-			completedUpdates.value += 1
+			try {
+				await applyManagedInstanceAction(action)
+				completedUpdates.value += 1
+				failedAt.delete(action.spec.id)
+			} catch (installError) {
+				// One instance that cannot be installed must not stop the others,
+				// and must not be attempted again by the next background sync.
+				failedAt.set(action.spec.id, Date.now())
+				failures.push(`${action.spec.name}: ${describeFailure(installError)}`)
+			}
 		}
 	}
 
 	await refreshRecords()
 	updatingName.value = null
 	state.value = 'ready'
+
+	if (failures.length > 0) {
+		error.value =
+			failures.length === 1 ? failures[0] : `${failures[0]} (+${failures.length - 1} more)`
+	}
+
 	syncedThisSession = true
+}
+
+/** Whether a failed instance may be attempted again yet. */
+function shouldAttempt(action: ManagedInstanceAction, force: boolean): boolean {
+	if (force) return true
+	const at = failedAt.get(action.spec.id)
+	return at === undefined || Date.now() - at > RETRY_COOLDOWN_MS
+}
+
+function describeFailure(error: unknown): string {
+	if (error instanceof Error) return error.message
+	if (typeof error === 'string') return error
+	if (error && typeof error === 'object') {
+		const message = (error as { message?: unknown }).message
+		if (typeof message === 'string' && message.length > 0) return message
+	}
+	return String(error)
 }
 
 /**
@@ -195,7 +242,7 @@ async function runSync(): Promise<void> {
  * Concurrent calls share one run, and failures leave the previous local records
  * and packs in place so the launcher stays usable.
  */
-async function syncNow(): Promise<void> {
+async function syncNow(force = false): Promise<void> {
 	if (!manifestUrl || state.value === 'unconfigured') return
 	startPeriodicSync()
 	if (inFlight) {
@@ -203,7 +250,7 @@ async function syncNow(): Promise<void> {
 		return
 	}
 
-	const run = runSync()
+	const run = runSync(force)
 	inFlight = run
 	try {
 		await run

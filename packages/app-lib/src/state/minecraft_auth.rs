@@ -36,6 +36,40 @@ mod yggdrasil;
 pub use oidc::*;
 pub use yggdrasil::*;
 
+/// When each account's society session was last confirmed with the site.
+static SESSION_VERIFIED_AT: std::sync::LazyLock<
+    std::sync::Mutex<HashMap<String, Instant>>,
+> = std::sync::LazyLock::new(Default::default);
+
+/// Confirms the stored session with the account site unless it was just checked.
+async fn verify_society_session(
+    credentials: &mut Credentials,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+) -> crate::Result<()> {
+    let key = credentials
+        .account_id
+        .clone()
+        .unwrap_or_else(|| credentials.offline_profile.id.to_string());
+
+    let checked_recently = SESSION_VERIFIED_AT
+        .lock()
+        .ok()
+        .and_then(|verified| verified.get(&key).copied())
+        .is_some_and(|at| at.elapsed() < Credentials::SESSION_VERIFY_MAX_AGE);
+
+    if checked_recently {
+        return Ok(());
+    }
+
+    verify_yggdrasil_session(credentials, exec).await?;
+
+    if let Ok(mut verified) = SESSION_VERIFIED_AT.lock() {
+        verified.insert(key, Instant::now());
+    }
+
+    Ok(())
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum MinecraftAuthStep {
     GetDeviceToken,
@@ -794,6 +828,13 @@ impl Credentials {
         )
     }
 
+    /// How often a society session is confirmed with the account site.
+    ///
+    /// Several callers ask for the credential while one page loads, and the
+    /// confirmation is a network round trip, so it is not repeated every time.
+    const SESSION_VERIFY_MAX_AGE: std::time::Duration =
+        std::time::Duration::from_secs(60);
+
     /// Like [`get_active`](Self::get_active), but enforces credentials to be
     /// successfully refreshed unless the network is unreachable or times out.
     #[tracing::instrument]
@@ -804,6 +845,16 @@ impl Credentials {
 
         if let Some(mut creds) = credentials.filter(Self::is_supported_provider)
         {
+            // A society session can be revoked on the site before the token's
+            // own expiry, so it is confirmed with the site before the token is
+            // used. Throttled: several callers run while a single page loads.
+            if let Err(error) = verify_society_session(&mut creds, exec).await {
+                if matches!(&*error.raw, ErrorKind::CredentialsExpired { .. }) {
+                    return Err(error);
+                }
+                tracing::warn!("Could not confirm the society session: {error}");
+            }
+
             let res = creds.refresh(exec).await;
 
             match res {

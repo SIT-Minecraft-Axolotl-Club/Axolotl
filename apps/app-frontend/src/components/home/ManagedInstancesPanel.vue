@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { DownloadIcon, RefreshCwIcon, TrashIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, useVIntl } from '@modrinth/ui'
-import { computed, onMounted, ref } from 'vue'
+import { RefreshCwIcon, TrashIcon } from '@modrinth/assets'
+import { ButtonStyled, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { computed, onMounted, ref, watch } from 'vue'
 
 import { useManagedInstances } from '@/composables/useManagedInstances'
 import { SitmcConfig } from '@/config'
@@ -10,22 +10,7 @@ import type { ManagedInstanceRecord } from '@/helpers/managed'
 import { managed_ensure_runnable } from '@/helpers/managed'
 
 const { formatMessage } = useVIntl()
-
-/** Tauri rejects a command with a string or a plain object, not always an Error. */
-function describeError(error: unknown): string {
-	if (error instanceof Error) return error.message
-	if (typeof error === 'string') return error
-	if (error && typeof error === 'object') {
-		const message = (error as { message?: unknown }).message
-		if (typeof message === 'string' && message.length > 0) return message
-		try {
-			return JSON.stringify(error)
-		} catch {
-			// Fall through to the plain conversion below.
-		}
-	}
-	return String(error)
-}
+const { handleError } = injectNotificationManager()
 
 const messages = defineMessages({
 	title: { id: 'managed-instances.title', defaultMessage: 'Society game instances' },
@@ -36,7 +21,6 @@ const messages = defineMessages({
 	updating: { id: 'managed-instances.updating', defaultMessage: 'Updating {name}' },
 	progress: { id: 'managed-instances.progress', defaultMessage: '{done} of {total} done' },
 	ready: { id: 'managed-instances.ready', defaultMessage: 'Up to date' },
-	retry: { id: 'managed-instances.retry', defaultMessage: 'Retry' },
 	refresh: { id: 'managed-instances.refresh', defaultMessage: 'Check for updates' },
 	play: { id: 'managed-instances.play', defaultMessage: 'Play' },
 	playDownloads: {
@@ -75,7 +59,6 @@ const {
 	isBusy,
 	isConfigured,
 	updatingName,
-	updateProgress,
 	manifestUrl,
 	syncNow,
 	ensureSynced,
@@ -85,7 +68,13 @@ const {
 
 const launchingId = ref<string | null>(null)
 const removingId = ref<string | null>(null)
-const launchError = ref<string | null>(null)
+
+// Failures are reported as a notification instead of inline text: the panel is
+// the first thing on the home page, and a sync that failed for a moment should
+// not leave a permanent red line there.
+watch(error, (value) => {
+	if (value) handleError(value)
+})
 
 const statusText = computed(() => {
 	if (state.value === 'syncing') return formatMessage(messages.checking)
@@ -135,20 +124,20 @@ function quickPlayAddress(serverInstanceId: string) {
 async function launch(instanceId: string, serverInstanceId: string) {
 	if (launchingId.value) return
 	launchingId.value = instanceId
-	launchError.value = null
 	try {
 		// The server owns the revision, so re-read the manifest before launching
 		// instead of trusting a record that may have been synced minutes ago. A
 		// failed refresh (offline) leaves the previous records in place, so an
-		// already installed instance can still start.
-		await syncNow()
+		// already installed instance can still start. The player asked, so an
+		// instance that failed earlier is attempted again.
+		await syncNow(true)
 		// The launcher refuses stale instances in its own launch path as well;
 		// checking here just turns that into an immediate, readable error.
 		await managed_ensure_runnable(instanceId)
 		await run(instanceId, quickPlayAddress(serverInstanceId))
 		await refresh()
 	} catch (launchFailure) {
-		launchError.value = describeError(launchFailure)
+		handleError(launchFailure)
 	} finally {
 		launchingId.value = null
 	}
@@ -184,14 +173,13 @@ async function play(record: ManagedInstanceRecord) {
 async function removeOptional(record: ManagedInstanceRecord) {
 	if (!record.instance_id || removingId.value) return
 	removingId.value = record.instance_id
-	launchError.value = null
 	try {
 		await removeInstance(record.instance_id)
 		await refresh()
 		// Re-reads the manifest so the instance is offered for download again.
-		await syncNow()
+		await syncNow(true)
 	} catch (removalFailure) {
-		launchError.value = describeError(removalFailure)
+		handleError(removalFailure)
 	} finally {
 		removingId.value = null
 	}
@@ -215,33 +203,13 @@ onMounted(() => {
 			<div class="flex items-center gap-3">
 				<span v-if="statusText" class="text-xs text-secondary">{{ statusText }}</span>
 				<ButtonStyled>
-					<button :disabled="isBusy" @click="syncNow">
+					<button :disabled="isBusy" @click="syncNow(true)">
 						<RefreshCwIcon :class="{ 'animate-spin': isBusy }" />
 						{{ formatMessage(messages.refresh) }}
 					</button>
 				</ButtonStyled>
 			</div>
 		</header>
-
-		<div
-			v-if="state === 'updating'"
-			class="mb-4 flex items-center gap-3 rounded-lg bg-surface-3 px-4 py-3"
-		>
-			<DownloadIcon class="size-5 shrink-0 text-brand" />
-			<span class="text-sm text-secondary">
-				{{ formatMessage(messages.progress, updateProgress) }}
-			</span>
-		</div>
-
-		<div v-if="error" class="mb-4 flex flex-wrap items-center gap-3">
-			<p class="m-0 flex-1 text-sm text-red">{{ error }}</p>
-			<ButtonStyled>
-				<button :disabled="isBusy" @click="syncNow">
-					{{ formatMessage(messages.retry) }}
-				</button>
-			</ButtonStyled>
-		</div>
-		<p v-if="launchError" class="m-0 mb-4 text-sm text-red">{{ launchError }}</p>
 
 		<p v-if="activeRecords.length === 0" class="m-0 text-sm text-secondary">
 			{{ formatMessage(messages.noInstances) }}
