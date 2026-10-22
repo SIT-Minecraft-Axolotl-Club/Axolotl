@@ -8810,6 +8810,12 @@
   "drop.help.worlds-title": {
     "message": "存档"
   },
+  "friend-sites.collapse": {
+    "message": "收起"
+  },
+  "friend-sites.expand": {
+    "message": "展开"
+  },
   "friend-sites.failed": {
     "message": "友社列表加载失败。"
   },
@@ -8831,14 +8837,26 @@
   "friend-sites.retry": {
     "message": "重试"
   },
+  "friend-sites.show-all": {
+    "message": "显示全部 {count} 个"
+  },
+  "friend-sites.show-less": {
+    "message": "收起"
+  },
   "friend-sites.stale": {
-    "message": "该站点刚才刷新失败，列表可能不是最新的。"
+    "message": "刚才刷新该站点失败，列表可能不是最新的。"
+  },
+  "friend-sites.summary": {
+    "message": "{sites} 个友社 · {instances} 个实例"
   },
   "friend-sites.title": {
     "message": "友社推荐实例"
   },
   "friend-sites.unavailable": {
     "message": "暂不提供下载"
+  },
+  "friend-sites.visit": {
+    "message": "访问站点"
   },
   "friends.action.add-friend": {
     "message": "添加好友"

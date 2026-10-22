@@ -10439,6 +10439,12 @@
   "drop.help.worlds-title": {
     "message": "World Saves"
   },
+  "friend-sites.collapse": {
+    "message": "Collapse"
+  },
+  "friend-sites.expand": {
+    "message": "Expand"
+  },
   "friend-sites.failed": {
     "message": "The friend-site list could not be loaded."
   },
@@ -10460,14 +10466,26 @@
   "friend-sites.retry": {
     "message": "Retry"
   },
+  "friend-sites.show-all": {
+    "message": "Show all {count}"
+  },
+  "friend-sites.show-less": {
+    "message": "Show fewer"
+  },
   "friend-sites.stale": {
-    "message": "This site could not be refreshed just now; the list may be out of date."
+    "message": "Not refreshed just now; this list may be out of date."
+  },
+  "friend-sites.summary": {
+    "message": "{sites} sites · {instances} instances"
   },
   "friend-sites.title": {
     "message": "Instances from friend sites"
   },
   "friend-sites.unavailable": {
     "message": "Not available for download"
+  },
+  "friend-sites.visit": {
+    "message": "Visit the site"
   },
   "friends.action.add-friend": {
     "message": "Add a friend"

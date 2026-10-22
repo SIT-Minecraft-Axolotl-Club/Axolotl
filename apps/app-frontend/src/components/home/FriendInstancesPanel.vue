@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { DownloadIcon, RefreshCwIcon } from '@modrinth/assets'
+import {
+	CheckIcon,
+	ChevronDownIcon,
+	DownloadIcon,
+	GlobeIcon,
+	RefreshCwIcon,
+	ServerIcon,
+	UsersIcon,
+} from '@modrinth/assets'
 import { ButtonStyled, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
@@ -16,9 +24,18 @@ import {
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 
+/** Rows shown before the player asks for the whole list. */
+const PREVIEW_LIMIT = 4
+
 const messages = defineMessages({
 	title: { id: 'friend-sites.title', defaultMessage: 'Instances from friend sites' },
+	summary: {
+		id: 'friend-sites.summary',
+		defaultMessage: '{sites} sites · {instances} instances',
+	},
 	refresh: { id: 'friend-sites.refresh', defaultMessage: 'Refresh' },
+	collapse: { id: 'friend-sites.collapse', defaultMessage: 'Collapse' },
+	expand: { id: 'friend-sites.expand', defaultMessage: 'Expand' },
 	loading: {
 		id: 'friend-sites.loading',
 		defaultMessage: 'Looking for instances from friend sites...',
@@ -34,8 +51,11 @@ const messages = defineMessages({
 	unavailable: { id: 'friend-sites.unavailable', defaultMessage: 'Not available for download' },
 	stale: {
 		id: 'friend-sites.stale',
-		defaultMessage: 'This site could not be refreshed just now; the list may be out of date.',
+		defaultMessage: 'Not refreshed just now; this list may be out of date.',
 	},
+	showAll: { id: 'friend-sites.show-all', defaultMessage: 'Show all {count}' },
+	showLess: { id: 'friend-sites.show-less', defaultMessage: 'Show fewer' },
+	visit: { id: 'friend-sites.visit', defaultMessage: 'Visit the site' },
 })
 
 /** Tauri rejects a command with a string or a plain object, not always an Error. */
@@ -57,10 +77,39 @@ const error = ref<string | null>(null)
 const catalog = ref<FriendsDocument | null>(null)
 const installed = ref<Set<string>>(new Set())
 const installingKey = ref<string | null>(null)
+const collapsed = ref(false)
+const showAllRows = ref(false)
 
 const sites = computed<FriendSite[]>(() => friendSitesWithInstances(catalog.value))
 
+const instanceCount = computed(() =>
+	sites.value.reduce((total, site) => total + site.instances.length, 0),
+)
+
 const isVisible = computed(() => isConfigured && (sites.value.length > 0 || error.value !== null))
+
+/**
+ * The rows to render, grouped by site but capped while collapsed.
+ *
+ * A homepage section has to stay short however many sites the backend
+ * aggregates, so only the first few recommendations are shown until the player
+ * asks for the rest.
+ */
+const visibleGroups = computed(() => {
+	const rows = sites.value.flatMap((site) => site.instances.map((instance) => ({ site, instance })))
+	const limited = showAllRows.value ? rows : rows.slice(0, PREVIEW_LIMIT)
+
+	const groups = new Map<string, { site: FriendSite; instances: FriendInstance[] }>()
+	for (const { site, instance } of limited) {
+		const group = groups.get(site.site_id) ?? { site, instances: [] }
+		group.instances.push(instance)
+		groups.set(site.site_id, group)
+	}
+
+	return [...groups.values()]
+})
+
+const hiddenCount = computed(() => Math.max(0, instanceCount.value - PREVIEW_LIMIT))
 
 async function load(): Promise<void> {
 	if (!isConfigured || loading.value) return
@@ -86,15 +135,18 @@ function isInstalled(instance: FriendInstance): boolean {
 	return installed.value.has(instance.name.trim())
 }
 
-function versionLabel(instance: FriendInstance): string {
+/** First character of a name, used as the tile for an entry without an icon. */
+function monogram(name: string): string {
+	return name.trim().charAt(0).toUpperCase() || '?'
+}
+
+function loaderLabel(instance: FriendInstance): string {
 	const minecraft = instance.minecraft
 	if (!minecraft) return ''
 	const loader = minecraft.loader?.trim()
-	return loader
-		? `${minecraft.game_version} · ${loader}${
-				minecraft.loader_version ? ` ${minecraft.loader_version}` : ''
-			}`
-		: minecraft.game_version
+	if (!loader) return ''
+	const version = minecraft.loader_version ? ` ${minecraft.loader_version}` : ''
+	return `${loader}${version}`
 }
 
 function serverLabel(instance: FriendInstance): string {
@@ -124,108 +176,167 @@ onMounted(() => {
 </script>
 
 <template>
-	<section v-if="isVisible" class="mb-6 rounded-xl border border-divider bg-surface-2 p-5">
-		<header class="mb-4 flex flex-wrap items-center justify-between gap-3">
-			<h2 class="m-0 text-lg font-semibold text-contrast">
-				{{ formatMessage(messages.title) }}
-			</h2>
-			<ButtonStyled>
-				<button :disabled="loading" @click="load">
-					<RefreshCwIcon :class="{ 'animate-spin': loading }" />
-					{{ formatMessage(messages.refresh) }}
-				</button>
-			</ButtonStyled>
+	<section v-if="isVisible" class="mb-6 rounded-xl border border-surface-4 bg-surface-2">
+		<header class="flex items-center gap-3 px-5 py-4">
+			<button
+				class="flex min-w-0 flex-1 items-center gap-3 rounded-lg text-left"
+				@click="collapsed = !collapsed"
+			>
+				<span
+					class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-surface-3 text-brand"
+				>
+					<UsersIcon class="size-5" />
+				</span>
+				<span class="flex min-w-0 flex-col">
+					<span class="truncate text-base font-semibold text-contrast">
+						{{ formatMessage(messages.title) }}
+					</span>
+					<span v-if="instanceCount > 0" class="truncate text-xs text-secondary">
+						{{
+							formatMessage(messages.summary, {
+								sites: sites.length,
+								instances: instanceCount,
+							})
+						}}
+					</span>
+				</span>
+			</button>
+
+			<div class="flex shrink-0 items-center gap-1">
+				<ButtonStyled circular type="transparent" size="small">
+					<button v-tooltip="formatMessage(messages.refresh)" :disabled="loading" @click="load">
+						<RefreshCwIcon :class="{ 'animate-spin': loading }" />
+					</button>
+				</ButtonStyled>
+				<ButtonStyled circular type="transparent" size="small">
+					<button
+						v-tooltip="formatMessage(collapsed ? messages.expand : messages.collapse)"
+						@click="collapsed = !collapsed"
+					>
+						<ChevronDownIcon :class="{ 'rotate-180': collapsed }" />
+					</button>
+				</ButtonStyled>
+			</div>
 		</header>
 
-		<div v-if="error" class="mb-4 flex flex-wrap items-center gap-3">
-			<p class="m-0 flex-1 text-sm text-red">{{ formatMessage(messages.failed) }} {{ error }}</p>
-			<ButtonStyled>
-				<button :disabled="loading" @click="load">
-					{{ formatMessage(messages.retry) }}
-				</button>
-			</ButtonStyled>
-		</div>
+		<div v-if="!collapsed" class="border-t border-surface-4 px-5 py-4">
+			<div v-if="error" class="flex flex-wrap items-center gap-3">
+				<p class="m-0 flex-1 text-sm text-red">{{ formatMessage(messages.failed) }} {{ error }}</p>
+				<ButtonStyled size="small">
+					<button :disabled="loading" @click="load">
+						{{ formatMessage(messages.retry) }}
+					</button>
+				</ButtonStyled>
+			</div>
 
-		<p
-			v-else-if="loading && sites.length === 0"
-			class="m-0 flex items-center gap-3 text-sm text-secondary"
-		>
-			<DownloadIcon class="size-5 shrink-0 text-brand" />
-			{{ formatMessage(messages.loading) }}
-		</p>
+			<p
+				v-else-if="loading && sites.length === 0"
+				class="m-0 flex items-center gap-2 text-sm text-secondary"
+			>
+				<DownloadIcon class="size-4 text-brand" />
+				{{ formatMessage(messages.loading) }}
+			</p>
 
-		<div v-else class="flex flex-col gap-5">
-			<section v-for="site in sites" :key="site.site_id" class="flex flex-col gap-2">
-				<header class="flex flex-wrap items-center gap-2">
-					<h3 class="m-0 text-base font-semibold text-contrast">{{ site.name }}</h3>
-					<a
-						v-if="site.domain"
-						:href="`https://${site.domain}`"
-						target="_blank"
-						rel="noreferrer"
-						class="text-xs text-secondary hover:text-contrast"
-					>
-						{{ site.domain }}
-					</a>
-					<span v-if="site.stale" class="text-xs text-secondary">
-						{{ formatMessage(messages.stale) }}
-					</span>
-				</header>
-				<p v-if="site.description" class="m-0 text-xs text-secondary">
-					{{ site.description }}
-				</p>
-
-				<div class="flex flex-col gap-3">
-					<article
-						v-for="instance in site.instances"
-						:key="instance.id"
-						class="flex flex-wrap items-center gap-4 rounded-lg border border-divider bg-surface-3 p-4"
-					>
-						<img
-							v-if="instance.icon_url"
-							:src="instance.icon_url"
-							alt=""
-							class="size-12 shrink-0 rounded-lg object-cover"
-						/>
-						<div
-							v-else
-							class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-xs font-semibold text-secondary"
+			<div v-else class="flex flex-col gap-3">
+				<section v-for="group in visibleGroups" :key="group.site.site_id">
+					<header class="mb-1 flex flex-wrap items-center gap-2">
+						<h3 class="m-0 text-xs font-semibold tracking-wide text-secondary uppercase">
+							{{ group.site.name }}
+						</h3>
+						<a
+							v-if="group.site.domain"
+							v-tooltip="formatMessage(messages.visit)"
+							:href="`https://${group.site.domain}`"
+							target="_blank"
+							rel="noreferrer"
+							class="flex items-center gap-1 text-[11px] text-secondary transition-colors hover:text-contrast"
 						>
-							{{ site.name }}
-						</div>
+							<GlobeIcon class="size-3" />
+							{{ group.site.domain }}
+						</a>
+						<span
+							v-if="group.site.stale"
+							v-tooltip="formatMessage(messages.stale)"
+							class="rounded-full bg-surface-3 px-1.5 py-0.5 text-[10px] text-secondary"
+						>
+							!
+						</span>
+					</header>
 
-						<div class="flex min-w-0 flex-1 flex-col gap-1">
-							<span class="truncate font-medium text-contrast">{{ instance.name }}</span>
-							<span v-if="instance.description" class="truncate text-xs text-secondary">
-								{{ instance.description }}
-							</span>
-							<span class="flex flex-wrap gap-3 text-xs text-secondary">
-								<span v-if="versionLabel(instance)">{{ versionLabel(instance) }}</span>
-								<span v-if="serverLabel(instance)">{{ serverLabel(instance) }}</span>
-							</span>
-						</div>
+					<div class="flex flex-col gap-1">
+						<div
+							v-for="instance in group.instances"
+							:key="instance.id"
+							class="flex items-center gap-3 rounded-lg px-2 py-1.5 transition-colors hover:bg-surface-3"
+						>
+							<div
+								class="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-surface-3"
+							>
+								<img
+									v-if="instance.icon_url"
+									:src="instance.icon_url"
+									alt=""
+									class="size-full object-cover"
+								/>
+								<span v-else class="text-xs font-semibold text-secondary">
+									{{ monogram(instance.name) }}
+								</span>
+							</div>
 
-						<div class="flex shrink-0 items-center gap-2">
-							<span v-if="isInstalled(instance)" class="text-xs font-semibold text-secondary">
+							<div class="flex min-w-0 flex-1 flex-col">
+								<span
+									:title="instance.description ?? undefined"
+									class="truncate text-sm font-medium text-contrast"
+								>
+									{{ instance.name }}
+								</span>
+								<span class="flex min-w-0 items-center gap-2 text-[11px] text-secondary">
+									<span v-if="instance.minecraft?.game_version">
+										{{ instance.minecraft.game_version }}
+									</span>
+									<span v-if="loaderLabel(instance)" class="capitalize">
+										{{ loaderLabel(instance) }}
+									</span>
+									<span v-if="serverLabel(instance)" class="flex min-w-0 items-center gap-1">
+										<ServerIcon class="size-3 shrink-0" />
+										<span class="truncate">{{ serverLabel(instance) }}</span>
+									</span>
+								</span>
+							</div>
+
+							<span
+								v-if="isInstalled(instance)"
+								class="flex shrink-0 items-center gap-1 text-xs text-secondary"
+							>
+								<CheckIcon class="size-3.5 text-brand" />
 								{{ formatMessage(messages.installed) }}
 							</span>
-							<ButtonStyled v-else-if="isInstallable(instance)" color="brand">
-								<button :disabled="installingKey !== null" @click="install(site, instance)">
-									<DownloadIcon />
+							<ButtonStyled v-else-if="isInstallable(instance)" color="brand" size="small">
+								<button :disabled="installingKey !== null" @click="install(group.site, instance)">
 									{{
-										installingKey === instanceKey(site, instance)
+										installingKey === instanceKey(group.site, instance)
 											? formatMessage(messages.installing)
 											: formatMessage(messages.install)
 									}}
 								</button>
 							</ButtonStyled>
-							<span v-else class="text-xs text-secondary">
+							<span v-else class="shrink-0 text-[11px] text-secondary">
 								{{ formatMessage(messages.unavailable) }}
 							</span>
 						</div>
-					</article>
-				</div>
-			</section>
+					</div>
+				</section>
+
+				<ButtonStyled v-if="hiddenCount > 0" type="transparent" size="small">
+					<button @click="showAllRows = !showAllRows">
+						{{
+							formatMessage(showAllRows ? messages.showLess : messages.showAll, {
+								count: instanceCount,
+							})
+						}}
+					</button>
+				</ButtonStyled>
+			</div>
 		</div>
 	</section>
 </template>
