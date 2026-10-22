@@ -28,7 +28,6 @@ const messages = defineMessages({
 		defaultMessage: 'Play (downloads first)',
 	},
 	starting: { id: 'managed-instances.starting', defaultMessage: 'Starting...' },
-	downloading: { id: 'managed-instances.downloading', defaultMessage: 'Downloading...' },
 	notDownloaded: { id: 'managed-instances.not-downloaded', defaultMessage: 'Not downloaded yet' },
 	remove: { id: 'managed-instances.remove', defaultMessage: 'Remove from this computer' },
 	removeHint: {

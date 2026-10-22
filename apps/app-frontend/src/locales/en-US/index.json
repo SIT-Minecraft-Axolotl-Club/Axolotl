@@ -12146,9 +12146,6 @@
   "managed-instances.checking": {
     "message": "Checking the server for versions..."
   },
-  "managed-instances.downloading": {
-    "message": "Downloading..."
-  },
   "managed-instances.empty": {
     "message": "The server currently publishes no game instances."
   },

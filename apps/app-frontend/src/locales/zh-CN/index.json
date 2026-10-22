@@ -8711,6 +8711,9 @@
   "app.worlds.title": {
     "message": "世界"
   },
+  "button.open-in-browser": {
+    "message": "在浏览器中打开"
+  },
   "create.back": {
     "message": "返回库"
   },
