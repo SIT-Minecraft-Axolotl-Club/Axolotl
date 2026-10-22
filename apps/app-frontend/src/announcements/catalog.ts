@@ -28,6 +28,25 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-2.1.1',
+		version: '2.1.1',
+		publishedAt: '2026-10-22',
+		title: {
+			'en-US': 'Axolotl Launcher 2.1.1',
+			'zh-CN': 'Axolotl 启动器 2.1.1',
+		},
+		changes: {
+			changed: [
+				{
+					'en-US':
+						'A friend site instance can now be started and removed on the page that lists it: once installed, the entry shows Play and Remove instead of sending you to the instance list. Play also connects to the server that came with the entry.',
+					'zh-CN':
+						'友社推荐的实例现在可以直接在列表里启动和卸载：安装完成后，这一行会显示「启动」和「移除」，不必再跳到实例列表。点「启动」会直接连接该实例附带的服务器地址。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-2.1.0',
 		version: '2.1.0',
 		publishedAt: '2026-10-22',

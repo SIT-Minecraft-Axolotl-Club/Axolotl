@@ -6,7 +6,7 @@ import {
 	installJobInstanceId,
 	wait_for_install_job,
 } from './install'
-import { list } from './instance'
+import { list, remove } from './instance'
 
 /**
  * Mirror of the friend-site catalog the society backend aggregates.
@@ -107,15 +107,32 @@ export function isInstallable(instance: FriendInstance): boolean {
 }
 
 /**
- * Names of the instances already on disk.
+ * The instances already on disk, by name.
  *
  * A friend instance is installed as an ordinary local instance, so its name is
- * what tells the panel it is here. Used only to keep the panel from offering a
- * second copy, never to gate anything.
+ * what ties the catalog entry to the copy on disk. The name is only used to find
+ * that copy; the instance id it maps to is what launches or removes it.
  */
-export async function installedInstanceNames(): Promise<Set<string>> {
+export async function installedInstancesByName(): Promise<Map<string, string>> {
 	const instances = await list().catch(() => [])
-	return new Set(instances.map((instance) => instance.name.trim()).filter(Boolean))
+	const byName = new Map<string, string>()
+	for (const instance of instances) {
+		const name = instance.name.trim()
+		if (name) byName.set(name, instance.id)
+	}
+	return byName
+}
+
+/** Address the game connects to on launch, for quick play. */
+export function quickPlayAddress(instance: FriendInstance): string | null {
+	const server = instance.server
+	if (!server?.address) return null
+	return server.port && server.port !== 25565 ? `${server.address}:${server.port}` : server.address
+}
+
+/** Removes an installed friend instance from this computer. */
+export async function uninstallFriendInstance(instanceId: string): Promise<void> {
+	await remove(instanceId)
 }
 
 /**

@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { CheckIcon, DownloadIcon, GlobeIcon, RefreshCwIcon, ServerIcon } from '@modrinth/assets'
+import {
+	DownloadIcon,
+	GlobeIcon,
+	PlayIcon,
+	RefreshCwIcon,
+	ServerIcon,
+	TrashIcon,
+} from '@modrinth/assets'
 import { ButtonStyled, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
@@ -8,10 +15,13 @@ import type { FriendInstance, FriendsDocument, FriendSite } from '@/helpers/frie
 import {
 	friends_fetch,
 	friendSitesWithInstances,
-	installedInstanceNames,
+	installedInstancesByName,
 	installFriendInstance,
 	isInstallable,
+	quickPlayAddress,
+	uninstallFriendInstance,
 } from '@/helpers/friend-sites'
+import { run } from '@/helpers/instance'
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
@@ -39,6 +49,14 @@ const messages = defineMessages({
 	install: { id: 'friend-sites.install', defaultMessage: 'Install' },
 	installing: { id: 'friend-sites.installing', defaultMessage: 'Installing...' },
 	installed: { id: 'friend-sites.installed', defaultMessage: 'Installed' },
+	play: { id: 'friend-sites.play', defaultMessage: 'Play' },
+	starting: { id: 'friend-sites.starting', defaultMessage: 'Starting...' },
+	remove: { id: 'friend-sites.remove', defaultMessage: 'Remove from this computer' },
+	removeHint: {
+		id: 'friend-sites.remove-hint',
+		defaultMessage:
+			'Removing it frees the disk space; the instance stays listed so you can install it again.',
+	},
 	unavailable: { id: 'friend-sites.unavailable', defaultMessage: 'Not available for download' },
 	stale: {
 		id: 'friend-sites.stale',
@@ -64,8 +82,10 @@ const isConfigured = urls.length > 0
 const loading = ref(false)
 const error = ref<string | null>(null)
 const catalog = ref<FriendsDocument | null>(null)
-const installed = ref<Set<string>>(new Set())
+const installed = ref<Map<string, string>>(new Map())
 const installingKey = ref<string | null>(null)
+const launchingId = ref<string | null>(null)
+const removingId = ref<string | null>(null)
 
 const sites = computed<FriendSite[]>(() => friendSitesWithInstances(catalog.value))
 
@@ -81,7 +101,7 @@ async function load(): Promise<void> {
 
 	try {
 		catalog.value = await friends_fetch(urls)
-		installed.value = await installedInstanceNames()
+		installed.value = await installedInstancesByName()
 	} catch (loadError) {
 		error.value = describeError(loadError)
 	} finally {
@@ -93,8 +113,9 @@ function instanceKey(site: FriendSite, instance: FriendInstance): string {
 	return `${site.site_id}:${instance.id}`
 }
 
-function isInstalled(instance: FriendInstance): boolean {
-	return installed.value.has(instance.name.trim())
+/** The local copy of this entry, when it is installed. */
+function installedId(instance: FriendInstance): string | null {
+	return installed.value.get(instance.name.trim()) ?? null
 }
 
 function loaderLabel(instance: FriendInstance): string {
@@ -119,11 +140,42 @@ async function install(site: FriendSite, instance: FriendInstance): Promise<void
 	installingKey.value = key
 	try {
 		await installFriendInstance(instance)
-		installed.value = await installedInstanceNames()
+		installed.value = await installedInstancesByName()
 	} catch (installError) {
 		handleError(installError)
 	} finally {
 		installingKey.value = null
+	}
+}
+
+/** Starts an installed entry straight from this page. */
+async function launch(instance: FriendInstance): Promise<void> {
+	const id = installedId(instance)
+	if (!id || launchingId.value) return
+
+	launchingId.value = id
+	try {
+		await run(id, quickPlayAddress(instance))
+	} catch (launchError) {
+		handleError(launchError)
+	} finally {
+		launchingId.value = null
+	}
+}
+
+/** Frees an installed entry. It stays listed, so it can be installed again. */
+async function removeInstalled(instance: FriendInstance): Promise<void> {
+	const id = installedId(instance)
+	if (!id || removingId.value) return
+
+	removingId.value = id
+	try {
+		await uninstallFriendInstance(id)
+		installed.value = await installedInstancesByName()
+	} catch (removeError) {
+		handleError(removeError)
+	} finally {
+		removingId.value = null
 	}
 }
 
@@ -246,13 +298,31 @@ onMounted(() => {
 						</div>
 
 						<div class="flex shrink-0 items-center gap-2">
-							<span
-								v-if="isInstalled(instance)"
-								class="flex items-center gap-1 text-xs font-semibold text-secondary"
-							>
-								<CheckIcon class="size-3.5 text-brand" />
-								{{ formatMessage(messages.installed) }}
-							</span>
+							<template v-if="installedId(instance)">
+								<ButtonStyled>
+									<button
+										v-tooltip="formatMessage(messages.removeHint)"
+										:disabled="launchingId !== null || removingId !== null"
+										@click="removeInstalled(instance)"
+									>
+										<TrashIcon />
+										{{ formatMessage(messages.remove) }}
+									</button>
+								</ButtonStyled>
+								<ButtonStyled color="brand">
+									<button
+										:disabled="launchingId !== null || removingId !== null"
+										@click="launch(instance)"
+									>
+										<PlayIcon />
+										{{
+											launchingId === installedId(instance)
+												? formatMessage(messages.starting)
+												: formatMessage(messages.play)
+										}}
+									</button>
+								</ButtonStyled>
+							</template>
 							<ButtonStyled v-else-if="isInstallable(instance)" color="brand">
 								<button :disabled="installingKey !== null" @click="install(site, instance)">
 									{{

@@ -8840,8 +8840,17 @@
   "friend-sites.loading": {
     "message": "正在获取友社推荐的实例…"
   },
+  "friend-sites.play": {
+    "message": "启动"
+  },
   "friend-sites.refresh": {
     "message": "刷新"
+  },
+  "friend-sites.remove": {
+    "message": "从本机移除"
+  },
+  "friend-sites.remove-hint": {
+    "message": "移除可以释放磁盘空间；条目仍会留在列表里，随时可以重新安装。"
   },
   "friend-sites.retry": {
     "message": "重试"
@@ -8854,6 +8863,9 @@
   },
   "friend-sites.stale": {
     "message": "刚才刷新该站点失败，列表可能不是最新的。"
+  },
+  "friend-sites.starting": {
+    "message": "正在启动…"
   },
   "friend-sites.summary": {
     "message": "{sites} 个友社 · {instances} 个实例"

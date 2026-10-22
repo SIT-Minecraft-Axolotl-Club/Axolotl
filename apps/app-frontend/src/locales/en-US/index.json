@@ -10466,8 +10466,17 @@
   "friend-sites.loading": {
     "message": "Looking for instances from friend sites..."
   },
+  "friend-sites.play": {
+    "message": "Play"
+  },
   "friend-sites.refresh": {
     "message": "Refresh"
+  },
+  "friend-sites.remove": {
+    "message": "Remove from this computer"
+  },
+  "friend-sites.remove-hint": {
+    "message": "Removing it frees the disk space; the instance stays listed so you can install it again."
   },
   "friend-sites.retry": {
     "message": "Retry"
@@ -10480,6 +10489,9 @@
   },
   "friend-sites.stale": {
     "message": "Not refreshed just now; this list may be out of date."
+  },
+  "friend-sites.starting": {
+    "message": "Starting..."
   },
   "friend-sites.summary": {
     "message": "{sites} sites · {instances} instances"
