@@ -195,20 +195,13 @@ onMounted(() => {
 				class="rounded-xl border border-divider bg-surface-2 p-5"
 			>
 				<header class="mb-4 flex flex-wrap items-center justify-between gap-3">
-					<div class="flex min-w-0 items-center gap-3">
-						<span
-							class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-surface-3 text-xs font-semibold text-secondary"
-						>
-							{{ monogram(site.name) }}
+					<div class="flex min-w-0 flex-col">
+						<h2 class="m-0 truncate text-lg font-semibold text-contrast">
+							{{ site.name }}
+						</h2>
+						<span v-if="site.description" class="truncate text-xs text-secondary">
+							{{ site.description }}
 						</span>
-						<div class="flex min-w-0 flex-col">
-							<h2 class="m-0 truncate text-lg font-semibold text-contrast">
-								{{ site.name }}
-							</h2>
-							<span v-if="site.description" class="truncate text-xs text-secondary">
-								{{ site.description }}
-							</span>
-						</div>
 					</div>
 					<div class="flex items-center gap-3">
 						<a
