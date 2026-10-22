@@ -8810,6 +8810,36 @@
   "drop.help.worlds-title": {
     "message": "存档"
   },
+  "friend-sites.failed": {
+    "message": "友社列表加载失败。"
+  },
+  "friend-sites.install": {
+    "message": "安装"
+  },
+  "friend-sites.installed": {
+    "message": "已安装"
+  },
+  "friend-sites.installing": {
+    "message": "正在安装…"
+  },
+  "friend-sites.loading": {
+    "message": "正在获取友社推荐的实例…"
+  },
+  "friend-sites.refresh": {
+    "message": "刷新"
+  },
+  "friend-sites.retry": {
+    "message": "重试"
+  },
+  "friend-sites.stale": {
+    "message": "该站点刚才刷新失败，列表可能不是最新的。"
+  },
+  "friend-sites.title": {
+    "message": "友社推荐实例"
+  },
+  "friend-sites.unavailable": {
+    "message": "暂不提供下载"
+  },
   "friends.action.add-friend": {
     "message": "添加好友"
   },

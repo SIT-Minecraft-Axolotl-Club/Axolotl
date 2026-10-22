@@ -107,6 +107,67 @@ fn default_required() -> bool {
     true
 }
 
+/// Instances the society's friend sites publish for this launcher.
+///
+/// The backend aggregates its peers and groups the same per-instance shape the
+/// manifest uses by source site, so a player can see which society recommends
+/// each instance. Nothing here is required, owned or updated by the local
+/// server: a friend instance is installed as an ordinary local instance only
+/// when the player asks for it.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct FriendsDocument {
+    #[serde(default)]
+    pub schema: u32,
+    #[serde(default)]
+    pub generated_at: Option<String>,
+    #[serde(default)]
+    pub sites: Vec<FriendSite>,
+}
+
+/// One friend site and the instances it recommends.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct FriendSite {
+    pub site_id: String,
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub description: Option<String>,
+    #[serde(default)]
+    pub domain: Option<String>,
+    #[serde(default)]
+    pub manifest_url: Option<String>,
+    /// Whether the local server's last poll of this site failed.
+    #[serde(default)]
+    pub stale: bool,
+    #[serde(default)]
+    pub instances: Vec<FriendInstance>,
+}
+
+/// One instance a friend site recommends.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct FriendInstance {
+    pub id: String,
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub description: Option<String>,
+    #[serde(default)]
+    pub icon_url: Option<String>,
+    #[serde(default)]
+    pub sort: i32,
+    /// Absent when the entry has no downloadable pack.
+    #[serde(default)]
+    pub revision: Option<i64>,
+    #[serde(default)]
+    pub minecraft: Option<ManagedMinecraftSpec>,
+    #[serde(default)]
+    pub pack: Option<ManagedPackSpec>,
+    #[serde(default)]
+    pub server: Option<ManagedServerSpec>,
+    #[serde(default)]
+    pub required: bool,
+}
+
 /// Outcome of reconciling a manifest with the local records.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ManagedSyncReport {
@@ -207,8 +268,66 @@ impl From<ManagedInstanceRow> for ManagedInstanceRecord {
 pub async fn fetch_manifest(
     manifest_url: &str,
 ) -> crate::Result<ManagedManifest> {
-    let body = fetch_manifest_body(manifest_url).await?;
+    let body = fetch_json_body(manifest_url).await?;
     parse_manifest(manifest_url, &body)
+}
+
+/// Fetches the friend-site catalog from the first address that answers.
+///
+/// The backend serves the same document at a launcher-facing and a versioned
+/// path, so both are tried in the order given; a build only has to reach one of
+/// them for friend recommendations to appear.
+#[tracing::instrument(skip(urls))]
+pub async fn fetch_friends(urls: &[String]) -> crate::Result<FriendsDocument> {
+    let mut last_error = None;
+
+    for url in urls
+        .iter()
+        .map(|url| url.trim())
+        .filter(|url| !url.is_empty())
+    {
+        match fetch_json_body(url).await {
+            Ok(body) => return parse_friends(url, &body),
+            Err(error) => {
+                tracing::warn!(
+                    url,
+                    error = %error,
+                    "Friend catalog address did not answer"
+                );
+                last_error = Some(error);
+            }
+        }
+    }
+
+    Err(last_error.unwrap_or_else(|| {
+        crate::ErrorKind::InputError(
+            "No friend catalog address is configured".to_string(),
+        )
+        .as_error()
+    }))
+}
+
+fn parse_friends(
+    url: &str,
+    body: &str,
+) -> crate::Result<FriendsDocument> {
+    let document: FriendsDocument =
+        serde_json::from_str(body).map_err(|error| {
+            crate::ErrorKind::InputError(format!(
+                "Friend catalog from {url} is not valid JSON: {error}"
+            ))
+            .as_error()
+        })?;
+
+    if document.schema > SUPPORTED_MANIFEST_SCHEMA {
+        return Err(crate::ErrorKind::InputError(format!(
+            "The friend catalog requires schema {}, but this launcher only supports schema {SUPPORTED_MANIFEST_SCHEMA}; update the launcher",
+            document.schema
+        ))
+        .as_error());
+    }
+
+    Ok(document)
 }
 
 /// Fetches the manifest, reconciles it with the local managed instance
@@ -221,7 +340,7 @@ pub async fn sync_manifest(
     manifest_url: &str,
 ) -> crate::Result<ManagedSyncReport> {
     let state = State::get().await?;
-    let body = fetch_manifest_body(manifest_url).await?;
+    let body = fetch_json_body(manifest_url).await?;
     let parsed = parse_manifest(manifest_url, &body)?;
 
     let ManagedManifest {
@@ -568,9 +687,9 @@ fn validate_manifest_schema(schema: u32) -> crate::Result<()> {
     Ok(())
 }
 
-async fn fetch_manifest_body(manifest_url: &str) -> crate::Result<String> {
+async fn fetch_json_body(url: &str) -> crate::Result<String> {
     let response = INSECURE_REQWEST_CLIENT
-        .get(manifest_url)
+        .get(url)
         .header(reqwest::header::ACCEPT, "application/json")
         .send()
         .await?;
@@ -579,7 +698,7 @@ async fn fetch_manifest_body(manifest_url: &str) -> crate::Result<String> {
         return Err(crate::ErrorKind::HttpError {
             status: status.as_u16(),
             method: "GET".to_string(),
-            url: manifest_url.to_string(),
+            url: url.to_string(),
         }
         .as_error());
     }
@@ -756,6 +875,100 @@ mod tests {
         assert!(validate_server_instance_id("../escape").is_err());
         assert!(
             validate_server_instance_id(&"a".repeat(MAX_INSTANCE_ID_LEN + 1))
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn parses_the_friend_catalog_the_backend_serves() {
+        // Copied from `GET /api/launcher/friends`, including the fields a
+        // launcher never reads, so an added field cannot break the page.
+        let body = r#"{
+            "schema": 1,
+            "generated_at": "2026-10-22T04:34:31Z",
+            "sites": [{
+                "site_id": "yda",
+                "name": "余梦",
+                "description": "余梦的公共服务器",
+                "domain": "mc.yudream.app",
+                "manifest_url": "https://mc.yudream.app/.well-known/mc-interop-v1.json",
+                "stale": false,
+                "instances": [{
+                    "id": "pixel",
+                    "name": "像素整合包",
+                    "description": "轻量像素风整合包",
+                    "icon_url": null,
+                    "sort": 1,
+                    "revision": 3,
+                    "minecraft": {
+                        "game_version": "1.20.1",
+                        "loader": "fabric",
+                        "loader_version": "0.15.11"
+                    },
+                    "pack": {
+                        "kind": "mrpack",
+                        "url": "https://skin.sitmc.club/api/launcher/packs/pixelsit/3",
+                        "sha1": "9a7b6c5d4e3f201182736455463728190a1b2c3d",
+                        "size": 48201122
+                    },
+                    "server": { "address": "pixel.sitmc.club", "port": 25565 },
+                    "required": false,
+                    "unknown_future_field": true
+                }, {
+                    "id": "creative",
+                    "name": "创造服",
+                    "description": null,
+                    "icon_url": null,
+                    "sort": 2,
+                    "revision": null,
+                    "minecraft": { "game_version": "26.2", "loader": null },
+                    "pack": null,
+                    "server": { "address": "build.sitmc.club", "port": null },
+                    "required": false
+                }]
+            }]
+        }"#;
+
+        let document = parse_friends("https://skin.sitmc.club/api/launcher/friends", body)
+            .expect("the served document parses");
+
+        assert_eq!(document.sites.len(), 1);
+        let site = &document.sites[0];
+        assert_eq!(site.site_id, "yda");
+        assert_eq!(site.instances.len(), 2);
+
+        let installable = &site.instances[0];
+        assert_eq!(installable.pack.as_ref().map(|pack| pack.kind.as_str()), Some("mrpack"));
+        assert_eq!(installable.revision, Some(3));
+        assert_eq!(
+            installable
+                .minecraft
+                .as_ref()
+                .and_then(|minecraft| minecraft.loader.as_deref()),
+            Some("fabric")
+        );
+
+        // An entry without a pack is a server-only recommendation: it parses,
+        // and installing it is refused by the caller.
+        assert!(site.instances[1].pack.is_none());
+        assert_eq!(site.instances[1].revision, None);
+    }
+
+    #[test]
+    fn accepts_an_empty_friend_catalog() {
+        let document = parse_friends(
+            "https://skin.sitmc.club/api/launcher/friends",
+            r#"{"schema":1,"generated_at":"2026-10-22T04:34:31Z","sites":[]}"#,
+        )
+        .expect("an empty catalog is valid");
+
+        assert!(document.sites.is_empty());
+    }
+
+    #[test]
+    fn rejects_a_friend_catalog_from_a_newer_backend() {
+        assert!(
+            parse_friends("https://example.test/friends", r#"{"schema":2}"#)
                 .is_err()
         );
     }

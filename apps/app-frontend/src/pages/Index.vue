@@ -18,6 +18,7 @@ import {
 import { computed, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+import FriendInstancesPanel from '@/components/home/FriendInstancesPanel.vue'
 import {
 	createDefaultHomeDashboard,
 	createHomeDashboardSaveQueue,
@@ -263,6 +264,7 @@ onUnmounted(() => {
 		@select="selectMinimalInstance"
 	/>
 	<ManagedInstancesPanel />
+	<FriendInstancesPanel />
 	<div class="min-h-full">
 		<HomeDashboard
 			v-if="!isMinimal && dashboardConfig"

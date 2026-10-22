@@ -656,6 +656,73 @@ Accept: application/json
 3. **连续失败计数**：客户端记录连续失败次数，超过 N 次（N 由客户端实现决定，建议为 3）后停止静默重试，向玩家展示明确的网络错误提示与「重试」入口。
 4. **启动器自身强制更新不受影响**：强制更新策略与安装包来自 `launcher` 对象与 `https://update.axlmc.org/latest`，清单服务不可用期间**启动器仍能完成自身更新**。这是刻意的降级设计：后端故障不应导致玩家无法修复客户端。
 
+### 3.9 友社推荐实例（可选）
+
+启动器首页可以列出**友社**推荐给玩家的实例。该列表由后端聚合（启动器只读本社一个来源，不做多站聚合），与第 3 章的受管清单是两份独立文档：这里的实例**不是**本社强制下发的内容，玩家安装后就是自己的一台普通本地实例，可随时删除，也不受受管实例的版本门禁约束。
+
+```http
+GET {content_base}/api/launcher/friends
+GET {content_base}/api/launcher/interop/v1/friends
+Accept: application/json
+```
+
+两个路径**返回完全相同的文档**，后者是便于反代/合规转发的版本化别名；启动器按配置顺序尝试，任一可用即可。
+
+```json
+{
+  "schema": 1,
+  "generated_at": "2026-10-22T04:34:31Z",
+  "sites": [
+    {
+      "site_id": "yda",
+      "name": "余梦",
+      "description": "余梦的公共服务器",
+      "domain": "mc.yudream.app",
+      "manifest_url": "https://mc.yudream.app/.well-known/mc-interop-v1.json",
+      "stale": false,
+      "instances": [
+        {
+          "id": "pixel",
+          "name": "像素整合包",
+          "description": "轻量像素风整合包",
+          "icon_url": null,
+          "sort": 1,
+          "revision": 3,
+          "minecraft": {
+            "game_version": "1.20.1",
+            "loader": "fabric",
+            "loader_version": "0.15.11"
+          },
+          "pack": {
+            "kind": "mrpack",
+            "url": "https://skin.sitmc.club/api/launcher/packs/pixelsit/3",
+            "sha1": "9a7b6c5d4e3f201182736455463728190a1b2c3d",
+            "size": 48201122
+          },
+          "server": { "address": "pixel.sitmc.club", "port": 25565 },
+          "required": false
+        }
+      ]
+    }
+  ]
+}
+```
+
+字段约定：
+
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `schema` | int | 是 | 当前为 `1`。比启动器支持的版本更新时整份文档被拒绝，不会部分解析 |
+| `generated_at` | string | 否 | UTC ISO-8601 |
+| `sites[].site_id` | string | 是 | 友社标识，同一文档内唯一 |
+| `sites[].name` | string | 是 | 展示名，缺失时回退为 `site_id` |
+| `sites[].stale` | bool | 否 | 本社上一次拉取该友社失败；其列表可能过期 |
+| `sites[].instances[]` | object | 否 | 与 §3.5 的单条实例结构一致 |
+| `sites[].instances[].pack` | object\|null | 否 | 为 `null` 表示只推荐服务器、没有可下载的包，启动器显示为「暂不提供下载」 |
+| `sites[].instances[].revision` | int\|null | 否 | 仅用于展示，友社实例不参与受管实例的版本对账 |
+
+启动器行为：`sites` 为空时整个区块不显示；`pack.kind` 只接受 `mrpack`；安装走与受管实例相同的下载管线（进度、断点续传、可重试），安装结果是普通本地实例。
+
 ---
 
 ## 4. 客户端行为规范

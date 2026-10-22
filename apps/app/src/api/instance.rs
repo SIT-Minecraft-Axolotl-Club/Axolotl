@@ -1972,6 +1972,13 @@ pub async fn managed_fetch_manifest(
 }
 
 #[tauri::command]
+pub async fn managed_fetch_friends(
+    urls: Vec<String>,
+) -> Result<theseus::managed::FriendsDocument> {
+    Ok(theseus::managed::fetch_friends(&urls).await?)
+}
+
+#[tauri::command]
 pub async fn managed_sync(
     manifest_url: String,
 ) -> Result<theseus::managed::ManagedSyncReport> {

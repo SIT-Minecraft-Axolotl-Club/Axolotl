@@ -10439,6 +10439,36 @@
   "drop.help.worlds-title": {
     "message": "World Saves"
   },
+  "friend-sites.failed": {
+    "message": "The friend-site list could not be loaded."
+  },
+  "friend-sites.install": {
+    "message": "Install"
+  },
+  "friend-sites.installed": {
+    "message": "Installed"
+  },
+  "friend-sites.installing": {
+    "message": "Installing..."
+  },
+  "friend-sites.loading": {
+    "message": "Looking for instances from friend sites..."
+  },
+  "friend-sites.refresh": {
+    "message": "Refresh"
+  },
+  "friend-sites.retry": {
+    "message": "Retry"
+  },
+  "friend-sites.stale": {
+    "message": "This site could not be refreshed just now; the list may be out of date."
+  },
+  "friend-sites.title": {
+    "message": "Instances from friend sites"
+  },
+  "friend-sites.unavailable": {
+    "message": "Not available for download"
+  },
   "friends.action.add-friend": {
     "message": "Add a friend"
   },

@@ -629,6 +629,7 @@ fn main() {
                         "instance_preview_local_game_option_changes",
                         "instance_save_local_game_option_changes",
                         "managed_fetch_manifest",
+                        "managed_fetch_friends",
                         "managed_sync",
                         "managed_list",
                         "managed_mark_installed",

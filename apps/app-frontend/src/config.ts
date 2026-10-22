@@ -59,11 +59,17 @@ export const config = {
  * feature instead of reaching for another community's server.
  */
 const DEFAULT_MANIFEST_URL = 'https://skin.sitmc.club/api/launcher/manifest'
+const DEFAULT_FRIENDS_URL = 'https://skin.sitmc.club/api/launcher/friends'
+const DEFAULT_FRIENDS_INTEROP_URL = 'https://skin.sitmc.club/api/launcher/interop/v1/friends'
 const DEFAULT_ANNOUNCEMENTS_URL = 'https://skin.sitmc.club/api/launcher/announcements'
 const DEFAULT_UPDATE_URL = 'https://skin.sitmc.club/api/launcher/update'
 const DEFAULT_DOCS_URL = 'https://sit-minecraft.feishu.cn/wiki/BlvtwrH8diexAtklJg8cntwmnwc'
 
 const manifestUrl = (import.meta.env.VITE_SITMC_MANIFEST_URL ?? DEFAULT_MANIFEST_URL).trim()
+const friendsUrl = (import.meta.env.VITE_SITMC_FRIENDS_URL ?? DEFAULT_FRIENDS_URL).trim()
+const friendsInteropUrl = (
+	import.meta.env.VITE_SITMC_FRIENDS_INTEROP_URL ?? DEFAULT_FRIENDS_INTEROP_URL
+).trim()
 const announcementsUrl = (
 	import.meta.env.VITE_SITMC_ANNOUNCEMENTS_URL ??
 	import.meta.env.VITE_AXO_ANNOUNCEMENTS_URL ??
@@ -82,6 +88,10 @@ export const SitmcConfig = Object.freeze({
 	officialSite: 'https://www.sitmc.club/',
 	privacyUrl: 'https://www.sitmc.club/privacy',
 	manifestUrl: trimTrailingSlash(manifestUrl),
+	/** Friend-site catalog, grouped by source site. */
+	friendsUrl: trimTrailingSlash(friendsUrl),
+	/** Versioned mirror of the same friend catalog. */
+	friendsInteropUrl: trimTrailingSlash(friendsInteropUrl),
 	announcementsUrl: trimTrailingSlash(announcementsUrl),
 	updateUrl: trimTrailingSlash(updateUrl),
 	docsUrl: trimTrailingSlash(docsUrl),
