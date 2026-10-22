@@ -10481,9 +10481,6 @@
   "friend-sites.stale": {
     "message": "Not refreshed just now; this list may be out of date."
   },
-  "friend-sites.subtitle": {
-    "message": "Instances other societies publish for this launcher. Installing one adds an ordinary local instance you can delete whenever you like."
-  },
   "friend-sites.summary": {
     "message": "{sites} sites · {instances} instances"
   },

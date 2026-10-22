@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import {
-	CheckIcon,
-	DownloadIcon,
-	GlobeIcon,
-	RefreshCwIcon,
-	ServerIcon,
-	UsersIcon,
-} from '@modrinth/assets'
+import { CheckIcon, DownloadIcon, GlobeIcon, RefreshCwIcon, ServerIcon } from '@modrinth/assets'
 import { ButtonStyled, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
@@ -25,11 +18,6 @@ const { handleError } = injectNotificationManager()
 
 const messages = defineMessages({
 	title: { id: 'friend-sites.title', defaultMessage: 'Instances from friend sites' },
-	subtitle: {
-		id: 'friend-sites.subtitle',
-		defaultMessage:
-			'Instances other societies publish for this launcher. Installing one adds an ordinary local instance you can delete whenever you like.',
-	},
 	summary: {
 		id: 'friend-sites.summary',
 		defaultMessage: '{sites} sites · {instances} instances',
@@ -150,120 +138,125 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="flex h-full min-h-0 flex-col gap-4 p-6">
-		<header class="flex flex-wrap items-start gap-3">
-			<span
-				class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-brand"
-			>
-				<UsersIcon class="size-5" />
-			</span>
-			<div class="flex min-w-0 flex-1 flex-col gap-1">
-				<h1 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.title) }}
-				</h1>
-				<p class="m-0 text-sm text-secondary">{{ formatMessage(messages.subtitle) }}</p>
+	<div class="flex h-full min-h-0 flex-col gap-4 overflow-y-auto p-6">
+		<header class="flex flex-wrap items-center justify-between gap-3">
+			<h1 class="m-0 text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.title) }}
+			</h1>
+			<div class="flex items-center gap-3">
+				<span v-if="instanceCount > 0" class="text-xs text-secondary">
+					{{
+						formatMessage(messages.summary, {
+							sites: sites.length,
+							instances: instanceCount,
+						})
+					}}
+				</span>
+				<ButtonStyled>
+					<button :disabled="loading" @click="load">
+						<RefreshCwIcon :class="{ 'animate-spin': loading }" />
+						{{ formatMessage(messages.refresh) }}
+					</button>
+				</ButtonStyled>
 			</div>
-			<ButtonStyled>
-				<button :disabled="loading" @click="load">
-					<RefreshCwIcon :class="{ 'animate-spin': loading }" />
-					{{ formatMessage(messages.refresh) }}
-				</button>
-			</ButtonStyled>
 		</header>
 
-		<div v-if="error" class="flex flex-wrap items-center gap-3 rounded-lg bg-surface-2 p-4">
+		<section
+			v-if="error"
+			class="flex flex-wrap items-center gap-3 rounded-xl border border-divider bg-surface-2 p-5"
+		>
 			<p class="m-0 flex-1 text-sm text-red">{{ formatMessage(messages.failed) }} {{ error }}</p>
 			<ButtonStyled size="small">
 				<button :disabled="loading" @click="load">
 					{{ formatMessage(messages.retry) }}
 				</button>
 			</ButtonStyled>
-		</div>
+		</section>
 
-		<p
+		<section
 			v-else-if="loading && sites.length === 0"
-			class="m-0 flex items-center gap-2 text-sm text-secondary"
+			class="flex items-center gap-3 rounded-xl border border-divider bg-surface-2 p-5"
 		>
-			<DownloadIcon class="size-4 text-brand" />
-			{{ formatMessage(messages.loading) }}
-		</p>
+			<DownloadIcon class="size-5 shrink-0 text-brand" />
+			<p class="m-0 text-sm text-secondary">{{ formatMessage(messages.loading) }}</p>
+		</section>
 
-		<p v-else-if="sites.length === 0" class="m-0 text-sm text-secondary">
-			{{ formatMessage(messages.empty) }}
-		</p>
+		<section
+			v-else-if="sites.length === 0"
+			class="rounded-xl border border-divider bg-surface-2 p-5"
+		>
+			<p class="m-0 text-sm text-secondary">{{ formatMessage(messages.empty) }}</p>
+		</section>
 
-		<div v-else class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
-			<p class="m-0 text-xs text-secondary">
-				{{ formatMessage(messages.summary, { sites: sites.length, instances: instanceCount }) }}
-			</p>
-
+		<template v-else>
 			<section
 				v-for="site in sites"
 				:key="site.site_id"
-				class="flex flex-col gap-3 rounded-xl border border-surface-4 bg-surface-2 p-4"
+				class="rounded-xl border border-divider bg-surface-2 p-5"
 			>
-				<header class="flex flex-wrap items-center gap-2">
-					<span
-						class="flex size-8 shrink-0 items-center justify-center rounded-md bg-surface-3 text-xs font-semibold text-secondary"
-					>
-						{{ monogram(site.name) }}
-					</span>
-					<div class="flex min-w-0 flex-col">
-						<h2 class="m-0 truncate text-base font-semibold text-contrast">
-							{{ site.name }}
-						</h2>
-						<span v-if="site.description" class="truncate text-xs text-secondary">
-							{{ site.description }}
+				<header class="mb-4 flex flex-wrap items-center justify-between gap-3">
+					<div class="flex min-w-0 items-center gap-3">
+						<span
+							class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-surface-3 text-xs font-semibold text-secondary"
+						>
+							{{ monogram(site.name) }}
+						</span>
+						<div class="flex min-w-0 flex-col">
+							<h2 class="m-0 truncate text-lg font-semibold text-contrast">
+								{{ site.name }}
+							</h2>
+							<span v-if="site.description" class="truncate text-xs text-secondary">
+								{{ site.description }}
+							</span>
+						</div>
+					</div>
+					<div class="flex items-center gap-3">
+						<a
+							v-if="site.domain"
+							v-tooltip="formatMessage(messages.visit)"
+							:href="`https://${site.domain}`"
+							target="_blank"
+							rel="noreferrer"
+							class="flex items-center gap-1 text-xs text-secondary transition-colors hover:text-contrast"
+						>
+							<GlobeIcon class="size-3.5" />
+							{{ site.domain }}
+						</a>
+						<span
+							v-if="site.stale"
+							v-tooltip="formatMessage(messages.stale)"
+							class="rounded-full bg-surface-3 px-2 py-0.5 text-[11px] text-secondary"
+						>
+							!
 						</span>
 					</div>
-					<a
-						v-if="site.domain"
-						v-tooltip="formatMessage(messages.visit)"
-						:href="`https://${site.domain}`"
-						target="_blank"
-						rel="noreferrer"
-						class="ml-auto flex items-center gap-1 text-xs text-secondary transition-colors hover:text-contrast"
-					>
-						<GlobeIcon class="size-3.5" />
-						{{ site.domain }}
-					</a>
-					<span
-						v-if="site.stale"
-						v-tooltip="formatMessage(messages.stale)"
-						class="rounded-full bg-surface-3 px-2 py-0.5 text-[11px] text-secondary"
-					>
-						!
-					</span>
 				</header>
 
-				<div class="flex flex-col gap-1">
+				<div class="flex flex-col gap-3">
 					<article
 						v-for="instance in site.instances"
 						:key="instance.id"
-						class="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-surface-3"
+						class="flex flex-wrap items-center gap-4 rounded-lg border border-divider bg-surface-3 p-4"
 					>
+						<img
+							v-if="instance.icon_url"
+							:src="instance.icon_url"
+							alt=""
+							class="size-12 shrink-0 rounded-lg object-cover"
+						/>
 						<div
-							class="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md bg-surface-3"
+							v-else
+							class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-xs font-semibold text-secondary"
 						>
-							<img
-								v-if="instance.icon_url"
-								:src="instance.icon_url"
-								alt=""
-								class="size-full object-cover"
-							/>
-							<span v-else class="text-sm font-semibold text-secondary">
-								{{ monogram(instance.name) }}
-							</span>
+							{{ monogram(instance.name) }}
 						</div>
 
-						<div class="flex min-w-0 flex-1 flex-col gap-0.5">
-							<h3 class="m-0 truncate text-sm font-medium text-contrast">
-								{{ instance.name }}
-							</h3>
-							<p v-if="instance.description" class="m-0 truncate text-[11px] text-secondary">
+						<div class="flex min-w-0 flex-1 flex-col gap-1">
+							<span class="truncate font-medium text-contrast">{{ instance.name }}</span>
+							<span v-if="instance.description" class="truncate text-xs text-secondary">
 								{{ instance.description }}
-							</p>
-							<span class="flex min-w-0 items-center gap-2 text-[11px] text-secondary">
+							</span>
+							<span class="flex flex-wrap gap-3 text-xs text-secondary">
 								<span v-if="instance.minecraft?.game_version">
 									{{ instance.minecraft.game_version }}
 								</span>
@@ -277,28 +270,30 @@ onMounted(() => {
 							</span>
 						</div>
 
-						<span
-							v-if="isInstalled(instance)"
-							class="flex shrink-0 items-center gap-1 text-xs text-secondary"
-						>
-							<CheckIcon class="size-3.5 text-brand" />
-							{{ formatMessage(messages.installed) }}
-						</span>
-						<ButtonStyled v-else-if="isInstallable(instance)" color="brand" size="small">
-							<button :disabled="installingKey !== null" @click="install(site, instance)">
-								{{
-									installingKey === instanceKey(site, instance)
-										? formatMessage(messages.installing)
-										: formatMessage(messages.install)
-								}}
-							</button>
-						</ButtonStyled>
-						<span v-else class="shrink-0 text-[11px] text-secondary">
-							{{ formatMessage(messages.unavailable) }}
-						</span>
+						<div class="flex shrink-0 items-center gap-2">
+							<span
+								v-if="isInstalled(instance)"
+								class="flex items-center gap-1 text-xs font-semibold text-secondary"
+							>
+								<CheckIcon class="size-3.5 text-brand" />
+								{{ formatMessage(messages.installed) }}
+							</span>
+							<ButtonStyled v-else-if="isInstallable(instance)" color="brand">
+								<button :disabled="installingKey !== null" @click="install(site, instance)">
+									{{
+										installingKey === instanceKey(site, instance)
+											? formatMessage(messages.installing)
+											: formatMessage(messages.install)
+									}}
+								</button>
+							</ButtonStyled>
+							<span v-else class="text-xs text-secondary">
+								{{ formatMessage(messages.unavailable) }}
+							</span>
+						</div>
 					</article>
 				</div>
 			</section>
-		</div>
+		</template>
 	</div>
 </template>
