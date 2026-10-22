@@ -151,6 +151,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_set_synced_pack_enabled,
             instance_remove_synced_pack,
             managed_fetch_manifest,
+            managed_fetch_friends,
             managed_sync,
             managed_list,
             managed_mark_installed,

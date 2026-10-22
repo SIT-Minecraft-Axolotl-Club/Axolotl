@@ -28,6 +28,25 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-2.1.0',
+		version: '2.1.0',
+		publishedAt: '2026-10-22',
+		title: {
+			'en-US': 'Axolotl Launcher 2.1.0',
+			'zh-CN': 'Axolotl 启动器 2.1.0',
+		},
+		changes: {
+			added: [
+				{
+					'en-US':
+						'The home page now shows instances that friend societies recommend: each one names the society it comes from, its game version and its server, and installs with one click as an ordinary local instance you can delete whenever you like.',
+					'zh-CN':
+						'首页新增「友社推荐实例」：会列出友社推荐给玩家的实例，标明来源社团、游戏版本与服务器地址，点一下即可安装成普通的本地实例，随时可以删除。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-2.0.9',
 		version: '2.0.9',
 		publishedAt: '2026-10-15',
