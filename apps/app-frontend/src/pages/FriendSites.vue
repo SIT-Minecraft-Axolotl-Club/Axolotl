@@ -97,11 +97,6 @@ function isInstalled(instance: FriendInstance): boolean {
 	return installed.value.has(instance.name.trim())
 }
 
-/** First character of a name, used as the tile for an entry without an icon. */
-function monogram(name: string): string {
-	return name.trim().charAt(0).toUpperCase() || '?'
-}
-
 function loaderLabel(instance: FriendInstance): string {
 	const minecraft = instance.minecraft
 	if (!minecraft) return ''
@@ -231,19 +226,6 @@ onMounted(() => {
 						:key="instance.id"
 						class="flex flex-wrap items-center gap-4 rounded-lg border border-divider bg-surface-3 p-4"
 					>
-						<img
-							v-if="instance.icon_url"
-							:src="instance.icon_url"
-							alt=""
-							class="size-12 shrink-0 rounded-lg object-cover"
-						/>
-						<div
-							v-else
-							class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-xs font-semibold text-secondary"
-						>
-							{{ monogram(instance.name) }}
-						</div>
-
 						<div class="flex min-w-0 flex-1 flex-col gap-1">
 							<span class="truncate font-medium text-contrast">{{ instance.name }}</span>
 							<span v-if="instance.description" class="truncate text-xs text-secondary">
