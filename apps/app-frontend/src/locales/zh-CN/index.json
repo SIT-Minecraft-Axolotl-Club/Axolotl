@@ -5885,6 +5885,9 @@
   "app.navigation.edit-world": {
     "message": "编辑存档"
   },
+  "app.navigation.friend-sites": {
+    "message": "友社"
+  },
   "app.navigation.home": {
     "message": "主页"
   },
@@ -8813,6 +8816,9 @@
   "friend-sites.collapse": {
     "message": "收起"
   },
+  "friend-sites.empty": {
+    "message": "目前没有友社发布实例。"
+  },
   "friend-sites.expand": {
     "message": "展开"
   },
@@ -8845,6 +8851,9 @@
   },
   "friend-sites.stale": {
     "message": "刚才刷新该站点失败，列表可能不是最新的。"
+  },
+  "friend-sites.subtitle": {
+    "message": "其他社团为这个启动器发布的实例。安装后会成为普通的本地实例，随时可以删除。"
   },
   "friend-sites.summary": {
     "message": "{sites} 个友社 · {instances} 个实例"

@@ -5909,6 +5909,9 @@
   "app.navigation.edit-world": {
     "message": "Edit world"
   },
+  "app.navigation.friend-sites": {
+    "message": "Friend sites"
+  },
   "app.navigation.home": {
     "message": "Home"
   },
@@ -10442,6 +10445,9 @@
   "friend-sites.collapse": {
     "message": "Collapse"
   },
+  "friend-sites.empty": {
+    "message": "No friend site publishes an instance right now."
+  },
   "friend-sites.expand": {
     "message": "Expand"
   },
@@ -10474,6 +10480,9 @@
   },
   "friend-sites.stale": {
     "message": "Not refreshed just now; this list may be out of date."
+  },
+  "friend-sites.subtitle": {
+    "message": "Instances other societies publish for this launcher. Installing one adds an ordinary local instance you can delete whenever you like."
   },
   "friend-sites.summary": {
     "message": "{sites} sites · {instances} instances"

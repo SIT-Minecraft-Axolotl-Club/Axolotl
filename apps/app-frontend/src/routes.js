@@ -28,6 +28,14 @@ export default new createRouter({
 			},
 		},
 		{
+			path: '/friend-sites',
+			name: 'FriendSites',
+			component: () => import('@/pages/FriendSites.vue'),
+			meta: {
+				breadcrumb: [{ name: 'Friend sites' }],
+			},
+		},
+		{
 			path: '/worlds',
 			name: 'Worlds',
 			component: () => import('@/pages/Worlds.vue'),

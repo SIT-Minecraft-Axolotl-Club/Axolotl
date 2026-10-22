@@ -16,6 +16,7 @@ import {
 	RotateCounterClockwiseIcon,
 	SettingsIcon,
 	SpinnerIcon,
+	UsersIcon,
 	WorldIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -951,6 +952,10 @@ const messages = defineMessages({
 	home: {
 		id: 'app.navigation.home',
 		defaultMessage: 'Home',
+	},
+	friendSites: {
+		id: 'app.navigation.friend-sites',
+		defaultMessage: 'Friend sites',
 	},
 	worlds: {
 		id: 'app.navigation.worlds',
@@ -2711,6 +2716,15 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<NavRail>
 				<NavButton v-tooltip.right="formatMessage(messages.home)" to="/">
 					<HomeIcon />
+				</NavButton>
+				<NavButton
+					v-if="SitmcConfig.friendsUrl || SitmcConfig.friendsInteropUrl"
+					v-tooltip.right="formatMessage(messages.friendSites)"
+					data-onboarding-id="nav-friend-sites"
+					to="/friend-sites"
+					:is-primary="(r) => r.path.startsWith('/friend-sites')"
+				>
+					<UsersIcon />
 				</NavButton>
 				<NavButton
 					v-tooltip.right="formatMessage(messages.skinSelector)"
