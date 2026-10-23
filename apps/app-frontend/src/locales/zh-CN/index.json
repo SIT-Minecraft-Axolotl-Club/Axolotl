@@ -591,10 +591,10 @@
     "message": "隐藏至托盘"
   },
   "app.appearance-settings.close-behavior.title": {
-    "message": "关闭 Axolotl Launcher 的方式"
+    "message": "关闭 SITMC Launcher 的方式"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "为 Axolotl Launcher 选择偏好的色彩主题。"
+    "message": "为 SITMC Launcher 选择偏好的色彩主题。"
   },
   "app.appearance-settings.color-theme.title": {
     "message": "色彩主题"
@@ -921,7 +921,7 @@
     "message": "记住我的选择"
   },
   "app.close-launcher.title": {
-    "message": "选择关闭 Axolotl Launcher 的方式"
+    "message": "选择关闭 SITMC Launcher 的方式"
   },
   "app.close-launcher.tray": {
     "message": "隐藏至托盘"
@@ -933,10 +933,10 @@
     "message": "如果您还有更多、更好的想法与建议，欢迎加入玩家交流 QQ 群："
   },
   "app.community-announcement.feedback-suffix": {
-    "message": " 中向我们提出。期待与大家共同完善 Axolotl Launcher！"
+    "message": " 中向我们提出。期待与大家共同完善 SITMC Launcher！"
   },
   "app.community-announcement.response": {
-    "message": "自 Axolotl Launcher 在视频平台宣传以来，我们收获了远超预期的喜爱与关注，同时也收到了许多高质量的反馈与建议。"
+    "message": "自 SITMC Launcher 在视频平台宣传以来，我们收获了远超预期的喜爱与关注，同时也收到了许多高质量的反馈与建议。"
   },
   "app.community-announcement.thanks": {
     "message": "对于视频评论区里的留言，我都已尽可能地逐一回复。承蒙各位厚爱，在此表达最诚挚的感谢！"
@@ -1884,7 +1884,7 @@
     "message": "调试信息"
   },
   "app.error.directory-description": {
-    "message": "Axolotl Launcher 无法迁移到所选目录。请联系支持获取帮助，或取消目录更改。"
+    "message": "SITMC Launcher 无法迁移到所选目录。请联系支持获取帮助，或取消目录更改。"
   },
   "app.error.directory-title": {
     "message": "无法更改应用目录"
@@ -1902,7 +1902,7 @@
     "message": "与 Microsoft、Xbox 或 Minecraft 服务的连接被拒绝。这些服务可能被 hosts 文件阻止，请参考支持文章进行修复。"
   },
   "app.error.loader-description": {
-    "message": "Axolotl Launcher 无法找到此实例所需的加载器版本。"
+    "message": "SITMC Launcher 无法找到此实例所需的加载器版本。"
   },
   "app.error.loader-fix": {
     "message": "请使用下方按钮修复此实例。"
@@ -1920,7 +1920,7 @@
     "message": "登录 Minecraft"
   },
   "app.error.network-description": {
-    "message": "Axolotl Launcher 连接 Microsoft 服务时遇到问题，这通常是网络连接不佳造成的。请重试；如果问题持续存在，请参考支持文章。"
+    "message": "SITMC Launcher 连接 Microsoft 服务时遇到问题，这通常是网络连接不佳造成的。请重试；如果问题持续存在，请参考支持文章。"
   },
   "app.error.network-issues": {
     "message": "网络问题"
@@ -1941,7 +1941,7 @@
     "message": "正在使用 PC Game Pass、从基岩版转来，或刚刚购买游戏？"
   },
   "app.error.permissions-description": {
-    "message": "Axolotl Launcher 无法写入所选目录。请调整目录权限后重试，或取消目录更改。"
+    "message": "SITMC Launcher 无法写入所选目录。请调整目录权限后重试，或取消目录更改。"
   },
   "app.error.permissions-title": {
     "message": "更改目录权限"
@@ -1959,19 +1959,19 @@
     "message": "空间不足"
   },
   "app.error.state-database-newer-description": {
-    "message": "数据库最后一次是被较新版本的 Axolotl 打开的，它将其升级为当前版本无法读取的格式。你的实例与设置仍然保留。"
+    "message": "数据库最后一次是被较新版本的 SITMC 打开的，它将其升级为当前版本无法读取的格式。你的实例与设置仍然保留。"
   },
   "app.error.state-database-newer-fix-downgrade": {
-    "message": "如果你只是在试用构建、并非日常使用启动器，可以改用 scripts/axolotl/downgrade-app-db.mjs 将数据库回退。"
+    "message": "如果你只是在试用构建、并非日常使用启动器，可以改用 downgrade-app-db.mjs 将数据库回退。"
   },
   "app.error.state-database-newer-fix-intro": {
     "message": "要让启动器重新启动，可以任选其一："
   },
   "app.error.state-database-newer-fix-update": {
-    "message": "重新安装较新版本的 Axolotl——它可以直接打开这个数据库。"
+    "message": "重新安装较新版本的 SITMC——它可以直接打开这个数据库。"
   },
   "app.error.state-description": {
-    "message": "Axolotl Launcher 未能正确加载，可能有文件损坏或缺少必要文件。"
+    "message": "SITMC Launcher 未能正确加载，可能有文件损坏或缺少必要文件。"
   },
   "app.error.state-fix-internet": {
     "message": "检查网络连接，然后重启应用。"
@@ -1983,7 +1983,7 @@
     "message": "重新下载并安装应用。"
   },
   "app.error.state-title": {
-    "message": "Axolotl Launcher 初始化失败"
+    "message": "SITMC Launcher 初始化失败"
   },
   "app.error.support-article": {
     "message": "支持文章"
@@ -3873,7 +3873,7 @@
     "message": "红石"
   },
   "app.lab.recipe-generator.copyright.disclaimer-body": {
-    "message": "Minecraft 素材版权归 Mojang Studios / Microsoft 所有，仅用于识别兼容的游戏内容。Axolotl Launcher 与 Mojang Studios 或 Microsoft 无关联，也未获得其认可。"
+    "message": "Minecraft 素材版权归 Mojang Studios / Microsoft 所有，仅用于识别兼容的游戏内容。SITMC Launcher 与 Mojang Studios 或 Microsoft 无关联，也未获得其认可。"
   },
   "app.lab.recipe-generator.copyright.disclaimer-heading": {
     "message": "非官方工具"
@@ -4851,13 +4851,13 @@
     "message": "复制 /tp"
   },
   "app.lab.seed-map.copyright.disclaimer-body": {
-    "message": "Minecraft 是 Mojang Synergies AB 的商标。Axolotl Launcher 与 Mojang 或 MinecraftSearch 均无隶属关系，也未获得其认可。"
+    "message": "Minecraft 是 Mojang Synergies AB 的商标。SITMC Launcher 与 Mojang 或 MinecraftSearch 均无隶属关系，也未获得其认可。"
   },
   "app.lab.seed-map.copyright.disclaimer-heading": {
     "message": "非官方工具"
   },
   "app.lab.seed-map.copyright.engine-body": {
-    "message": "群系、地形、出生点与结构数据由 cubiomes 和 Axolotl 原生集成在本地生成。cubiomes 版权所有 (c) 2020 Cubitect，并依据 MIT 许可证提供。"
+    "message": "群系、地形、出生点与结构数据由 cubiomes 和 SITMC 原生集成在本地生成。cubiomes 版权所有 (c) 2020 Cubitect，并依据 MIT 许可证提供。"
   },
   "app.lab.seed-map.copyright.engine-heading": {
     "message": "本地地图引擎"
@@ -6162,10 +6162,10 @@
     "message": "浏览时直接翻译 Modrinth 项目的标题、摘要和介绍。保留原文、双语同屏，或者让译文站 C 位，都由你决定。"
   },
   "app.onboarding.translation.title": {
-    "message": "翻译，是 Axolotl 的拿手活"
+    "message": "翻译，是 SITMC 的拿手活"
   },
   "app.onboarding.updates.description": {
-    "message": "决定 Axolotl 何时检查更新，以及是否替你安装。"
+    "message": "决定 SITMC 何时检查更新，以及是否替你安装。"
   },
   "app.onboarding.updates.title": {
     "message": "保持在线"
@@ -6192,7 +6192,7 @@
     "message": "Discord 运行时显示你当前使用启动器或游玩的状态。"
   },
   "app.privacy-consent.intro": {
-    "message": "选择 Axolotl 可以发送或展示的内容。确认前不会发送任何遥测。"
+    "message": "选择 SITMC 可以发送或展示的内容。确认前不会发送任何遥测。"
   },
   "app.privacy-consent.privacy-policy": {
     "message": "阅读隐私政策"
@@ -6951,7 +6951,7 @@
     "message": "安装完成"
   },
   "app.servers.modpack.unsupported-loader-description": {
-    "message": "此整合包使用 {loader}，但 Axolotl 目前仅支持原版、Fabric 和 Quilt 整合包服务端。{loader} 支持即将推出。"
+    "message": "此整合包使用 {loader}，但 SITMC 目前仅支持原版、Fabric 和 Quilt 整合包服务端。{loader} 支持即将推出。"
   },
   "app.servers.modpack.unsupported-loader-title": {
     "message": "{loader} 服务端暂不支持"
@@ -6963,7 +6963,7 @@
     "message": "支持项目持续开发"
   },
   "app.settings.about.attribution": {
-    "message": "Axolotl Launcher 是开源项目 Modrinth 代码库的修改版本。"
+    "message": "SITMC Launcher 是开源项目 Modrinth 代码库的修改版本。"
   },
   "app.settings.about.community-support": {
     "message": "项目与社区"
@@ -6996,7 +6996,7 @@
     "message": "许可证与来源声明"
   },
   "app.settings.about.not-affiliated": {
-    "message": "Modrinth 是 Rinth, Inc. 的商标。Axolotl Launcher 与 Rinth, Inc. 无关联，亦未获得其认可。"
+    "message": "Modrinth 是 Rinth, Inc. 的商标。SITMC Launcher 与 Rinth, Inc. 无关联，亦未获得其认可。"
   },
   "app.settings.about.original-source": {
     "message": "Modrinth 原始源代码"
@@ -7035,7 +7035,7 @@
     "message": "调查问卷"
   },
   "app.settings.about.survey-description": {
-    "message": "帮助我们改进 Axolotl Launcher"
+    "message": "帮助我们改进 SITMC Launcher"
   },
   "app.settings.about.test-error": {
     "message": "触发测试错误"
@@ -7371,13 +7371,13 @@
     "message": "应用缓存"
   },
   "app.settings.resources.app-cache-description": {
-    "message": "Axolotl Launcher 会缓存数据以加快加载速度。清除缓存会强制应用重新加载数据，并可能暂时降低速度。"
+    "message": "SITMC Launcher 会缓存数据以加快加载速度。清除缓存会强制应用重新加载数据，并可能暂时降低速度。"
   },
   "app.settings.resources.app-directory": {
     "message": "应用目录"
   },
   "app.settings.resources.axolotl-data-directory": {
-    "message": "Axolotl 数据目录"
+    "message": "SITMC 数据目录"
   },
   "app.settings.resources.app-directory-description": {
     "message": "启动器用于存储全部游戏文件的目录。更改将在重启启动器后生效。"
@@ -7389,7 +7389,7 @@
     "message": "Minecraft 目录"
   },
   "app.settings.resources.minecraft-directories-description": {
-    "message": "添加一个或多个供实例使用的外部 .minecraft 文件夹。这些文件夹与 Axolotl 数据分开保存。"
+    "message": "添加一个或多个供实例使用的外部 .minecraft 文件夹。这些文件夹与 SITMC 数据分开保存。"
   },
   "app.settings.resources.minecraft-directory-mode": {
     "message": "游戏目录模式"
@@ -7890,7 +7890,7 @@
     "message": "将 Release 数据复制到 Beta？"
   },
   "app.settings.updates.channel.description": {
-    "message": "选择 Axolotl 接收的启动器版本。"
+    "message": "选择 SITMC 接收的启动器版本。"
   },
   "app.settings.updates.channel.label": {
     "message": "通道"
@@ -7902,7 +7902,7 @@
     "message": "稳定且经过测试的新功能与修复，更新频率较慢。"
   },
   "app.settings.updates.channel.restart-description": {
-    "message": "立即重启 Axolotl 以开始使用新的更新通道，或稍后手动重启。"
+    "message": "立即重启 SITMC 以开始使用新的更新通道，或稍后手动重启。"
   },
   "app.settings.updates.channel.restart-development-description": {
     "message": "手动重启开发会话后，新的更新通道才会生效。"
@@ -7941,7 +7941,7 @@
     "message": "数据库隔离"
   },
   "app.settings.updates.database-operation.active-target": {
-    "message": "无法覆盖当前正在使用的数据库。请先重启 Axolotl 并切换更新通道。"
+    "message": "无法覆盖当前正在使用的数据库。请先重启 SITMC 并切换更新通道。"
   },
   "app.settings.updates.database-operation.beta-to-release": {
     "message": "从 Beta 复制到 Release"
@@ -7959,7 +7959,7 @@
     "message": "覆盖数据库？"
   },
   "app.settings.updates.database-operation.failed": {
-    "message": "无法复制数据库。请确认 Axolotl 未在使用目标数据库。"
+    "message": "无法复制数据库。请确认 SITMC 未在使用目标数据库。"
   },
   "app.settings.updates.database-operation.label": {
     "message": "数据库操作"
@@ -8031,7 +8031,7 @@
     "message": "更新渠道"
   },
   "app.settings.updates.up-to-date": {
-    "message": "Axolotl 已是最新版本。"
+    "message": "SITMC 已是最新版本。"
   },
   "app.skins.add-button": {
     "message": "添加皮肤"
@@ -8100,7 +8100,7 @@
     "message": "填写问卷"
   },
   "app.survey-promotion.intro": {
-    "message": "为了更好地改进 Axolotl Launcher，我们准备了一份简短的调查问卷，期待听到你的反馈。"
+    "message": "为了更好地改进 SITMC Launcher，我们准备了一份简短的调查问卷，期待听到你的反馈。"
   },
   "app.survey-promotion.reward": {
     "message": "我们将从填写问卷的用户中抽取幸运用户，赠送 Minecraft 正版账号（可折现）。"
@@ -8310,16 +8310,16 @@
     "message": "此版本暂未内置更新公告，请前往官网查看完整更新日志。"
   },
   "app.update-announcement.unknown-title": {
-    "message": "Axolotl Launcher 已更新"
+    "message": "SITMC Launcher 已更新"
   },
   "app.update-announcement.version": {
     "message": "版本 {version}"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Axolotl Launcher v{version} 更新已下载完成！立即重启更新，或退出时自动安装。"
+    "message": "SITMC Launcher v{version} 更新已下载完成！立即重启更新，或退出时自动安装。"
   },
   "app.update-popup.body.metered": {
-    "message": "Axolotl Launcher v{version} 现已发布！由于你正在使用按流量计费的网络，该更新未自动下载。"
+    "message": "SITMC Launcher v{version} 现已发布！由于你正在使用按流量计费的网络，该更新未自动下载。"
   },
   "app.update-popup.changelog": {
     "message": "更新日志"
@@ -8349,7 +8349,7 @@
     "message": "正在安装版本 {version}"
   },
   "app.warning.running-as-admin": {
-    "message": "Axolotl 正在以管理员身份运行。此模式下无法拖拽导入文件，请以普通权限重新启动启动器。"
+    "message": "SITMC 正在以管理员身份运行。此模式下无法拖拽导入文件，请以普通权限重新启动启动器。"
   },
   "app.world-editor.allow-commands.label": {
     "message": "允许作弊"
@@ -8805,7 +8805,7 @@
     "message": "光影包"
   },
   "drop.help.title": {
-    "message": "我可以拖入什么到 Axolotl？"
+    "message": "我可以拖入什么到 SITMC？"
   },
   "drop.help.worlds-desc": {
     "message": "拖放存档文件夹来导入到实例。"
@@ -9270,7 +9270,7 @@
     "message": "切换隔离仅更新启动器路径。请自行移动模组、存档和配置文件夹以保持一致。"
   },
   "instance.settings.tabs.general.game-dir.managed-note": {
-    "message": "此实例使用 Axolotl 托管目录。"
+    "message": "此实例使用 SITMC 托管目录。"
   },
   "instance.settings.tabs.general.game-dir.external-note": {
     "message": "此实例使用外部 .minecraft 目录，文件会直接在原位置管理。"
@@ -9828,7 +9828,7 @@
     "message": "{count} 个精确选择"
   },
   "instance.upgrade.customize.custom.description": {
-    "message": "为所选内容固定精确版本，其余依赖图由 Axolotl 求解。"
+    "message": "为所选内容固定精确版本，其余依赖图由 SITMC 求解。"
   },
   "instance.upgrade.customize.custom.discard-switch": {
     "message": "放弃并切换"
@@ -9933,7 +9933,7 @@
     "message": "继续前请处理自定义冲突。"
   },
   "instance.upgrade.customize.search-limit.body": {
-    "message": "Axolotl 未能在搜索上限内找到方案。请放宽一项自定义选择。"
+    "message": "SITMC 未能在搜索上限内找到方案。请放宽一项自定义选择。"
   },
   "instance.upgrade.customize.search-limit.title": {
     "message": "已达到搜索上限"
@@ -12429,13 +12429,13 @@
     "message": "皮肤排序失败"
   },
   "app.skins.sign-in.axolotl-alt": {
-    "message": "Axolotl 启动器"
+    "message": "SITMC 启动器"
   },
   "app.skins.sign-in.button": {
     "message": "登录"
   },
   "app.skins.sign-in.description": {
-    "message": "请登录你的 Minecraft 账户以使用 Axolotl 启动器的皮肤管理功能。"
+    "message": "请登录你的 Minecraft 账户以使用 SITMC 启动器的皮肤管理功能。"
   },
   "app.skins.sign-in.title": {
     "message": "请先登录"

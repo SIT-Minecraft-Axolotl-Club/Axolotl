@@ -116,7 +116,7 @@ const messages = defineMessages({
 	},
 	axolotlAlt: {
 		id: 'app.skins.sign-in.axolotl-alt',
-		defaultMessage: 'Axolotl Launcher',
+		defaultMessage: 'SITMC Launcher',
 	},
 	signInTitle: {
 		id: 'app.skins.sign-in.title',
@@ -125,7 +125,7 @@ const messages = defineMessages({
 	signInDescription: {
 		id: 'app.skins.sign-in.description',
 		defaultMessage:
-			'Please sign into your Minecraft account to use the skin management features of Axolotl Launcher.',
+			'Please sign into your Minecraft account to use the skin management features of SITMC Launcher.',
 	},
 	signInButton: {
 		id: 'app.skins.sign-in.button',

@@ -28,6 +28,39 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-2.2.0',
+		version: '2.2.0',
+		publishedAt: '2026-10-23',
+		title: {
+			'en-US': 'SITMC Launcher 2.2.0',
+			'zh-CN': 'SITMC 启动器 2.2.0',
+		},
+		changes: {
+			changed: [
+				{
+					'en-US':
+						'The launcher is now SITMC Launcher, published by the SIT-Minecraft society: the name, icon, start-up logo and about page all carry the society brand, and the project links point at sitmc.club.',
+					'zh-CN':
+						'启动器已更名为 SITMC 启动器，由上海应用技术大学Minecraft社发布：名称、图标、启动画面与关于页都换成了社团品牌，项目链接指向 sitmc.club。',
+				},
+				{
+					'en-US':
+						"The first start after updating moves your existing instances, settings and accounts to the launcher's new data folder automatically, and removes the previous launcher once the data is safe. Nothing needs to be reinstalled by hand.",
+					'zh-CN':
+						'更新后首次启动会自动把现有的实例、设置与账号迁移到新的数据目录；数据搬运完成后会自动卸载旧版启动器，不需要手动重装。',
+				},
+			],
+			removed: [
+				{
+					'en-US':
+						'The launcher no longer registers itself to open .mrpack files, so double-clicking a modpack no longer starts it. Drag a pack onto the launcher or install it from inside instead.',
+					'zh-CN':
+						'启动器不再自动关联 .mrpack 文件，双击整合包不会再启动它。需要安装时请把整合包拖进启动器，或在启动器内选择安装。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-2.1.1',
 		version: '2.1.1',
 		publishedAt: '2026-10-22',

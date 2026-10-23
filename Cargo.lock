@@ -6924,6 +6924,7 @@ dependencies = [
  "chrono",
  "daedalus",
  "dashmap",
+ "dirs",
  "either",
  "enumset",
  "flate2",

@@ -445,7 +445,7 @@ const messages = defineMessages({
 	},
 	copyDesc: {
 		id: 'drop.symlink_method.copy_desc',
-		defaultMessage: 'Copy to Axolotl directory',
+		defaultMessage: 'Copy to SITMC directory',
 	},
 	symlinkTitle: {
 		id: 'drop.symlink_method.symlink_title',
@@ -526,7 +526,7 @@ const messages = defineMessages({
 	},
 	statsCacheTooltip: {
 		id: 'drop.symlink_method.stats_cache_tooltip',
-		defaultMessage: 'Axolotl cache',
+		defaultMessage: 'SITMC cache',
 	},
 	statsLocal: {
 		id: 'drop.symlink_method.stats_local',

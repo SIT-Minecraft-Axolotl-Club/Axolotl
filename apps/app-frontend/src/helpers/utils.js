@@ -62,7 +62,7 @@ export async function showLauncherLogsFolder() {
 
 export async function exportErrorLogs(
 	errorMessage,
-	fileNamePrefix = 'Axolotl Launcher error logs',
+	fileNamePrefix = 'SITMC Launcher error logs',
 ) {
 	const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
 	const outputPath = await save({
@@ -86,7 +86,7 @@ export async function exportLauncherLogs({
 	includeSystemInfo = true,
 	includeInstanceLogs = false,
 	includeCrashAnalysis = false,
-	fileNamePrefix = 'Axolotl Launcher logs',
+	fileNamePrefix = 'SITMC Launcher logs',
 } = {}) {
 	const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
 	const outputPath = await save({

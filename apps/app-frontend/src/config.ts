@@ -1,21 +1,26 @@
 const trimTrailingSlash = (url: string) => url.replace(/\/$/, '')
 
 export const AxolotlBrandConfig = Object.freeze({
-	productName: 'Axolotl Launcher',
-	shortProductName: 'Axolotl',
+	productName: 'SITMC Launcher',
+	shortProductName: 'SITMC',
+	societyName: '上海应用技术大学Minecraft社',
 	website: 'https://www.sitmc.club/',
 	repositoryUrl: 'https://github.com/SIT-Minecraft-Axolotl-Club/Axolotl',
 	// The AGPL LICENSE text only exists upstream; the society fork carries COPYING.md
 	// and the third-party attributions that the About page links to as well.
 	upstreamRepositoryUrl: 'https://github.com/Mystic-Stars/Axolotl',
-	supportUrl: 'https://qm.qq.com/q/rCtTVlDhEk',
-	qqGroupNumber: '',
+	supportUrl: 'https://qm.qq.com/q/YTb3tqvyYE',
+	qqGroupNumber: '623697015',
 	qqChannelUrl: '',
 	sponsorUrl: '',
 	surveyUrl: '',
+	// The bundle identifier is deliberately unchanged by the rename: Windows keys
+	// the installed app, its data directory and the updater on it, so changing it
+	// would orphan every existing installation instead of updating it.
 	bundleIdentifier: 'red.ghs.axolotl',
+	// Same reason: an existing install already registered this deep-link scheme.
 	deepLinkScheme: 'axolotl',
-	userAgent: (version: string, os: string) => `garbage-human-studio/axolotl/${version} (${os})`,
+	userAgent: (version: string, os: string) => `sitmc-launcher/${version} (${os})`,
 	capabilities: Object.freeze({
 		publicModrinthApi: true,
 		privateModrinthServices: false,

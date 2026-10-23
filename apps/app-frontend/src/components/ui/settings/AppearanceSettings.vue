@@ -72,7 +72,7 @@ const messages = defineMessages({
 	},
 	colorThemeDescription: {
 		id: 'app.appearance-settings.color-theme.description',
-		defaultMessage: 'Select your preferred color theme for Axolotl Launcher.',
+		defaultMessage: 'Select your preferred color theme for SITMC Launcher.',
 	},
 	accentColorTitle: {
 		id: 'app.appearance-settings.accent-color.title',
@@ -249,7 +249,7 @@ const messages = defineMessages({
 	},
 	closeBehaviorTitle: {
 		id: 'app.appearance-settings.close-behavior.title',
-		defaultMessage: 'Choose how to close Axolotl Launcher',
+		defaultMessage: 'Choose how to close SITMC Launcher',
 	},
 	closeBehaviorDescription: {
 		id: 'app.appearance-settings.close-behavior.description',

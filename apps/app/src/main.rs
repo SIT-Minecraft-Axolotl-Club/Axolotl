@@ -21,6 +21,7 @@ use theseus::prelude::*;
 
 mod api;
 mod error;
+mod legacy;
 mod lightweight_mode;
 mod mod_translation;
 mod portable;
@@ -194,6 +195,22 @@ fn is_skin_editor_referer(
     // Top-level iframe navigation initiated by the launcher, whose route
     // path (e.g. `/` or `/lab/skin-editor`) is never `/index.html`.
     true
+}
+
+/// Whether a data directory from the launcher this build was forked from is
+/// still waiting to be moved. The boot screen asks once, before it initializes
+/// the state that would read that data.
+#[tauri::command]
+fn legacy_migration_pending() -> bool {
+    legacy::migration_pending()
+}
+
+/// Moves that data across before the state is initialized.
+#[tauri::command]
+async fn legacy_migrate() -> Result<(), String> {
+    tauri::async_runtime::spawn_blocking(legacy::migrate)
+        .await
+        .map_err(|error| error.to_string())?
 }
 
 // Should be called in launcher initialization
@@ -882,6 +899,8 @@ fn main() {
         .manage(PendingUpdateData::default())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
+            legacy_migration_pending,
+            legacy_migrate,
             get_update_channel,
             get_current_app_database_path,
             set_update_channel,

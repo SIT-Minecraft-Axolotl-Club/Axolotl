@@ -78,10 +78,10 @@ let userAgentPromise: Promise<string> | null = null
 function launcherUserAgent(): Promise<string> {
 	userAgentPromise ??= Promise.all([getVersion(), osType()]).then(
 		([version, platform]) =>
-			`garbage-human-studio/axolotl/${version} (${platform}; +https://www.ghs.red)`,
+			`sitmc-launcher/${version} (${platform}; +https://www.sitmc.club)`,
 	)
 	userAgentPromise = userAgentPromise.catch(
-		() => 'garbage-human-studio/axolotl (+https://www.ghs.red)',
+		() => 'sitmc-launcher (+https://www.sitmc.club)',
 	)
 	return userAgentPromise
 }

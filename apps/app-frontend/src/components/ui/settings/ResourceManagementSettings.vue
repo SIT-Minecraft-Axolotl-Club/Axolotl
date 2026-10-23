@@ -118,7 +118,7 @@ const messages = defineMessages({
 	appDirectory: { id: 'app.settings.resources.app-directory', defaultMessage: 'App directory' },
 	axolotlDataDirectory: {
 		id: 'app.settings.resources.axolotl-data-directory',
-		defaultMessage: 'Axolotl data directory',
+		defaultMessage: 'SITMC data directory',
 	},
 	appDirectoryDescription: {
 		id: 'app.settings.resources.app-directory-description',
@@ -181,7 +181,7 @@ const messages = defineMessages({
 	appCacheDescription: {
 		id: 'app.settings.resources.app-cache-description',
 		defaultMessage:
-			'Axolotl Launcher caches data to speed up loading. Purging it forces the app to reload data and may temporarily slow the app down.',
+			'SITMC Launcher caches data to speed up loading. Purging it forces the app to reload data and may temporarily slow the app down.',
 	},
 	downloadMirrors: {
 		id: 'app.settings.resources.download-mirrors',

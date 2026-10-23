@@ -50,13 +50,13 @@ const messages = defineMessages({
 	loaderTitle: { id: 'app.error.loader-title', defaultMessage: 'No loader selected' },
 	stateTitle: {
 		id: 'app.error.state-title',
-		defaultMessage: 'Error initializing Axolotl Launcher',
+		defaultMessage: 'Error initializing SITMC Launcher',
 	},
 	networkIssues: { id: 'app.error.network-issues', defaultMessage: 'Network issues' },
 	networkDescription: {
 		id: 'app.error.network-description',
 		defaultMessage:
-			'Axolotl Launcher had trouble connecting to Microsoft services. This is often caused by a poor connection. Try again, and use our support article if the issue persists.',
+			'SITMC Launcher had trouble connecting to Microsoft services. This is often caused by a poor connection. Try again, and use our support article if the issue persists.',
 	},
 	hostsDescription: {
 		id: 'app.error.hosts-description',
@@ -113,7 +113,7 @@ const messages = defineMessages({
 	permissionsDescription: {
 		id: 'app.error.permissions-description',
 		defaultMessage:
-			'Axolotl Launcher cannot write to the selected directory. Adjust its permissions and try again, or cancel the directory change.',
+			'SITMC Launcher cannot write to the selected directory. Adjust its permissions and try again, or cancel the directory change.',
 	},
 	spaceTitle: { id: 'app.error.space-title', defaultMessage: 'Not enough space' },
 	spaceDescription: {
@@ -124,7 +124,7 @@ const messages = defineMessages({
 	directoryDescription: {
 		id: 'app.error.directory-description',
 		defaultMessage:
-			'Axolotl Launcher cannot migrate to the selected directory. Contact support for help or cancel the directory change.',
+			'SITMC Launcher cannot migrate to the selected directory. Contact support for help or cancel the directory change.',
 	},
 	retryDirectory: {
 		id: 'app.error.retry-directory',
@@ -142,7 +142,7 @@ const messages = defineMessages({
 	stateDescription: {
 		id: 'app.error.state-description',
 		defaultMessage:
-			'Axolotl Launcher failed to load correctly. A file may be corrupted or an essential file may be missing.',
+			'SITMC Launcher failed to load correctly. A file may be corrupted or an essential file may be missing.',
 	},
 	stateFixIntro: {
 		id: 'app.error.state-fix-intro',
@@ -176,7 +176,7 @@ const messages = defineMessages({
 	},
 	loaderDescription: {
 		id: 'app.error.loader-description',
-		defaultMessage: 'Axolotl Launcher could not find a loader version for this instance.',
+		defaultMessage: 'SITMC Launcher could not find a loader version for this instance.',
 	},
 	loaderFix: {
 		id: 'app.error.loader-fix',

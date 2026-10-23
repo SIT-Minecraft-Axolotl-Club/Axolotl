@@ -381,7 +381,7 @@ const messages = defineMessages({
 	},
 	gameDirManagedNote: {
 		id: 'instance.settings.tabs.general.game-dir.managed-note',
-		defaultMessage: 'This instance uses the Axolotl-managed folder.',
+		defaultMessage: 'This instance uses the SITMC-managed folder.',
 	},
 	gameDirExternalNote: {
 		id: 'instance.settings.tabs.general.game-dir.external-note',

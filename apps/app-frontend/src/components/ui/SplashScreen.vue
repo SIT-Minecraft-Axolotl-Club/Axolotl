@@ -5,7 +5,7 @@
 				class="absolute h-screen w-full flex flex-col justify-center items-center gap-4 z-[9998]"
 				data-tauri-drag-region
 			>
-				<img class="app-logo" src="@/assets/axolotl.png" alt="Axolotl Launcher" />
+				<img class="app-logo" src="@/assets/axolotl.png" alt="SITMC Launcher" />
 				<ProgressBar class="max-w-xs" :progress="Math.min(loadingProgress, 100)" />
 				<span v-if="message">{{ message }}</span>
 			</div>
@@ -104,8 +104,8 @@ loading_listener(async (e) => {
 }
 
 .app-logo {
-	height: min(18rem, 45vh);
-	width: min(18rem, 45vw);
+	height: min(11rem, 30vh);
+	width: min(11rem, 30vw);
 	object-fit: contain;
 }
 

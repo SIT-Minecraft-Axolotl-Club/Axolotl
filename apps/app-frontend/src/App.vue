@@ -118,6 +118,7 @@ import {
 } from '@/helpers/events.js'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
 import { type DirectLinkSyncReport, get as getInstance, run } from '@/helpers/instance'
+import { legacyMigrationPending, runLegacyMigration } from '@/helpers/legacy-migration'
 import { reconcileMojangAuthSourceAtStartup } from '@/helpers/mojang-auth'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { getNavShortcutEnabled } from '@/helpers/nav-shortcut-state'
@@ -270,7 +271,23 @@ provideModalBehavior({
 	noblur: computed(() => !themeStore.advancedRendering),
 })
 
-const stateInitialization = initialize_state()
+/**
+ * Moves an installation from the pre-rename data directory before the state
+ * database is opened.
+ *
+ * Both directories live under the same application data root, so this is a
+ * rename and finishes immediately; the splash is already up, so nothing is shown
+ * for it. A failure is surfaced as an initialization error rather than swallowed:
+ * starting with an empty launcher while the old data still exists would look
+ * like the player lost everything.
+ */
+async function migrateLegacyData(): Promise<void> {
+	const pending = await legacyMigrationPending().catch(() => false)
+	if (!pending) return
+	await runLegacyMigration()
+}
+
+const stateInitialization = migrateLegacyData().then(() => initialize_state())
 const {
 	instanceIconPickerModal,
 	installationModal,
@@ -923,7 +940,7 @@ const messages = defineMessages({
 	runningAsAdmin: {
 		id: 'app.warning.running-as-admin',
 		defaultMessage:
-			'Axolotl is running as administrator. Drag-and-drop file import is disabled in this mode; please restart the launcher without administrator privileges.',
+			'SITMC is running as administrator. Drag-and-drop file import is disabled in this mode; please restart the launcher without administrator privileges.',
 	},
 	restarting: {
 		id: 'app.restarting',
@@ -931,7 +948,7 @@ const messages = defineMessages({
 	},
 	closeLauncherTitle: {
 		id: 'app.close-launcher.title',
-		defaultMessage: 'Choose how to close Axolotl Launcher',
+		defaultMessage: 'Choose how to close SITMC Launcher',
 	},
 	closeLauncherDirect: {
 		id: 'app.close-launcher.direct',
@@ -2295,11 +2312,11 @@ const updatePopupMessages = defineMessages({
 	},
 	meteredBody: {
 		id: 'app.update-popup.body.metered',
-		defaultMessage: `Axolotl Launcher v{version} is available now! Since you're on a metered network, we didn't automatically download it.`,
+		defaultMessage: `SITMC Launcher v{version} is available now! Since you're on a metered network, we didn't automatically download it.`,
 	},
 	downloadedBody: {
 		id: 'app.update-popup.body.download-complete',
-		defaultMessage: `Axolotl Launcher v{version} has finished downloading. Reload to update now, or automatically when you close Axolotl Launcher.`,
+		defaultMessage: `SITMC Launcher v{version} has finished downloading. Reload to update now, or automatically when you close SITMC Launcher.`,
 	},
 	reload: {
 		id: 'app.update-popup.reload',
@@ -2638,6 +2655,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 
 <template>
 	<SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
+
 	<!--
 		A failed initialization never renders the app shell, so this framed window
 		ends up with no title bar and no controls at all. This strip keeps the
