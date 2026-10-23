@@ -8001,7 +8001,7 @@
     "message": "最新更新可用后立即获取"
   },
   "app.settings.updates.immediate-fetch-description": {
-    "message": "在推出最新的稳定更改、修复后，成为第一批获得这些更新的用户。"
+    "message": "新版本发布后立即提供；关闭后会先等待一天再推送。"
   },
   "app.settings.updates.immediate-fetch.beta-description": {
     "message": "Beta 更新始终立即可用。"

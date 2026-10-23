@@ -180,7 +180,7 @@ const messages = defineMessages({
 	immediateFetchDescription: {
 		id: 'app.settings.updates.immediate-fetch-description',
 		defaultMessage:
-			'After the latest stable changes and fixes are released, be among the first to receive them.',
+			'Releases are offered as soon as they are published. Turn this off to wait a day before a release is offered.',
 	},
 	pause: {
 		id: 'app.settings.updates.pause',

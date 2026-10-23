@@ -31,6 +31,7 @@
 ; --------------------------------------------------------------------------------
 
 Var /GLOBAL OldInstallDir
+Var /GLOBAL RenameUpgrade
 
 !macro NSIS_HOOK_PREINSTALL
     ; The updater is normally launched silently by the Tauri updater plugin.
@@ -82,11 +83,49 @@ Var /GLOBAL OldInstallDir
 !macroend
 
 !macro NSIS_HOOK_POSTINSTALL
+    ; Keep an existing desktop shortcut pointing at this installation.
     !insertmacro IsShortcutTarget "$DESKTOP\${PRODUCTNAME}.lnk" "$OldInstallDir\${MAINBINARYNAME}.exe"
     Pop $0
     ${If} $0 = 1
         !insertmacro SetShortcutTarget "$DESKTOP\${PRODUCTNAME}.lnk" "$INSTDIR\${MAINBINARYNAME}.exe"
-        Return
+    ${EndIf}
+
+    ; Shortcuts are only created for the rename upgrade. The updater runs the
+    ; installer with /UPDATE, which makes the stock template skip shortcuts
+    ; entirely, so the launcher's new name would never get one. Ordinary
+    ; installs and updates keep the stock behaviour, and a shortcut the player
+    ; deleted is not recreated.
+    StrCpy $RenameUpgrade 0
+    ReadRegStr $1 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Axolotl Launcher" "UninstallString"
+    ${If} $1 != ""
+        StrCpy $RenameUpgrade 1
+    ${Else}
+        ReadRegStr $1 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Axolotl Launcher" "UninstallString"
+        ${If} $1 != ""
+            StrCpy $RenameUpgrade 1
+        ${EndIf}
+    ${EndIf}
+
+    ; The old launcher may already be gone because the data move finished first.
+    ${If} $RenameUpgrade = 0
+    ${AndIf} ${FileExists} "$APPDATA\club.sitmc.launcher\.legacy-migration-complete"
+        StrCpy $RenameUpgrade 1
+    ${EndIf}
+
+    ${If} $RenameUpgrade = 1
+        ${If} $NoShortcutMode = 0
+            ${IfNot} ${FileExists} "$SMPROGRAMS\${PRODUCTNAME}.lnk"
+                CreateShortcut "$SMPROGRAMS\${PRODUCTNAME}.lnk" "$INSTDIR\${MAINBINARYNAME}.exe"
+                !insertmacro SetLnkAppUserModelId "$SMPROGRAMS\${PRODUCTNAME}.lnk"
+            ${EndIf}
+        ${EndIf}
+
+        ${If} $NoDesktopShortcutMode = 0
+            ${IfNot} ${FileExists} "$DESKTOP\${PRODUCTNAME}.lnk"
+                CreateShortcut "$DESKTOP\${PRODUCTNAME}.lnk" "$INSTDIR\${MAINBINARYNAME}.exe"
+                !insertmacro SetLnkAppUserModelId "$DESKTOP\${PRODUCTNAME}.lnk"
+            ${EndIf}
+        ${EndIf}
     ${EndIf}
 !macroend
 

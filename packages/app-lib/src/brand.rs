@@ -1,14 +1,21 @@
-pub const PRODUCT_NAME: &str = "Axolotl Launcher";
-pub const SHORT_PRODUCT_NAME: &str = "Axolotl";
-pub const WEBSITE: &str = "https://www.ghs.red";
-pub const BUNDLE_IDENTIFIER: &str = "red.ghs.axolotl";
+pub const PRODUCT_NAME: &str = "SITMC Launcher";
+pub const SHORT_PRODUCT_NAME: &str = "SITMC";
+pub const WEBSITE: &str = "https://www.sitmc.club/";
+pub const BUNDLE_IDENTIFIER: &str = "club.sitmc.launcher";
 pub const DEEP_LINK_SCHEME: &str = "axolotl";
+
+/// Identifier earlier builds stored the launcher's data under.
+///
+/// It keys the data directory, so a settings row written before the rename still
+/// names a path below this directory. `DirectoryInfo::init` maps such a path onto
+/// the current directory instead of recreating the old one.
+pub const LEGACY_BUNDLE_IDENTIFIER: &str = "red.ghs.axolotl";
 
 /// Longest accepted data directory suffix; enough to name a branch or a build.
 const MAX_DATA_DIR_SUFFIX_LEN: usize = 32;
 
 pub fn user_agent(version: &str, os: &str) -> String {
-    format!("garbage-human-studio/axolotl/{version} ({os})")
+    format!("sitmc-launcher/{version} ({os})")
 }
 
 /// Name of the directory the launcher keeps its settings, databases and logs in.
@@ -64,8 +71,8 @@ mod tests {
     fn user_agent_is_unique_and_contains_no_contact_information() {
         let user_agent = user_agent("1.2.3", "windows");
 
-        assert_eq!(user_agent, "garbage-human-studio/axolotl/1.2.3 (windows)");
-        assert!(!user_agent.contains("ghs.red"));
+        assert_eq!(user_agent, "sitmc-launcher/1.2.3 (windows)");
+        assert!(!user_agent.contains("sitmc.club"));
         assert!(!user_agent.contains("http"));
         assert!(!user_agent.contains('@'));
     }

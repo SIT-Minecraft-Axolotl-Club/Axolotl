@@ -64,14 +64,37 @@ impl DirectoryInfo {
             ))
         })?;
 
-        let config_dir =
-            config_dir.map_or_else(|| settings_dir.clone(), PathBuf::from);
+        let config_dir = match config_dir {
+            Some(dir) => Self::remap_legacy_config_dir(&dir, &settings_dir),
+            None => settings_dir.clone(),
+        };
 
         Ok(Self {
             settings_dir,
             config_dir,
             app_identifier: app_identifier.to_owned(),
         })
+    }
+
+    /// Maps a data directory that names the pre-rename identifier directory
+    /// onto the current one.
+    ///
+    /// The launcher's data directory used to be `%APPDATA%\red.ghs.axolotl`. The
+    /// rename moved that directory, but the `custom_dir` setting still holds the
+    /// old absolute path, and honouring it would recreate the old folder and put
+    /// new instances and caches there — split from the data that was just moved.
+    fn remap_legacy_config_dir(config_dir: &str, settings_dir: &Path) -> PathBuf {
+        let path = PathBuf::from(config_dir);
+        let Some(data_root) = dirs::data_dir() else {
+            return path;
+        };
+        let legacy_root = data_root
+            .join(crate::brand::LEGACY_BUNDLE_IDENTIFIER);
+        let Ok(rest) = path.strip_prefix(&legacy_root) else {
+            return path;
+        };
+
+        settings_dir.join(rest)
     }
 
     /// Get the Minecraft instance metadata directory

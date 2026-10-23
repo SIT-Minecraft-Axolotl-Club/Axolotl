@@ -9531,7 +9531,7 @@
     "message": "Get updates as soon as they are available"
   },
   "app.settings.updates.immediate-fetch-description": {
-    "message": "After the latest stable changes and fixes are released, be among the first to receive them."
+    "message": "Releases are offered as soon as they are published. Turn this off to wait a day before a release is offered."
   },
   "app.settings.updates.immediate-fetch.beta-description": {
     "message": "Beta updates are always available immediately."

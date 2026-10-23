@@ -345,8 +345,10 @@ async fn get_update_preferences(
         _ => theseus::default_update_channel() == "beta",
     };
     Ok(UpdatePreferences {
+        // Releases fetch immediately by default too; the setting only exists so
+        // a release channel can opt back into a delayed rollout.
         immediate_update_fetch: is_beta
-            || state.immediate_update_fetch.unwrap_or(false),
+            || state.immediate_update_fetch.unwrap_or(true),
         updates_paused: state.updates_paused.unwrap_or(false),
     })
 }

@@ -28,6 +28,39 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-2.2.1',
+		version: '2.2.1',
+		publishedAt: '2026-10-23',
+		title: {
+			'en-US': 'SITMC Launcher 2.2.1',
+			'zh-CN': 'SITMC 启动器 2.2.1',
+		},
+		changes: {
+			changed: [
+				{
+					'en-US':
+						'Release updates are fetched as soon as they are published, the same as beta builds. Turn "Get updates as soon as they are available" off in Settings > Updates to wait a day first.',
+					'zh-CN':
+						'稳定版更新现在也会在发布后立即获取，与测试版一致。如果希望先等一天再收到更新，可以在「设置 → 更新」里关闭「发布后立即获取更新」。',
+				},
+			],
+			fixed: [
+				{
+					'en-US':
+						'Installing the renamed launcher left no shortcut on the desktop or in the Start menu: the update installer skips shortcut creation. A shortcut is now created when the launcher was carried over from the previous name, and a shortcut you deleted yourself stays deleted.',
+					'zh-CN':
+						'更换名称后的启动器安装完成后，桌面和开始菜单里没有快捷方式：更新所用的安装方式会跳过创建快捷方式。现在只要是从旧名称迁移过来的，就会补建缺少的快捷方式；你自己删掉的快捷方式不会被重新创建。',
+				},
+				{
+					'en-US':
+						'After the rename, new instances and caches were written back into the old launcher folder instead of the moved one, so they sat apart from the data that had just been carried over. They now follow the new folder.',
+					'zh-CN':
+						'更名后，新建的实例与缓存会被写回旧的启动器目录，而不是迁移后的新目录，导致它们和刚搬过去的数据分开。现在会统一写入新目录。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-2.2.0',
 		version: '2.2.0',
 		publishedAt: '2026-10-23',
