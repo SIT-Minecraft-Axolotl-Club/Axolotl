@@ -32,6 +32,8 @@
 
 Var /GLOBAL OldInstallDir
 Var /GLOBAL RenameUpgrade
+Var /GLOBAL HookNoShortcut
+Var /GLOBAL HookNoDesktopShortcut
 
 !macro NSIS_HOOK_PREINSTALL
     ; The updater is normally launched silently by the Tauri updater plugin.
@@ -95,6 +97,20 @@ Var /GLOBAL RenameUpgrade
     ; entirely, so the launcher's new name would never get one. Ordinary
     ; installs and updates keep the stock behaviour, and a shortcut the player
     ; deleted is not recreated.
+    ;
+    ; The opt-out flags are read from the command line here rather than from the
+    ; template's variables, which the bundled template does not define.
+    StrCpy $HookNoShortcut 0
+    StrCpy $HookNoDesktopShortcut 0
+    ${GetOptions} $CMDLINE "/NS" $0
+    ${IfNot} ${Errors}
+        StrCpy $HookNoShortcut 1
+    ${EndIf}
+    ${GetOptions} $CMDLINE "/NO_DESKTOP_SHORTCUT" $0
+    ${IfNot} ${Errors}
+        StrCpy $HookNoDesktopShortcut 1
+    ${EndIf}
+
     StrCpy $RenameUpgrade 0
     ReadRegStr $1 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Axolotl Launcher" "UninstallString"
     ${If} $1 != ""
@@ -113,14 +129,14 @@ Var /GLOBAL RenameUpgrade
     ${EndIf}
 
     ${If} $RenameUpgrade = 1
-        ${If} $NoShortcutMode = 0
+        ${If} $HookNoShortcut = 0
             ${IfNot} ${FileExists} "$SMPROGRAMS\${PRODUCTNAME}.lnk"
                 CreateShortcut "$SMPROGRAMS\${PRODUCTNAME}.lnk" "$INSTDIR\${MAINBINARYNAME}.exe"
                 !insertmacro SetLnkAppUserModelId "$SMPROGRAMS\${PRODUCTNAME}.lnk"
             ${EndIf}
         ${EndIf}
 
-        ${If} $NoDesktopShortcutMode = 0
+        ${If} $HookNoDesktopShortcut = 0
             ${IfNot} ${FileExists} "$DESKTOP\${PRODUCTNAME}.lnk"
                 CreateShortcut "$DESKTOP\${PRODUCTNAME}.lnk" "$INSTDIR\${MAINBINARYNAME}.exe"
                 !insertmacro SetLnkAppUserModelId "$DESKTOP\${PRODUCTNAME}.lnk"
